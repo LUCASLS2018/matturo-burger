@@ -1,0 +1,1348 @@
+{
+  "source": "https://matturoburger.com/products",
+  "categories": [
+    {
+      "id": "a1145c2c-6730-4479-a80f-cfca7f0a14cf",
+      "name": "PROMOÇOES",
+      "slug": "promocoes"
+    },
+    {
+      "id": "a1df8f58-b216-427d-8308-3d4c4c0eadf4",
+      "name": "Pizza",
+      "slug": "pizza"
+    },
+    {
+      "id": "a0e45564-e0c7-4097-aa9d-b7cefbf77d71",
+      "name": "HAMBURGUER",
+      "slug": "hamburguer"
+    },
+    {
+      "id": "9f9660fa-58cf-492d-a4e4-87b5d7e48baf",
+      "name": "Entradas",
+      "slug": "entradas"
+    },
+    {
+      "id": "9fe2c3ad-c27f-473c-8db5-34108c76c3f4",
+      "name": "Sobremesa",
+      "slug": "sobremesa"
+    },
+    {
+      "id": "a1f1b4cd-1fd5-4657-b524-519f00306a9c",
+      "name": "Bebidas",
+      "slug": "bebidas"
+    }
+  ],
+  "products": [
+    {
+      "id": "a28eb809-67a7-4254-ae72-63e51984bb86",
+      "name": "Combo 2 Pizzas(Individuais)",
+      "slug": "combo-2-pizzasindividuais",
+      "description": "2 Pizzas Individuais \nMolho de tomate,mozzarela,fiambre e orégãos",
+      "category": "promocoes",
+      "price": 13,
+      "variants": [
+        {
+          "id": "a28eb809-6bff-4d67-8609-3412f84da859",
+          "name": null,
+          "price": 13,
+          "original_price": 13,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/eae9a840-b6fe-4573-9987-32d74056c20b/combo-2-pizzasindividuais.png",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a28eb977-5805-44b4-babe-64e3b564ef48",
+      "name": "Combo 2 pizzas (individuais",
+      "slug": "combo-2-pizzas-individuais",
+      "description": "2 pizzas\nMolho de tomate fresco, queijo \nmussarela  e pepperoni picante, finalizados com orégano",
+      "category": "promocoes",
+      "price": 14,
+      "variants": [
+        {
+          "id": "a28eb977-59c5-4b50-a7cb-0485c76f2df1",
+          "name": null,
+          "price": 14,
+          "original_price": 14,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/b99c3abc-f40f-42cb-80dc-ae1da6c83233/combo-2-pizzas-individuais.jpg",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a1145cb7-48c1-4cfd-885d-cfd2ddb8f4f4",
+      "name": "Combo 2 hamburguinho",
+      "slug": "combo-2-hamburguinho",
+      "description": "👉Pão brioche,Smash artesanal, cheddar derretido e maionese exclusiva da casa. A combinação perfeita sem rodeios.Pequeno no preço, gigante no sabor.",
+      "category": "promocoes",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1145cb7-4a12-4689-a2b5-eee6d7c7dcfe",
+          "name": null,
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/db626f03-7c89-4818-b8e5-03c67c637583/combo-2-hamburguinho.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1145cbc-3ed3-433f-83a4-dfbed3131cf7",
+      "name": "combo 2 Salad Bacon",
+      "slug": "combo-2-salad-bacon",
+      "description": "Pão brioche,molho Matturo,carne smash 80gr,cheddar,alface,tomate",
+      "category": "promocoes",
+      "price": 10.99,
+      "variants": [
+        {
+          "id": "a1145cbc-40e2-4b28-9450-2f027aa04229",
+          "name": null,
+          "price": 10.99,
+          "original_price": 10.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/b475695b-fad3-4f3b-9cbd-9830bcda2fe0/combo-2-salad-bacon.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1145cc4-a35d-4cbb-8560-ae61d6fde566",
+      "name": "combo 2TriploOverdose",
+      "slug": "combo-2triplooverdose",
+      "description": "Pão brioche, maionese verde, 3 carnes smash de 80 g, cheddar, bacon e cebola caramelizada.",
+      "category": "promocoes",
+      "price": 17.99,
+      "variants": [
+        {
+          "id": "a1145cc4-a4d1-466f-99f6-c7448396589b",
+          "name": null,
+          "price": 17.99,
+          "original_price": 17.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/a52428a2-91d0-4fef-982d-54bff3e0c445/combo-2triplooverdose.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3c7b5-3f4c-41bb-bfa4-7619cfc1fa99",
+      "name": "Margarita",
+      "slug": "margarita",
+      "description": "Molho de tomate ,Queijo Mozzarella e orégãos",
+      "category": "pizza",
+      "price": 6.5,
+      "variants": [
+        {
+          "id": "a1e3c7b5-4414-4a67-8460-009e85861336",
+          "name": "Pequena(25CM)",
+          "price": 6.5,
+          "original_price": 6.5,
+          "stock": 100
+        },
+        {
+          "id": "a1e3c7d4-b0b2-480a-b97f-3cd68d7978f1",
+          "name": "Grande35cm)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/b539eccc-7746-49f2-a6e2-119690bc7561/margarita.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3c8e2-7407-40aa-9226-17345c7c4f00",
+      "name": "4 estacões",
+      "slug": "4-estacoes",
+      "description": "Mozzarella , fiambre  cogumelos frescos e o  oregãos",
+      "category": "pizza",
+      "price": 7.99,
+      "variants": [
+        {
+          "id": "a1e3c8e2-7601-4e6d-9f42-3bbe293d2f2b",
+          "name": "Pequena (25CM)",
+          "price": 7.99,
+          "original_price": 7.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3c8e2-76da-47b7-93b6-05a477597f48",
+          "name": "Grande(35cm)",
+          "price": 12.99,
+          "original_price": 12.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/ad76abaf-3c9f-4b95-b0d4-7c2aab8252f6/4-estacoes.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3dd5b-e6cf-4ea1-9b98-026beda1a109",
+      "name": "Ka Preziosa",
+      "slug": "ka-preziosa",
+      "description": "Molho de tomate, mozzarella, fiambre, cogumelos e pimento",
+      "category": "pizza",
+      "price": 7.99,
+      "variants": [
+        {
+          "id": "a1e3dd5b-eaf5-47fb-974c-09d208f4d1e8",
+          "name": "Pequena(25CM)",
+          "price": 7.99,
+          "original_price": 7.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3dd5b-ebff-45c6-8d6b-2d68538228d5",
+          "name": "Grande(35cm)",
+          "price": 12.99,
+          "original_price": 12.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/4b5d18ec-2baa-44a0-93ec-e479cea7bbdc/ka-preziosa.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1efbbcc-70b7-49c6-9ef4-05b2768b0356",
+      "name": "Peperoni",
+      "slug": "peperoni",
+      "description": "Molho de tomate fresco, queijo mussarela  e pepperoni picante, finalizados com orégano",
+      "category": "pizza",
+      "price": 7.99,
+      "variants": [
+        {
+          "id": "a1efbbcc-7374-4b3e-9b0d-b9f624a9c061",
+          "name": "PEQUENA(25CM)",
+          "price": 7.99,
+          "original_price": 7.99,
+          "stock": 100
+        },
+        {
+          "id": "a1efbbcc-74d5-4c38-8d28-0c76c6615b39",
+          "name": "GRANDE(35cm)",
+          "price": 11.99,
+          "original_price": 11.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/d0f0b79c-56be-404e-aa5b-4e338c6cf2c9/peperoni.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3def8-d577-46e7-b6f9-167929ff8591",
+      "name": "Delícia de Frango",
+      "slug": "delicia-de-frango",
+      "description": "Molho de tomate com frango , queijo mozzarella derretido, catupiry cremoso e oregãos",
+      "category": "pizza",
+      "price": 8.99,
+      "variants": [
+        {
+          "id": "a1e3def8-d73e-49d0-9201-2afa25479aec",
+          "name": "Pequena (25CM)",
+          "price": 8.99,
+          "original_price": 8.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3def8-d822-4714-bb66-dabe52c4a406",
+          "name": "Grande(35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/cf541a66-d50c-416e-947a-d87ba7a5ecaa/delicia-de-frango.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3e00c-30ab-4d53-a712-b37018eb9c12",
+      "name": "Carbonara",
+      "slug": "carbonara",
+      "description": "Tomate fresco, mozzarella , bacon , cogumelos , natas  ovo e oregano",
+      "category": "pizza",
+      "price": 8.99,
+      "variants": [
+        {
+          "id": "a1e3e00c-32c3-4ff9-8ed8-fec4a3a79e06",
+          "name": "Pequena(25CM)",
+          "price": 8.99,
+          "original_price": 8.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3e00c-33ca-4b96-9fde-416f064c8b1f",
+          "name": "grande(35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/31e097e4-2b91-4022-b41b-9833f0047981/carbonara.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3e07c-7165-4bdd-affb-9a041c724224",
+      "name": "Vegetariana",
+      "slug": "vegetariana",
+      "description": "Molho de tomate, mozzarella, cogumelos, cebola, pimento, milho e azeitona.",
+      "category": "pizza",
+      "price": 8.99,
+      "variants": [
+        {
+          "id": "a1e3e07c-7887-42fb-9849-48e26f5b7133",
+          "name": "Pequena(25CM)",
+          "price": 8.99,
+          "original_price": 8.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3e07c-79c7-4bd0-88b6-d8ee8fa6a0b9",
+          "name": "Grande35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/9c53fc1a-9d27-49da-b67b-757cfb9d4e96/vegetariana.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3e0b7-188b-47ed-9242-09c5ec201035",
+      "name": "Strogonof",
+      "slug": "strogonof",
+      "description": "Molho  de tomate, queijo mussarela, frango  ,cogumelos frescos ,natas e oragano",
+      "category": "pizza",
+      "price": 8.99,
+      "variants": [
+        {
+          "id": "a1e3e0b7-1a73-4a01-a39a-3b85029f6105",
+          "name": "Pequena(25CM)l (25CM)",
+          "price": 8.99,
+          "original_price": 8.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3e0b7-1b8f-484d-ade5-d4eceb1c774d",
+          "name": "Grande(35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/b0513c4b-5633-4f85-a8f0-4adb63ae17a1/strogonof.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3de9a-c79e-4cf4-a79e-1d606ab60043",
+      "name": "Especial da casa",
+      "slug": "especial-da-casa",
+      "description": "Molho de tomate  ,mozzarella, bacon, fiambre, milho e catupiry.",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3de9a-c9be-4233-a87b-d6e4081419e4",
+          "name": "Pequena(25CM)(25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3de9a-caba-4650-9337-3001a25039f6",
+          "name": "grande(35cm)",
+          "price": 14.99,
+          "original_price": 14.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/a8595be2-1d81-4ec8-8bce-fcdfd04b9f05/especial-da-casa.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3df49-fef2-4053-974d-97455994d6ff",
+      "name": "Maré de Camarão",
+      "slug": "mare-de-camarao",
+      "description": "Molho de tomate, mozzarella, camarão , delícias do mar e atum,  oregãos.",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3df4a-00df-4a48-9dd4-ce5a3e6b61b7",
+          "name": "Pequena(25CM) (25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3df4a-01e7-4b03-ba9a-b8c1922e9af4",
+          "name": "Grande(35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/5746a8c9-4c91-4495-b455-9dcb046cf61a/mare-de-camarao.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3df92-edcd-48d4-ad41-cce7450f8d02",
+      "name": "Suprema",
+      "slug": "suprema",
+      "description": "Molho de tomate ,mozzarella derretida, chouriço , fiambre, cogumelos frescos, gorgonzola cremoso, ovo cozido e oregãos",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3df92-ef8a-4944-b78a-e9fe2703969e",
+          "name": "Pequena(25CM)(25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3df92-f086-4ab4-af99-7e4eb208705c",
+          "name": "Grande(35cm)",
+          "price": 15.99,
+          "original_price": 15.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/ee2d265e-5dc1-4bc2-80de-5569056ee298/suprema.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3dfc3-aa1e-4eb3-a98a-76ca931e0b4e",
+      "name": "Saborosa",
+      "slug": "saborosa",
+      "description": "Molho  de tomate com mozzarella, carne moída suculenta, pimento cebola, azeitonas e ovo cozido.",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3dfc3-abcb-4087-ba05-8f1d8704fae2",
+          "name": "Individual (25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3dfc3-acbf-4cbd-9c05-fca6b06d8d78",
+          "name": "Média(35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/221d455c-92ff-47d3-8642-2941ed1faccc/saborosa.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3e045-cc97-4ca7-982c-b14e868e367d",
+      "name": "Campestre",
+      "slug": "campestre",
+      "description": "Molho de tomate  com mozzarella ,chouriço , cogumelos frescos, azeitonas e cebola, finalizado com emmenthal e oregãos.",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3e045-d16a-4a23-842e-028e00e45fa7",
+          "name": "Pequena(25CM)(25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3e045-d2d5-4c6d-a8bf-1b03d3193fe7",
+          "name": "Grande35cm)",
+          "price": 14.99,
+          "original_price": 14.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/d312a5fa-31c1-42eb-853a-ccddc970d340/campestre.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3e0e1-ff30-4821-a0b8-68fd27709bb4",
+      "name": "4 Queijos",
+      "slug": "4-queijos",
+      "description": "molho de tomate com mozzarella, gorgonzola, emmenthal, parmesão e orégano.",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3e0e2-012c-4ebf-8bfe-77fba46270d6",
+          "name": "Pequena(25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3e0e2-0240-4e0d-9a05-842639c759de",
+          "name": "Grande(35cm)",
+          "price": 13.99,
+          "original_price": 13.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/6b90a017-1152-4d3c-8a97-d52d4de88a48/4-queijos.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1e3e126-3894-437a-9698-a563e0972927",
+      "name": "MODA TTURO",
+      "slug": "moda-tturo",
+      "description": "Molho de tomate  com queijo mussarela, carne picada suculenta, bacon ,milho , azeitonas, cogumelos, ovo cozido , ananás e orégãos.",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1e3e126-3a79-478b-8d01-13c339852f55",
+          "name": "Pequena (25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1e3e126-3b70-41c4-9d21-f5d376a2ddbc",
+          "name": "Grande(35cm)",
+          "price": 14.99,
+          "original_price": 14.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/57097ee8-fffd-423c-a042-adbb02d824bf/moda-tturo.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a1efb8f8-81bb-4621-8e3d-e300bc9bdbae",
+      "name": "Calabresa",
+      "slug": "calabresa",
+      "description": "molho de tomate, queijo mussarela ccalabresa , cebola e orégano",
+      "category": "pizza",
+      "price": 9.99,
+      "variants": [
+        {
+          "id": "a1efb8f8-8720-4c56-a0d0-33d89b520d29",
+          "name": "Pequena(25CM)",
+          "price": 9.99,
+          "original_price": 9.99,
+          "stock": 100
+        },
+        {
+          "id": "a1efb8f8-8850-427c-91d2-0c4a97831e43",
+          "name": "Grande(35cm)",
+          "price": 14.99,
+          "original_price": 14.99,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/c03cf117-4057-4dc3-a55c-16505d4605b1/calabresa.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e455d6-5e1e-414c-b0cf-c873bed34efe",
+      "name": "hamburguinho",
+      "slug": "hamburguinho",
+      "description": "👉Pão brioche,Smash artesanal, cheddar derretido e maionese exclusiva da casa. A combinação perfeita sem rodeios.Pequeno no preço, gigante no sabor.\nC",
+      "category": "hamburguer",
+      "price": 5,
+      "variants": [
+        {
+          "id": "a0e455d6-619c-4c99-8787-6984a1caaa5c",
+          "name": "So hamburguer",
+          "price": 5,
+          "original_price": 5,
+          "stock": 100
+        },
+        {
+          "id": "a1f1b005-3d8d-489b-8621-60944fcaa267",
+          "name": "burger+batata",
+          "price": 6,
+          "original_price": 6,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/90ce849c-d3c4-4450-a140-0545800e0a51/hamburguinho.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e455dd-1ded-4bb5-8f9c-671dcfbadc05",
+      "name": "HAMBURGUER matturo",
+      "slug": "hamburguer-matturo",
+      "description": "Pão brioche, maionese Matturo, 2 fatias de cheddar e 2 carnes smash de 80 g.",
+      "category": "hamburguer",
+      "price": 8,
+      "variants": [
+        {
+          "id": "a0e455dd-20fa-4f5c-af85-3fe9f77806c1",
+          "name": "so hamburguer",
+          "price": 8,
+          "original_price": 8,
+          "stock": 100
+        },
+        {
+          "id": "a1f1b04e-9ecc-46c0-8bc1-9b674c4aedde",
+          "name": "burger+batata",
+          "price": 9,
+          "original_price": 9,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/5f48a7c2-9052-4613-a322-5776c39fb819/hamburguer-matturo.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e455e5-5d7b-4242-b5b4-59d2b682a385",
+      "name": "HAMBURGUER  Triplo Overdose",
+      "slug": "hamburguer-triplo-overdose",
+      "description": "Pão brioche, maionese verde, 3 carnes smash de 80 g, cheddar, bacon e cebola caramelizada.",
+      "category": "hamburguer",
+      "price": 11,
+      "variants": [
+        {
+          "id": "a0e455e5-5f98-4194-8f08-a17d6381aa88",
+          "name": "so burger",
+          "price": 11,
+          "original_price": 11,
+          "stock": 100
+        },
+        {
+          "id": "a1f1b0ae-703e-4bd1-b2bc-683853f527a2",
+          "name": "burger+batata",
+          "price": 12,
+          "original_price": 12,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/52edde02-928d-4364-8344-913fa8cdec59/hamburguer-triplo-overdose.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a2f966db-44ad-49d3-aede-35291f6d4b02",
+      "name": "Hamburguer X-tonelada",
+      "slug": "hamburguer-x-tonelada",
+      "description": "💥 X Tonelada 💥\nSe prepara, porque aqui é peso pesado! São 2 hambúrgueres suculentos de 70g, acompanhados de 2 ovos bem cremosos, 4 tiras crocantes de bacon e uma camada generosa de cheddar derretido. Tudo isso dentro de um pão brioche macio, com o toque especial da maionese verde, frescor da alface e do tomate, o docinho do milho e aquela crocância insana da batata palha. É o lanche que desafia a fome e conquista no sabor! 🔥🤤\nAcompanha Batata",
+      "category": "hamburguer",
+      "price": 11,
+      "variants": [
+        {
+          "id": "a2f966db-4ce5-4c59-bdd0-7b49e0e43b6a",
+          "name": "So burger",
+          "price": 11,
+          "original_price": 11,
+          "stock": 100
+        },
+        {
+          "id": "a2f9672d-413a-4d1c-b181-51d8eeb72e69",
+          "name": "burger+batata",
+          "price": 12,
+          "original_price": 12,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/fd9b57b6-c2cb-4022-9a2d-84b243638b1c/hamburguer-x-tonelada.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e455f0-1c51-42a4-9c20-6e8348517144",
+      "name": "HAMBURGUER  Poço de Cheddar",
+      "slug": "hamburguer-poco-de-cheddar",
+      "description": "👉Pão brioche, Smash mergulhado em cheddar cremoso com farofa de bacon. O sonho de qualquer amante de queijo..",
+      "category": "hamburguer",
+      "price": 11,
+      "variants": [
+        {
+          "id": "a0e455f0-1ea5-493b-b095-fe04bd70d984",
+          "name": "burger",
+          "price": 11,
+          "original_price": 11,
+          "stock": 100
+        },
+        {
+          "id": "a1f1b127-1ebc-4eb7-b5d1-9d65c9822f1c",
+          "name": "burger+batata",
+          "price": 12,
+          "original_price": 12,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/e5b6f39d-15d9-40ef-b068-dd8d9be05355/hamburguer-poco-de-cheddar.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e455f9-f555-45da-800d-b5f89f1dc2b6",
+      "name": "HAMBURGUER  Croc Burger",
+      "slug": "hamburguer-croc-burger",
+      "description": "Pão brioche,maionese verde, frango, cheddar,alface,tomate e bacon.",
+      "category": "hamburguer",
+      "price": 9.2,
+      "variants": [
+        {
+          "id": "a0e455f9-f763-4288-a224-fded740e9f2d",
+          "name": "burger",
+          "price": 9.2,
+          "original_price": 9.2,
+          "stock": 100
+        },
+        {
+          "id": "a1f1b215-cd7a-4d4f-8600-91eba7d8a97e",
+          "name": "burger+batata",
+          "price": 10.2,
+          "original_price": 10.2,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/015cd0ac-2c7b-4b57-83cf-8081cf6c092e/hamburguer-croc-burger.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e45608-eb02-493c-b6bc-c92116add04d",
+      "name": "HAMBURGUER  BBQ Beast",
+      "slug": "hamburguer-bbq-beast",
+      "description": "Pão brioche, molho BBQ, 2 smash de 80 g, cheddar, bacon e cebola grelhada.",
+      "category": "hamburguer",
+      "price": 9.2,
+      "variants": [
+        {
+          "id": "a1f1b275-9c80-4472-aa58-12d490f24c13",
+          "name": "burger",
+          "price": 9.2,
+          "original_price": 9.2,
+          "stock": 100
+        },
+        {
+          "id": "a0e45608-ecc2-4241-a4ff-4c98fbe36dba",
+          "name": "burger+batata",
+          "price": 10.2,
+          "original_price": 10.2,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/f08ad066-50fc-451b-a970-1782bf77148e/hamburguer-bbq-beast.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e45612-503f-4036-bb01-7f7aca81bbb8",
+      "name": "HAMBURGUER  Fatpig",
+      "slug": "hamburguer-fatpig",
+      "description": "Pão brioche, molho matturo, 2 carnes smash de 80 g, cheddar e 4 fatias de bacon.",
+      "category": "hamburguer",
+      "price": 8.5,
+      "variants": [
+        {
+          "id": "a1f1b2b5-41e8-4b7c-bd07-366ac9208ade",
+          "name": "burger",
+          "price": 8.5,
+          "original_price": 8.5,
+          "stock": 100
+        },
+        {
+          "id": "a0e45612-5292-4f82-8140-20fe00f6d830",
+          "name": "burger+batata",
+          "price": 9.5,
+          "original_price": 9.5,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/6d34092f-1ad0-4a43-9c67-da970edb2649/hamburguer-fatpig.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e4561d-101c-4375-b0bf-9f1a2fd7a4f5",
+      "name": "HAMBURGUER  Piu Piu Tturo",
+      "slug": "hamburguer-piu-piu-tturo",
+      "description": "Pão brioche, maionese verde, carne smash de 80 g, cheddar, bacon, ovo e batata palha.",
+      "category": "hamburguer",
+      "price": 8,
+      "variants": [
+        {
+          "id": "a1f1b2ea-249a-43de-a07c-4ae182e60483",
+          "name": "burger",
+          "price": 8,
+          "original_price": 8,
+          "stock": 100
+        },
+        {
+          "id": "a0e4561d-11ae-4d75-8493-a52e8599f827",
+          "name": "burger+batata",
+          "price": 9,
+          "original_price": 9,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/166ee020-dc71-4fad-af9f-03be4436af29/hamburguer-piu-piu-tturo.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e4562a-24b6-4aa0-88e1-e7f1ccbdde1f",
+      "name": "HAMBURGUER Salad Bacon",
+      "slug": "hamburguer-salad-bacon",
+      "description": "Pão brioche,molho Matturo,carne smash 80gr,cheddar,alface,tomate",
+      "category": "hamburguer",
+      "price": 6,
+      "variants": [
+        {
+          "id": "a1f1b326-9745-4499-a642-6bc15914fa48",
+          "name": "burger",
+          "price": 6,
+          "original_price": 6,
+          "stock": 100
+        },
+        {
+          "id": "a0e4562a-2726-493b-9ee6-0cbcec60fbea",
+          "name": "burger+batata",
+          "price": 7,
+          "original_price": 7,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/8b0a1690-5e30-467c-9ced-a6da3a1efa4d/hamburguer-salad-bacon.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e45635-9e4f-4639-a926-c839b4b2442a",
+      "name": "HAMBURGUER  Matturito",
+      "slug": "hamburguer-matturito",
+      "description": "👉Pão brioche, Smash simples com cheddar, bacon e a maionese Matturo. Pequeno no preço, gigante no sabor.",
+      "category": "hamburguer",
+      "price": 5.5,
+      "variants": [
+        {
+          "id": "a1f1b397-c802-42ea-b0a6-785ee8871b44",
+          "name": "burger",
+          "price": 5.5,
+          "original_price": 5.5,
+          "stock": 100
+        },
+        {
+          "id": "a0e45635-a036-4de0-89a2-351a65666e00",
+          "name": "burger+batata",
+          "price": 6.5,
+          "original_price": 6.5,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/3788e82b-c9b3-4237-8587-2e6e76bfad27/hamburguer-matturito.jpeg",
+      "modifierCount": 4,
+      "visible": true
+    },
+    {
+      "id": "a0e4563d-3818-47e3-b9ea-7d0b115f0780",
+      "name": "HAMBURGUER  fungada",
+      "slug": "hamburguer-fungada",
+      "description": "pao brioche .molho matturo ,carne 70 gr,cheddar,bacon ,cebola caramelizada ,gorgonzola",
+      "category": "hamburguer",
+      "price": 9,
+      "variants": [
+        {
+          "id": "a1f1b3b7-bca0-4abd-99b7-01e1f3b8a21a",
+          "name": "burger",
+          "price": 9,
+          "original_price": 9,
+          "stock": 100
+        },
+        {
+          "id": "a0e4563d-3a46-42a9-852d-b7f455042fe8",
+          "name": "burger+batata",
+          "price": 10,
+          "original_price": 10,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/0658375e-d111-4ef2-992e-e70ef719d632/hamburguer-fungada.jpeg",
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "a0e45652-ada2-479f-8d12-6ec2dadd9f0c",
+      "name": "HAMBURGUER  x tudo",
+      "slug": "hamburguer-x-tudo",
+      "description": "🔥 O Brabo da Casa 🔥\nUm pão brioche fofinho abraçando um hambúrguer de 70g de pura suculência, coberto com cheddar derretido e um ovo no ponto perfeito. Pra equilibrar, a crocância da alface e a refrescância do tomate. É o tipo de combinação que faz o coração bater mais forte e o estômago agradecer! 🤤✨",
+      "category": "hamburguer",
+      "price": 8.4,
+      "variants": [
+        {
+          "id": "a1f1b3e3-d082-487d-b966-e8b8992037b5",
+          "name": "burger",
+          "price": 8.4,
+          "original_price": 8.4,
+          "stock": 100
+        },
+        {
+          "id": "a0e45652-af39-4dbe-8f59-d6aba19e510a",
+          "name": "burger+batata",
+          "price": 9.4,
+          "original_price": 9.4,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/43346a03-4d84-486a-8d28-99b573a44ca5/hamburguer-x-tudo.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e4565a-c1fa-476f-bc73-cc4f32be890a",
+      "name": "hamburguer x-egg",
+      "slug": "hamburguer-x-egg",
+      "description": "🍳 X-Egg 🍳\nO combo perfeito do dia a dia: pão brioche fofinho, um hambúrguer de 70g suculento, coroado com ovo no ponto certo e cheddar derretido. Pra deixar ainda mais especial, a frescura da alface e a suculência do tomate. Um clássico que nunca falha! 😍🔥",
+      "category": "hamburguer",
+      "price": 7.5,
+      "variants": [
+        {
+          "id": "a1f1b41b-ecc5-43a0-8254-bf3201fa6312",
+          "name": "burger",
+          "price": 7.5,
+          "original_price": 7.5,
+          "stock": 100
+        },
+        {
+          "id": "a0e4565a-c3f0-417f-a829-3c43c0971ed2",
+          "name": "burger+batata",
+          "price": 8.5,
+          "original_price": 8.5,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/95a6dedc-6384-40fd-bea5-22071e7a799c/hamburguer-x-egg.jpg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a0e45674-9503-4abe-8fa9-1e5c937f4b1c",
+      "name": "HAMBURGUE bacon lover",
+      "slug": "hamburgue-bacon-lover",
+      "description": "🥓 Bacon Lover 🥓\nSe você é fã de bacon, esse é O lanche! Um pão brioche fofinho abraçando um hambúrguer suculento de 70g, coberto com cheddar derretido, muita crocância de bacon, o toque adocicado da cebola caramelizada e o clássico molho BBQ que amarra tudo com perfeição. É amor à primeira mordida! 🤤🔥",
+      "category": "hamburguer",
+      "price": 7.5,
+      "variants": [
+        {
+          "id": "a0e45674-9745-4db0-a093-ed0ea229176e",
+          "name": "burger",
+          "price": 7.5,
+          "original_price": 7.5,
+          "stock": 100
+        },
+        {
+          "id": "a1f1b45b-bb98-4a5f-b39b-d9b39c13662a",
+          "name": "burger+batata",
+          "price": 8.5,
+          "original_price": 8.5,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/12d00b5f-d521-4320-af85-e7979a376eeb/hamburgue-bacon-lover.jpeg",
+      "modifierCount": 2,
+      "visible": true
+    },
+    {
+      "id": "a213e340-96c4-40f0-87fe-d6143706d4ed",
+      "name": "Pao de alho",
+      "slug": "pao-de-alho",
+      "description": "",
+      "category": "entradas",
+      "price": 2,
+      "variants": [
+        {
+          "id": "a213e340-98e7-4d61-b9ab-248d2dd94662",
+          "name": null,
+          "price": 2,
+          "original_price": 2,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "9f9660fa-5d77-40be-ac53-64e6bde63cfb",
+      "name": "Batata",
+      "slug": "batata",
+      "description": "",
+      "category": "entradas",
+      "price": 2,
+      "variants": [
+        {
+          "id": "9f9660fa-5f28-40f2-bfab-f52fe76be37b",
+          "name": null,
+          "price": 2,
+          "original_price": 2,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/2b91dded-34e0-49c6-8704-818e518869e7/batata.png",
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "9f9661cf-9872-426f-b0d6-b6a222d640f8",
+      "name": "Nuggets",
+      "slug": "nuggets",
+      "description": "",
+      "category": "entradas",
+      "price": 3.5,
+      "variants": [
+        {
+          "id": "9f9661cf-9a54-4590-a0e4-202be0ea6066",
+          "name": "5 unidades",
+          "price": 3.5,
+          "original_price": 3.5,
+          "stock": 100
+        },
+        {
+          "id": "9f966233-dfae-47c8-a88d-d77198298aa9",
+          "name": "10 unidades",
+          "price": 5.5,
+          "original_price": 5.5,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/716e3d4e-0e55-4c99-b224-818547f786b4/nuggets.jpg",
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "9fee837c-a0a6-475c-949a-f79bb84420a6",
+      "name": "aros de cebola",
+      "slug": "aros-de-cebola",
+      "description": "",
+      "category": "entradas",
+      "price": 3.5,
+      "variants": [
+        {
+          "id": "9fee837c-a2e3-4f7e-a0a5-2c7f2e832ae1",
+          "name": "5 unidades",
+          "price": 3.5,
+          "original_price": 3.5,
+          "stock": 100
+        },
+        {
+          "id": "9fee837c-a3e7-4c00-9c1a-b2b932910f85",
+          "name": "10 unidades",
+          "price": 5.5,
+          "original_price": 5.5,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/904a0a7b-15ba-43dd-b92b-e2c4ed11b88c/aros-de-cebola.png",
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "a0154c14-23f5-461a-a52a-6b2ecec02575",
+      "name": "pote de cheddar",
+      "slug": "pote-de-cheddar",
+      "description": "",
+      "category": "entradas",
+      "price": 1,
+      "variants": [
+        {
+          "id": "a0154c14-294f-4621-9a82-be041f37c482",
+          "name": null,
+          "price": 1,
+          "original_price": 1,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "a0154c54-a6a8-4b6b-8177-9e04c010fe94",
+      "name": "pote maionese verde",
+      "slug": "pote-maionese-verde",
+      "description": "",
+      "category": "entradas",
+      "price": 0.5,
+      "variants": [
+        {
+          "id": "a0154c54-a84d-476b-b594-98d8b93be99e",
+          "name": null,
+          "price": 0.5,
+          "original_price": 0.5,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "a0154c72-f29d-47ea-998b-30bfcb207806",
+      "name": "pote molho matturo",
+      "slug": "pote-molho-matturo",
+      "description": "",
+      "category": "entradas",
+      "price": 1,
+      "variants": [
+        {
+          "id": "a0154c72-f4dd-48a6-95dc-acb86e9279da",
+          "name": null,
+          "price": 1,
+          "original_price": 1,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "a0154ce5-3dc9-4658-bfe2-251573e5c0f6",
+      "name": "pote molho bbq",
+      "slug": "pote-molho-bbq",
+      "description": "",
+      "category": "entradas",
+      "price": 1,
+      "variants": [
+        {
+          "id": "a0154ce5-4032-4e83-a1dd-cf72f95ef6a0",
+          "name": null,
+          "price": 1,
+          "original_price": 1,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 1,
+      "visible": true
+    },
+    {
+      "id": "9fe2c3ae-afa6-44c1-a50d-379e3f7e84d5",
+      "name": "honey baby",
+      "slug": "honey-baby",
+      "description": "Pao brioche selado com mel,nuttela,e morangos grelhados no mel",
+      "category": "sobremesa",
+      "price": 4,
+      "variants": [
+        {
+          "id": "9fe2c3ae-b396-4f8d-9f5c-f51823da918d",
+          "name": null,
+          "price": 4,
+          "original_price": 4,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a21216f2-8ebe-4579-abeb-d0076b894f71",
+      "name": "Doce da avó",
+      "slug": "doce-da-avo",
+      "description": "",
+      "category": "sobremesa",
+      "price": 3,
+      "variants": [
+        {
+          "id": "a21216f2-911d-4796-b406-8c9425cea8c8",
+          "name": null,
+          "price": 3,
+          "original_price": 3,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a2febc85-74aa-46d6-9a41-d2a994ca7a63",
+      "name": "mousse de chocolate",
+      "slug": "mousse-de-chocolate",
+      "description": "",
+      "category": "sobremesa",
+      "price": 0,
+      "variants": [
+        {
+          "id": "a2febc85-788b-4deb-ac29-c5824ccb1abf",
+          "name": null,
+          "price": 0,
+          "original_price": 0,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a2febcd1-3bd8-4548-8b3b-70aab0e076bc",
+      "name": "chessecake",
+      "slug": "chessecake",
+      "description": "",
+      "category": "sobremesa",
+      "price": 3.5,
+      "variants": [
+        {
+          "id": "a2febcd1-3e2a-42aa-a831-9b4db32e2c8c",
+          "name": null,
+          "price": 3.5,
+          "original_price": 3.5,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a1f1b4cd-b2f1-451b-9138-e1c5f696e965",
+      "name": "Coca-cola",
+      "slug": "coca-cola",
+      "description": "",
+      "category": "bebidas",
+      "price": 1.8,
+      "variants": [
+        {
+          "id": "a1f1b4cd-b5cc-44ca-8fb0-5a69cdb72171",
+          "name": null,
+          "price": 1.8,
+          "original_price": 1.8,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/b35d6a3e-a10d-4191-967d-611c16d047bc/coca-cola.jpg",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a1f1b511-4765-44ec-8e9e-cb9c1d168425",
+      "name": "guarana",
+      "slug": "guarana",
+      "description": "",
+      "category": "bebidas",
+      "price": 1.8,
+      "variants": [
+        {
+          "id": "a1f1b511-48fc-4690-b20c-6479f5395cbd",
+          "name": null,
+          "price": 1.8,
+          "original_price": 1.8,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/e96e6c32-f596-4007-9b5f-23366b894f72/guarana.jpg",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a1f1b526-824a-4799-9b9d-5368cc5ee19c",
+      "name": "ice-tea pessego",
+      "slug": "ice-tea-pessego",
+      "description": "",
+      "category": "bebidas",
+      "price": 1.8,
+      "variants": [
+        {
+          "id": "a1f1b526-83f7-4fb6-923a-e2bfb556a11b",
+          "name": null,
+          "price": 1.8,
+          "original_price": 1.8,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/54918346-157a-46e9-b9ed-50239a21ba0b/ice-tea-pessego.jpg",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a1f1b54c-43e0-4998-9f00-500b0b3f2293",
+      "name": "ice-tea manga",
+      "slug": "ice-tea-manga",
+      "description": "",
+      "category": "bebidas",
+      "price": 1.8,
+      "variants": [
+        {
+          "id": "a1f1b54c-452d-45b5-acde-c1ef395081de",
+          "name": null,
+          "price": 1.8,
+          "original_price": 1.8,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/a7a7ad41-da6e-47bb-8c71-8d7cc5ad3e49/ice-tea-manga.jpg",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a1f1b566-086f-4b2a-b48c-ecec5bb9a3cb",
+      "name": "ice-tea limão",
+      "slug": "ice-tea-limao",
+      "description": "",
+      "category": "bebidas",
+      "price": 1.8,
+      "variants": [
+        {
+          "id": "a1f1b566-0a49-4a58-bf0d-677b785a29dd",
+          "name": null,
+          "price": 1.8,
+          "original_price": 1.8,
+          "stock": 100
+        }
+      ],
+      "image": "/__l5e/assets-v1/26c48250-c7fe-4af7-81d5-fdb00380f819/ice-tea-limao.jpg",
+      "modifierCount": 0,
+      "visible": true
+    },
+    {
+      "id": "a20b5df5-ac9c-406b-9664-ed943378ed8d",
+      "name": "agua",
+      "slug": "agua",
+      "description": "",
+      "category": "bebidas",
+      "price": 1,
+      "variants": [
+        {
+          "id": "a20b5df5-afd2-4f67-a371-3a9937ed5402",
+          "name": null,
+          "price": 1,
+          "original_price": 1,
+          "stock": 100
+        }
+      ],
+      "image": null,
+      "modifierCount": 0,
+      "visible": true
+    }
+  ]
+}
