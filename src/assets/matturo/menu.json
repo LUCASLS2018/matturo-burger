@@ -51,7 +51,9 @@
       ],
       "image": "/__l5e/assets-v1/eae9a840-b6fe-4573-9987-32d74056c20b/combo-2-pizzasindividuais.png",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a28eb977-5805-44b4-babe-64e3b564ef48",
@@ -71,7 +73,9 @@
       ],
       "image": "/__l5e/assets-v1/b99c3abc-f40f-42cb-80dc-ae1da6c83233/combo-2-pizzas-individuais.jpg",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a1145cb7-48c1-4cfd-885d-cfd2ddb8f4f4",
@@ -91,7 +95,118 @@
       ],
       "image": "/__l5e/assets-v1/db626f03-7c89-4818-b8e5-03c67c637583/combo-2-hamburguinho.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a14721d9-9a0c-4ab3-be1d-6c55466d9dc9",
+          "name": "Deseja Batata Frita?",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a14ec857-1859-48d1-83d2-a7fa322560a1",
+              "name": "SO os Hambúrgueres",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "a14721da-4390-4485-b019-b2945a1ef79c",
+              "name": "1 dose de batata frita",
+              "price": 1.5,
+              "max": 1
+            },
+            {
+              "id": "a14721da-f10e-4e5e-b786-2313e7b65a69",
+              "name": "2 doses de batata frita",
+              "price": 3,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1145cbc-3ed3-433f-83a4-dfbed3131cf7",
@@ -111,7 +226,118 @@
       ],
       "image": "/__l5e/assets-v1/b475695b-fad3-4f3b-9cbd-9830bcda2fe0/combo-2-salad-bacon.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a14721d9-9a0c-4ab3-be1d-6c55466d9dc9",
+          "name": "Deseja Batata Frita?",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a14ec857-1859-48d1-83d2-a7fa322560a1",
+              "name": "SO os Hambúrgueres",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "a14721da-4390-4485-b019-b2945a1ef79c",
+              "name": "1 dose de batata frita",
+              "price": 1.5,
+              "max": 1
+            },
+            {
+              "id": "a14721da-f10e-4e5e-b786-2313e7b65a69",
+              "name": "2 doses de batata frita",
+              "price": 3,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1145cc4-a35d-4cbb-8560-ae61d6fde566",
@@ -131,7 +357,118 @@
       ],
       "image": "/__l5e/assets-v1/a52428a2-91d0-4fef-982d-54bff3e0c445/combo-2triplooverdose.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a14721d9-9a0c-4ab3-be1d-6c55466d9dc9",
+          "name": "Deseja Batata Frita?",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a14ec857-1859-48d1-83d2-a7fa322560a1",
+              "name": "SO os Hambúrgueres",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "a14721da-4390-4485-b019-b2945a1ef79c",
+              "name": "1 dose de batata frita",
+              "price": 1.5,
+              "max": 1
+            },
+            {
+              "id": "a14721da-f10e-4e5e-b786-2313e7b65a69",
+              "name": "2 doses de batata frita",
+              "price": 3,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3c7b5-3f4c-41bb-bfa4-7619cfc1fa99",
@@ -158,7 +495,123 @@
       ],
       "image": "/__l5e/assets-v1/b539eccc-7746-49f2-a6e2-119690bc7561/margarita.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3c8e2-7407-40aa-9226-17345c7c4f00",
@@ -185,7 +638,123 @@
       ],
       "image": "/__l5e/assets-v1/ad76abaf-3c9f-4b95-b0d4-7c2aab8252f6/4-estacoes.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3dd5b-e6cf-4ea1-9b98-026beda1a109",
@@ -212,7 +781,123 @@
       ],
       "image": "/__l5e/assets-v1/4b5d18ec-2baa-44a0-93ec-e479cea7bbdc/ka-preziosa.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1efbbcc-70b7-49c6-9ef4-05b2768b0356",
@@ -239,7 +924,123 @@
       ],
       "image": "/__l5e/assets-v1/d0f0b79c-56be-404e-aa5b-4e338c6cf2c9/peperoni.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3def8-d577-46e7-b6f9-167929ff8591",
@@ -266,7 +1067,123 @@
       ],
       "image": "/__l5e/assets-v1/cf541a66-d50c-416e-947a-d87ba7a5ecaa/delicia-de-frango.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3e00c-30ab-4d53-a712-b37018eb9c12",
@@ -293,7 +1210,123 @@
       ],
       "image": "/__l5e/assets-v1/31e097e4-2b91-4022-b41b-9833f0047981/carbonara.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3e07c-7165-4bdd-affb-9a041c724224",
@@ -320,7 +1353,123 @@
       ],
       "image": "/__l5e/assets-v1/9c53fc1a-9d27-49da-b67b-757cfb9d4e96/vegetariana.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3e0b7-188b-47ed-9242-09c5ec201035",
@@ -347,7 +1496,123 @@
       ],
       "image": "/__l5e/assets-v1/b0513c4b-5633-4f85-a8f0-4adb63ae17a1/strogonof.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3de9a-c79e-4cf4-a79e-1d606ab60043",
@@ -374,7 +1639,123 @@
       ],
       "image": "/__l5e/assets-v1/a8595be2-1d81-4ec8-8bce-fcdfd04b9f05/especial-da-casa.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3df49-fef2-4053-974d-97455994d6ff",
@@ -401,7 +1782,123 @@
       ],
       "image": "/__l5e/assets-v1/5746a8c9-4c91-4495-b455-9dcb046cf61a/mare-de-camarao.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3df92-edcd-48d4-ad41-cce7450f8d02",
@@ -428,7 +1925,123 @@
       ],
       "image": "/__l5e/assets-v1/ee2d265e-5dc1-4bc2-80de-5569056ee298/suprema.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3dfc3-aa1e-4eb3-a98a-76ca931e0b4e",
@@ -455,7 +2068,123 @@
       ],
       "image": "/__l5e/assets-v1/221d455c-92ff-47d3-8642-2941ed1faccc/saborosa.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3e045-cc97-4ca7-982c-b14e868e367d",
@@ -482,7 +2211,123 @@
       ],
       "image": "/__l5e/assets-v1/d312a5fa-31c1-42eb-853a-ccddc970d340/campestre.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3e0e1-ff30-4821-a0b8-68fd27709bb4",
@@ -509,7 +2354,123 @@
       ],
       "image": "/__l5e/assets-v1/6b90a017-1152-4d3c-8a97-d52d4de88a48/4-queijos.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1e3e126-3894-437a-9698-a563e0972927",
@@ -536,7 +2497,123 @@
       ],
       "image": "/__l5e/assets-v1/57097ee8-fffd-423c-a042-adbb02d824bf/moda-tturo.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a1efb8f8-81bb-4621-8e3d-e300bc9bdbae",
@@ -563,7 +2640,123 @@
       ],
       "image": "/__l5e/assets-v1/c03cf117-4057-4dc3-a55c-16505d4605b1/calabresa.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a20d6d88-1575-4642-b5e8-df4801035c3d",
+          "name": "borda recheada",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "modifiers": []
+        },
+        {
+          "id": "a215f5ee-6575-48e8-97ae-91dbbfd1da1d",
+          "name": "Quer ingrediente extra ?",
+          "required": false,
+          "min": 1,
+          "max": 10,
+          "modifiers": [
+            {
+              "id": "a215f5ee-682c-4ab6-b0b9-f44a8b6eb0b9",
+              "name": "Milho",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-694d-47e4-90fc-55eb787de1a9",
+              "name": "Ovo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6a61-460e-8700-e288eaedd7ff",
+              "name": "Extra queijo",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6b90-4ef9-8d09-67c25183ce4d",
+              "name": "Fiambre",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6cbd-4998-beee-4b5262f4d7e4",
+              "name": "Bacon",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6df0-456c-b865-0d6b92c2badb",
+              "name": "Carne picada",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-6f1a-4ec4-9a23-9e27ca1bd963",
+              "name": "Chouriço",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-703e-49e4-b28d-a03b67b56ef2",
+              "name": "Cogumelos",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-715e-4a68-b4a9-7e3ce1874794",
+              "name": "Natas",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-727d-4d9c-b04b-f352baefb79a",
+              "name": "Pimento",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7395-4114-9b30-c0cd7d71963f",
+              "name": "Cebola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-7490-41f7-a816-1e54089526af",
+              "name": "Peperoni",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-75a1-4867-a9a9-30262b105697",
+              "name": "Azeitona",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-76b7-47cf-8006-4977ba813608",
+              "name": "Atum",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-77dd-4067-a64e-6810c9461131",
+              "name": "Gorngozola",
+              "price": 2,
+              "max": 3
+            },
+            {
+              "id": "a215f5ee-78fd-482e-8fd9-fc829755e12e",
+              "name": "Parmessao",
+              "price": 2,
+              "max": 3
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e455d6-5e1e-414c-b0cf-c873bed34efe",
@@ -590,7 +2783,136 @@
       ],
       "image": "/__l5e/assets-v1/90ce849c-d3c4-4450-a140-0545800e0a51/hamburguinho.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e455dd-1ded-4bb5-8f9c-671dcfbadc05",
@@ -617,7 +2939,136 @@
       ],
       "image": "/__l5e/assets-v1/5f48a7c2-9052-4613-a322-5776c39fb819/hamburguer-matturo.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e455e5-5d7b-4242-b5b4-59d2b682a385",
@@ -644,7 +3095,136 @@
       ],
       "image": "/__l5e/assets-v1/52edde02-928d-4364-8344-913fa8cdec59/hamburguer-triplo-overdose.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a2f966db-44ad-49d3-aede-35291f6d4b02",
@@ -671,7 +3251,136 @@
       ],
       "image": "/__l5e/assets-v1/fd9b57b6-c2cb-4022-9a2d-84b243638b1c/hamburguer-x-tonelada.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e455f0-1c51-42a4-9c20-6e8348517144",
@@ -698,7 +3407,136 @@
       ],
       "image": "/__l5e/assets-v1/e5b6f39d-15d9-40ef-b068-dd8d9be05355/hamburguer-poco-de-cheddar.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e455f9-f555-45da-800d-b5f89f1dc2b6",
@@ -725,7 +3563,136 @@
       ],
       "image": "/__l5e/assets-v1/015cd0ac-2c7b-4b57-83cf-8081cf6c092e/hamburguer-croc-burger.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e45608-eb02-493c-b6bc-c92116add04d",
@@ -752,7 +3719,136 @@
       ],
       "image": "/__l5e/assets-v1/f08ad066-50fc-451b-a970-1782bf77148e/hamburguer-bbq-beast.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e45612-503f-4036-bb01-7f7aca81bbb8",
@@ -779,7 +3875,136 @@
       ],
       "image": "/__l5e/assets-v1/6d34092f-1ad0-4a43-9c67-da970edb2649/hamburguer-fatpig.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e4561d-101c-4375-b0bf-9f1a2fd7a4f5",
@@ -806,7 +4031,136 @@
       ],
       "image": "/__l5e/assets-v1/166ee020-dc71-4fad-af9f-03be4436af29/hamburguer-piu-piu-tturo.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e4562a-24b6-4aa0-88e1-e7f1ccbdde1f",
@@ -833,7 +4187,136 @@
       ],
       "image": "/__l5e/assets-v1/8b0a1690-5e30-467c-9ced-a6da3a1efa4d/hamburguer-salad-bacon.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e45635-9e4f-4639-a926-c839b4b2442a",
@@ -860,7 +4343,220 @@
       ],
       "image": "/__l5e/assets-v1/3788e82b-c9b3-4237-8587-2e6e76bfad27/hamburguer-matturito.jpeg",
       "modifierCount": 4,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a09bc371-1ff4-42c1-9413-7fa87e7fcdf7",
+          "name": "Acompanhamentos",
+          "required": true,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "a09bc682-ba48-4f30-9b6e-60543bac7524",
+              "name": "Nao quero",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "a09bc3f0-443f-4cfe-b74e-1a8508f2584b",
+              "name": "Nuggets 5 un",
+              "price": 3,
+              "max": 100
+            },
+            {
+              "id": "a09bc422-660c-4abe-90fd-de6b463c438a",
+              "name": "Nuggets 10 un",
+              "price": 5,
+              "max": 100
+            },
+            {
+              "id": "a09bc43c-19e7-4725-bac5-223688a7568f",
+              "name": "aros de cebola 5 un",
+              "price": 3.5,
+              "max": 100
+            },
+            {
+              "id": "a09bc473-6288-4a54-91d5-54b50964d2d3",
+              "name": "aros de cebola 10 un",
+              "price": 5.5,
+              "max": 100
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e4563d-3818-47e3-b9ea-7d0b115f0780",
@@ -887,7 +4583,55 @@
       ],
       "image": "/__l5e/assets-v1/0658375e-d111-4ef2-992e-e70ef719d632/hamburguer-fungada.jpeg",
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e45652-ada2-479f-8d12-6ec2dadd9f0c",
@@ -914,7 +4658,136 @@
       ],
       "image": "/__l5e/assets-v1/43346a03-4d84-486a-8d28-99b573a44ca5/hamburguer-x-tudo.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e4565a-c1fa-476f-bc73-cc4f32be890a",
@@ -941,7 +4814,136 @@
       ],
       "image": "/__l5e/assets-v1/95a6dedc-6384-40fd-bea5-22071e7a799c/hamburguer-x-egg.jpg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0e45674-9503-4abe-8fa9-1e5c937f4b1c",
@@ -968,7 +4970,136 @@
       ],
       "image": "/__l5e/assets-v1/12d00b5f-d521-4320-af85-e7979a376eeb/hamburgue-bacon-lover.jpeg",
       "modifierCount": 2,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "a0e45b6a-7730-46e3-8c7e-12e5a180e3ca",
+          "name": "Bebidas",
+          "required": false,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": "a0e45b6a-7983-492e-ae75-e08a7277cf8d",
+              "name": "coca-cola",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7aba-443e-ab45-47f7d2f0f199",
+              "name": "coca cola zero",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7bd6-4bff-bb7c-9049ad050744",
+              "name": "ice tea limao",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7cf2-4517-8067-7c4d4d3eb730",
+              "name": "ice tea pessego",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a0e45b6a-7e0f-4e20-ae28-2541115e8929",
+              "name": "guarana",
+              "price": 1.8,
+              "max": 2
+            },
+            {
+              "id": "a1f1b859-ff96-465e-9ec3-a856e9ea852b",
+              "name": "ice tea manga",
+              "price": 1.8,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "9f965c53-6241-4111-90a3-c2a61d05b00e",
+          "name": "Adicionar extras",
+          "required": false,
+          "min": 1,
+          "max": 20,
+          "modifiers": [
+            {
+              "id": "9f965c53-75cb-4f56-9c10-0809d9b43fca",
+              "name": "NAO QUERO",
+              "price": 0,
+              "max": 1
+            },
+            {
+              "id": "9fb5dc3e-b750-4433-82d8-769e2801be22",
+              "name": "batata palha",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dc1e-24cb-420d-b4c9-0947211b0e23",
+              "name": "cheddar",
+              "price": 1.5,
+              "max": 10
+            },
+            {
+              "id": "9fb5dc0b-560d-467a-b0d0-5e0a701860cc",
+              "name": "cebola grelhada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbf9-d08f-46e5-a9ad-8451997d1448",
+              "name": "cebola caramelizada",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbe2-e810-4a1f-b588-de208664b2e4",
+              "name": "cebola",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9fb5dbac-e2c3-4a44-8707-b25810edc44e",
+              "name": "tomate",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9fb5dba8-6e57-49bf-bcf7-04541dd105ae",
+              "name": "alface",
+              "price": 1,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-6986-43de-bb8b-27e600789189",
+              "name": "smash",
+              "price": 2,
+              "max": 5
+            },
+            {
+              "id": "9f965c53-6dcb-4187-8ba5-d3fc7d79900d",
+              "name": "ovo estrelado",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "9f965c53-71ed-4bdb-98a4-935a4c598d41",
+              "name": "bacon",
+              "price": 1.5,
+              "max": 2
+            },
+            {
+              "id": "a146fb4f-6c73-4083-a699-1d02b8a6148c",
+              "name": "MILHO",
+              "price": 1,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a213e340-96c4-40f0-87fe-d6143706d4ed",
@@ -988,7 +5119,9 @@
       ],
       "image": null,
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "9f9660fa-5d77-40be-ac53-64e6bde63cfb",
@@ -1008,7 +5141,55 @@
       ],
       "image": "/__l5e/assets-v1/2b91dded-34e0-49c6-8704-818e518869e7/batata.png",
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "9f9661cf-9872-426f-b0d6-b6a222d640f8",
@@ -1035,7 +5216,55 @@
       ],
       "image": "/__l5e/assets-v1/716e3d4e-0e55-4c99-b224-818547f786b4/nuggets.jpg",
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "9fee837c-a0a6-475c-949a-f79bb84420a6",
@@ -1062,7 +5291,55 @@
       ],
       "image": "/__l5e/assets-v1/904a0a7b-15ba-43dd-b92b-e2c4ed11b88c/aros-de-cebola.png",
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0154c14-23f5-461a-a52a-6b2ecec02575",
@@ -1082,7 +5359,55 @@
       ],
       "image": null,
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0154c54-a6a8-4b6b-8177-9e04c010fe94",
@@ -1102,7 +5427,55 @@
       ],
       "image": null,
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0154c72-f29d-47ea-998b-30bfcb207806",
@@ -1122,7 +5495,55 @@
       ],
       "image": null,
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "a0154ce5-3dc9-4658-bfe2-251573e5c0f6",
@@ -1142,7 +5563,55 @@
       ],
       "image": null,
       "modifierCount": 1,
-      "visible": true
+      "visible": true,
+      "groups": [
+        {
+          "id": "9f965c53-2405-4181-bd5b-a3aeddbd1da6",
+          "name": "Pote de molho",
+          "required": false,
+          "min": 1,
+          "max": 100,
+          "modifiers": [
+            {
+              "id": "9f965c53-2af5-489e-8e05-00169a5d4e98",
+              "name": "Maionese matturo",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-2ee6-4a22-9868-e4efc8fbe016",
+              "name": "Maionese de bacon",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f965c53-32d3-4882-bd2b-e4bee672f06c",
+              "name": "Maionese verde",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649a-4ef5-474b-8419-b9450edeac56",
+              "name": "Molho BBQ",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f96649e-52c5-4bcf-b920-a6370a18b745",
+              "name": "Molho cheddar",
+              "price": 1,
+              "max": 1
+            },
+            {
+              "id": "9f9664fc-fa00-49a6-8e10-e9e2e8f4b761",
+              "name": "NAO QUERO Extra molho",
+              "price": 0,
+              "max": 1
+            }
+          ]
+        }
+      ],
+      "available": true
     },
     {
       "id": "9fe2c3ae-afa6-44c1-a50d-379e3f7e84d5",
@@ -1162,7 +5631,9 @@
       ],
       "image": null,
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a21216f2-8ebe-4579-abeb-d0076b894f71",
@@ -1182,7 +5653,9 @@
       ],
       "image": null,
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a2febc85-74aa-46d6-9a41-d2a994ca7a63",
@@ -1202,7 +5675,9 @@
       ],
       "image": null,
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": false
     },
     {
       "id": "a2febcd1-3bd8-4548-8b3b-70aab0e076bc",
@@ -1222,7 +5697,9 @@
       ],
       "image": null,
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a1f1b4cd-b2f1-451b-9138-e1c5f696e965",
@@ -1242,7 +5719,9 @@
       ],
       "image": "/__l5e/assets-v1/b35d6a3e-a10d-4191-967d-611c16d047bc/coca-cola.jpg",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a1f1b511-4765-44ec-8e9e-cb9c1d168425",
@@ -1262,7 +5741,9 @@
       ],
       "image": "/__l5e/assets-v1/e96e6c32-f596-4007-9b5f-23366b894f72/guarana.jpg",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a1f1b526-824a-4799-9b9d-5368cc5ee19c",
@@ -1282,7 +5763,9 @@
       ],
       "image": "/__l5e/assets-v1/54918346-157a-46e9-b9ed-50239a21ba0b/ice-tea-pessego.jpg",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a1f1b54c-43e0-4998-9f00-500b0b3f2293",
@@ -1302,7 +5785,9 @@
       ],
       "image": "/__l5e/assets-v1/a7a7ad41-da6e-47bb-8c71-8d7cc5ad3e49/ice-tea-manga.jpg",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a1f1b566-086f-4b2a-b48c-ecec5bb9a3cb",
@@ -1322,7 +5807,9 @@
       ],
       "image": "/__l5e/assets-v1/26c48250-c7fe-4af7-81d5-fdb00380f819/ice-tea-limao.jpg",
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     },
     {
       "id": "a20b5df5-ac9c-406b-9664-ed943378ed8d",
@@ -1342,7 +5829,9 @@
       ],
       "image": null,
       "modifierCount": 0,
-      "visible": true
+      "visible": true,
+      "groups": [],
+      "available": true
     }
   ]
 }
