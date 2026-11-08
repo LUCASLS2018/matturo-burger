@@ -5,6 +5,7 @@ import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { cleanText, formatPrice, productQuery } from "@/lib/shop";
 import { useCart } from "@/lib/cart";
+import { studioPhoto } from "@/lib/studio-photos";
 import { RibbonBadge } from "@/components/shop/ProductCard";
 
 export const Route = createFileRoute("/produto/$slug")({
@@ -69,11 +70,13 @@ function ProductPage() {
 
   const add = () => {
     if (!canAdd || price === null) return;
-    cart.add({ productId: p.id, slug: p.slug, name: p.name, image: p.images[0]?.url ?? null, price, options: sel }, qty);
+    cart.add({ productId: p.id, slug: p.slug, name: p.name, image: studio ?? p.images[0]?.url ?? null, price, options: sel }, qty);
     toast.success("Adicionado ao carrinho", { description: p.name, action: { label: "Ver carrinho", onClick: () => (window.location.href = "/carrinho") } });
   };
 
-  const img = p.images[imgIdx] ?? p.images[0];
+  const studio = studioPhoto(p.slug);
+  const gallery = studio ? [{ url: studio, alt: p.name }, ...p.images] : p.images;
+  const img = gallery[imgIdx] ?? gallery[0];
   const paragraphs = cleanText(p.description).split(/\n{2,}/).filter(Boolean);
 
   return (
@@ -93,9 +96,9 @@ function ProductPage() {
             {img && <img src={img.url} alt={img.alt} className="aspect-square w-full object-cover" />}
             <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">{p.ribbons.map((r) => <RibbonBadge key={r} name={r} />)}</div>
           </div>
-          {p.images.length > 1 && (
+          {gallery.length > 1 && (
             <div className="mt-3 grid grid-cols-5 gap-2">
-              {p.images.map((im, i) => (
+              {gallery.map((im, i) => (
                 <button key={im.url} onClick={() => setImgIdx(i)} aria-label={`Imagem ${i + 1}`} className={`overflow-hidden rounded-lg border-2 ${i === imgIdx ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"}`}>
                   <img src={im.url} alt="" loading="lazy" className="aspect-square w-full object-cover" />
                 </button>

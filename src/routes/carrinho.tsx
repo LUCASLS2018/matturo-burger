@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/shop";
+import { studioPhoto } from "@/lib/studio-photos";
 
 export const Route = createFileRoute("/carrinho")({
   head: () => ({
@@ -39,7 +40,7 @@ function CartPage() {
           {items.map((i) => (
             <li key={i.key} className="flex gap-4 p-4">
               <Link to="/produto/$slug" params={{ slug: i.slug }} className="shrink-0">
-                {i.image && <img src={i.image} alt={i.name} className="h-20 w-20 rounded-lg object-cover sm:h-24 sm:w-24" />}
+                {(studioPhoto(i.slug) ?? i.image) && <img src={studioPhoto(i.slug) ?? i.image!} alt={i.name} className="h-20 w-20 rounded-lg object-cover sm:h-24 sm:w-24" />}
               </Link>
               <div className="flex min-w-0 flex-1 flex-col">
                 <Link to="/produto/$slug" params={{ slug: i.slug }} className="font-medium hover:text-primary">{i.name}</Link>
