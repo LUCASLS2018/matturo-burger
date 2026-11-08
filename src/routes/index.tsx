@@ -2,14 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Bike, ShoppingBag, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DishCard } from "@/components/restaurant/Menu";
-import { categories } from "@/lib/menu";
+
 import { restaurant, restaurantHead } from "@/lib/restaurant";
 import burgerCutout from "@/assets/matturo/hamburguer-matturo-cutout.png";
-import { menuQuery } from "@/lib/menu-query";
+import { menuCategoriesQuery, menuQuery } from "@/lib/menu-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
-export const Route = createFileRoute("/")({ head: () => restaurantHead("Hambúrgueres e pizzas em Vila Franca de Xira", restaurant.description), loader:({context})=>context.queryClient.ensureQueryData(menuQuery), component: Home });
+export const Route = createFileRoute("/")({ head: () => restaurantHead("Hambúrgueres e pizzas em Vila Franca de Xira", restaurant.description), loader:({context})=>Promise.all([context.queryClient.ensureQueryData(menuQuery),context.queryClient.ensureQueryData(menuCategoriesQuery)]), component: Home });
 function Home() {
  const { data: dishes } = useSuspenseQuery(menuQuery);
+ const { data: categories } = useSuspenseQuery(menuCategoriesQuery);
  const hero = dishes.find(p => p.slug === "hamburguer-matturo");
  const orderedCategories = [...categories].sort((a,b) => Number(b.slug === "promocoes") - Number(a.slug === "promocoes"));
  return <><section className="matturo-hero relative flex items-center overflow-hidden bg-background text-foreground">
