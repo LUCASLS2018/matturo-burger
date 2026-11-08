@@ -11,7 +11,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { CartProvider } from "@/lib/cart";
-import { SiteHeader, SiteFooter } from "@/components/shop/SiteHeader";
+import { RestaurantHeader, RestaurantFooter } from "@/components/restaurant/Shell";
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -55,7 +56,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           Ocorreu um erro. Tente novamente ou volte ao início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
+          <Button
             onClick={() => {
               router.invalidate();
               reset();
@@ -63,7 +64,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Tentar novamente
-          </button>
+          </Button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
@@ -84,23 +85,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "NovaFix Tech Lab — Personalizados em 3D e Laser" },
-      { name: "description", content: "Loja de artigos personalizados feitos com impressão 3D, gravação e corte a laser." },
-      { name: "author", content: "NovaFix Tech Lab" },
-      { property: "og:title", content: "NovaFix Tech Lab" },
-      { property: "og:description", content: "Personalizados em impressão 3D, gravação e corte a laser." },
+      { title: "Matturo Burger" },
+      { name: "description", content: "Hambúrgueres e pizzas em Vila Franca de Xira." },
+      { name: "author", content: "Matturo Burger" },
+      { property: "og:title", content: "Matturo Burger" },
+      { property: "og:description", content: "Hambúrgueres e pizzas em Vila Franca de Xira." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
@@ -131,13 +132,13 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <CartProvider>
         <div className="flex min-h-screen flex-col">
-          <SiteHeader />
+          <RestaurantHeader />
           <main className="flex-1">
             <Outlet />
           </main>
-          <SiteFooter />
+          <RestaurantFooter />
         </div>
-        <Toaster theme="dark" position="bottom-right" />
+        <Toaster theme="light" position="bottom-right" />
       </CartProvider>
     </QueryClientProvider>
   );
