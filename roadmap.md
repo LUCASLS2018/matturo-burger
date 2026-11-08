@@ -30,4 +30,4 @@
 - [x] Management stage 2a: orders saved on the site (server-priced snapshots), customer status page, admin order centre with live updates and optional sound.
 - [x] Add a visible team panel entry point: header "Painel" button and a /painel hub with pedidos, entregas and configurações areas (admin-only cards hidden for couriers).
 - [x] Management stage 2b: link orders to courier assignment and deliveries automatically; cancelling an order cancels its active delivery, hides the courier position and revokes the tracking link.
-- [ ] Management stage 3: editable menu with autosave in the admin panel.
+- [ ] Management stage 3: editable menu with autosave in the admin panel; implementation complete, pending authenticated end-to-end verification.

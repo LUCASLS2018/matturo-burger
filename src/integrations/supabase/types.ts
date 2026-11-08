@@ -183,6 +183,51 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_menu_items: {
+        Row: {
+          available: boolean
+          category: string
+          created_at: string
+          description: string
+          id: string
+          image: string | null
+          name: string
+          price_cents: number
+          revision: number
+          slug: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          available?: boolean
+          category: string
+          created_at?: string
+          description?: string
+          id: string
+          image?: string | null
+          name: string
+          price_cents: number
+          revision?: number
+          slug: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          available?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image?: string | null
+          name?: string
+          price_cents?: number
+          revision?: number
+          slug?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
       matturo_order_items: {
         Row: {
           created_at: string

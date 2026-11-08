@@ -3,11 +3,13 @@ import { useState } from "react";
 import { Minus, Plus, ShoppingBag, ChevronLeft, Utensils } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { dishes, selectionValid, dishTotal, type Dish } from "@/lib/menu";
+import { selectionValid, dishTotal, type Dish } from "@/lib/menu";
 import { useCart } from "@/lib/cart";
 import { money, restaurantHead } from "@/lib/restaurant";
-export const Route = createFileRoute("/produto/$slug")({validateSearch:(s:Record<string,unknown>):{editar?:string | undefined;quantidade?:number | undefined}=>({editar:typeof s["editar"] === "string"?s["editar"]:undefined,quantidade:Number.isInteger(Number(s["quantidade"]))&&Number(s["quantidade"])>0?Number(s["quantidade"]):undefined}),loader:({params})=>{const p=dishes.find(p=>p.slug===params.slug);if(!p)throw notFound();return p;},head:({loaderData})=>restaurantHead(loaderData?.name??"Prato indisponível",loaderData?.description||"Consulte os pratos Matturo Burger."),component:ProductPage,notFoundComponent:()=> <div className="page-width py-20"><h1 className="section-title">Prato não encontrado</h1><Button asChild className="mt-6"><Link to="/cardapio">Ver cardápio</Link></Button></div>});
-function ProductPage(){const p=Route.useLoaderData();return <DishDetail key={p.id} dish={p}/>;}
+import { menuQuery } from "@/lib/menu-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+export const Route = createFileRoute("/produto/$slug")({validateSearch:(s:Record<string,unknown>):{editar?:string | undefined;quantidade?:number | undefined}=>({editar:typeof s["editar"] === "string"?s["editar"]:undefined,quantidade:Number.isInteger(Number(s["quantidade"]))&&Number(s["quantidade"])>0?Number(s["quantidade"]):undefined}),loader:async({params,context})=>{const menu=await context.queryClient.ensureQueryData(menuQuery);const p=menu.find(p=>p.slug===params.slug);if(!p)throw notFound();return p;},head:({loaderData})=>restaurantHead(loaderData?.name??"Prato indisponível",loaderData?.description||"Consulte os pratos Matturo Burger."),component:ProductPage,notFoundComponent:()=> <div className="page-width py-20"><h1 className="section-title">Prato não encontrado</h1><Button asChild className="mt-6"><Link to="/cardapio">Ver cardápio</Link></Button></div>});
+function ProductPage(){const initial=Route.useLoaderData();const {data:menu}=useSuspenseQuery(menuQuery);const p=menu.find(dish=>dish.id===initial.id)??initial;return <DishDetail key={p.id} dish={p}/>;}
 function DishDetail({dish:p}:{dish:Dish}){
  const cart=useCart();const {editar,quantidade}=Route.useSearch();const existing=cart.items.find(i=>i.key===editar&&i.productId===p.id);const [qty,setQty]=useState(existing?.qty??quantidade??1);const [selected,setSelected]=useState<Record<string,number>>(()=>Object.fromEntries(p.groups.flatMap(g=>g.modifiers.map(m=>{const value=existing?.options[g.name]?.split(", ").find(v=>v.endsWith(`× ${m.name}`));return [m.id,value?Number(value.split("×")[0]):0];}))));const [notes,setNotes]=useState(existing?.options["Observações"]??"");
  const price=dishTotal(p,selected);const valid=selectionValid(p,selected);

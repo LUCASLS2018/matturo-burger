@@ -2,16 +2,20 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, Utensils, Minus, Plus, ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { categories, dishes, type Dish } from "@/lib/menu";
+import { categories, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { menuQuery } from "@/lib/menu-query";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const [quantity, setQuantity] = useState(1);
   const cutout = dishCutout(dish.slug);
+  const customPhoto = dish.image?.startsWith("https://") ? dish.image : null;
+  const photo = customPhoto || cutout || dish.image;
   return <article className="burger-card group">
     <div className="burger-card-panel" />
-    <Link to="/produto/$slug" params={{ slug: dish.slug }} className="burger-card-photo" aria-label={dish.name}>{(cutout || dish.image) ? <img src={cutout || dish.image || undefined} alt={dish.name} loading="lazy" className={cutout ? "food-photo h-full w-full object-contain" : "food-photo mx-auto mt-4 aspect-square w-full rounded-full object-cover"} /> : <Utensils className="mx-auto mt-12 h-10 w-10 text-muted-foreground" />}</Link>
+    <Link to="/produto/$slug" params={{ slug: dish.slug }} className="burger-card-photo" aria-label={dish.name}>{photo ? <img src={photo} alt={dish.name} loading="lazy" className={(customPhoto || cutout) ? "food-photo h-full w-full object-contain" : "food-photo mx-auto mt-4 aspect-square w-full rounded-full object-cover"} /> : <Utensils className="mx-auto mt-12 h-10 w-10 text-muted-foreground" />}</Link>
     <div className="burger-card-content">
       <div className="mb-4 flex items-center justify-end gap-2">
         <Button size="icon" variant="outline" className="h-7 w-7 rounded-md border-0 bg-primary/15 text-primary" title={`Diminuir quantidade de ${dish.name}`} aria-label={`Diminuir quantidade de ${dish.name}`} disabled={quantity === 1} onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus className="h-3 w-3" /></Button>
@@ -26,6 +30,7 @@ export function DishCard({ dish }: { dish: Dish }) {
 }
 
 export function MenuPage() {
+  const { data: dishes } = useSuspenseQuery(menuQuery);
   const [category,setCategory] = useState("todas"); const [query,setQuery] = useState("");
   const normalize = (s:string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
   const list = dishes.filter(p => (category === "todas" || p.category === category) && normalize(p.name+" "+p.description).includes(normalize(query)));

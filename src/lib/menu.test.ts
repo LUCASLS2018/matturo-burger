@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { dishes, dishTotal, selectionValid } from "./menu";
+import { dishes, dishTotal, menuItemToDish, selectionValid } from "./menu";
+import { priceLine } from "./order-pricing";
 describe("Original Matturo menu", () => {
   it("preserves the exact original Matturo burger price", () => {
     const dish = dishes.find(p => p.slug === "hamburguer-matturo");
@@ -17,5 +18,22 @@ describe("Original Matturo menu", () => {
     if (!fries) throw new Error("Missing fries option");
     expect(fries.price).toBe(1.5);
     expect(dishTotal(dish, { [fries.id]: 1 })).toBe(11.49);
+  });
+  it("uses an edited database price for new orders and preserves the original options", () => {
+    const original = dishes.find(p => p.slug === "hamburguer-matturo");
+    if (!original) throw new Error("Missing original burger");
+    const edited = menuItemToDish({
+      id: original.id,
+      name: original.name,
+      slug: original.slug,
+      description: original.description,
+      category: original.category,
+      price_cents: 925,
+      image: original.image,
+      available: true,
+      visible: true,
+    });
+    expect(edited.groups).toEqual(original.groups);
+    expect(priceLine({ productId: original.id, qty: 1, options: {} }, [edited]).unit_price_cents).toBe(925);
   });
 });
