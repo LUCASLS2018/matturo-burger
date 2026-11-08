@@ -1,5 +1,7 @@
 # Matturo Burger
 
+- [ ] Present and obtain approval for the complete Matturo management architecture: onsite orders, live order administration, autosaved catalogue/categories, courier assignment, customer access and restaurant pause controls; no structural database changes before approval.
+- [ ] Implement and verify the approved management stages; blocked pending architecture authorization.
 - [x] Extract and verify original identity, photographs, menu and business information: 54 products, 6 categories, 41 customized dishes.
 - [x] Replace NovaFix pages and navigation with restaurant home, menu, product details, cart, service and contacts.
 - [x] Keep Matturo cart separate; direct order completion to original restaurant WhatsApp without using NovaFix Stripe or Supabase.
