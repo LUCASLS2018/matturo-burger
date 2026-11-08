@@ -8,3 +8,4 @@
 - [x] Follow the newly uploaded visual reference while keeping original restaurant product photographs.
 - [ ] Remove the background of the large homepage burger.
 - [ ] Restyle every hamburger selection card to match the new compact reference, with original burger cutouts and functional controls.
+- [ ] Keep all ordering buttons on this site instead of the discontinued external menu.

@@ -7,7 +7,7 @@ export const restaurant = {
   instagram: "https://www.instagram.com/matturoburger",
   tiktok: "https://www.tiktok.com/@matturo.burger",
   maps: "https://www.google.com/maps/search/?api=1&query=38.9534874,-8.9883805",
-  orderUrl: "https://matturo-burguer.ola.click/products",
+  orderUrl: "/cardapio" as const,
   source: "https://matturoburger.com/",
 };
 
