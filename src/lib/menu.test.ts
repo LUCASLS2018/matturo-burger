@@ -19,4 +19,21 @@ describe("Original Matturo menu", () => {
     expect(fries.price).toBe(1.5);
     expect(dishTotal(dish, { [fries.id]: 1 })).toBe(11.49);
   });
+  it("uses an edited database price for new orders and preserves the original options", () => {
+    const original = dishes.find(p => p.slug === "hamburguer-matturo");
+    if (!original) throw new Error("Missing original burger");
+    const edited = menuItemToDish({
+      id: original.id,
+      name: original.name,
+      slug: original.slug,
+      description: original.description,
+      category: original.category,
+      price_cents: 925,
+      image: original.image,
+      available: true,
+      visible: true,
+    });
+    expect(edited.groups).toEqual(original.groups);
+    expect(priceLine({ productId: original.id, qty: 1, options: {} }, [edited]).unit_price_cents).toBe(925);
+  });
 });
