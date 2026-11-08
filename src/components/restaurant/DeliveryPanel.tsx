@@ -1,12 +1,13 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { ClientOnly, useNavigate } from "@tanstack/react-router";
+import { ClientOnly, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { authorizeCourier, changeDelivery, deliveryDashboard, issueTrackingLink, recordPosition, setCourierAvailability } from "@/lib/delivery.functions";
 import { deliveryLabels, nextDeliveryState } from "@/lib/delivery";
 import { money } from "@/lib/restaurant";
-import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike } from "lucide-react";
+import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 const Map = lazy(() => import("./DeliveryMap"));
 type Data = Awaited<ReturnType<typeof deliveryDashboard>>;
@@ -69,40 +70,98 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const ownOpen = data.deliveries.filter((delivery) => delivery.courier_id === data.userId && openStates.includes(delivery.status)).length;
   const availability = ownOpen ? "busy" : ownAvailability?.state ?? "available";
 
-  return <div className="page-width py-12">
-    <div className="flex flex-wrap items-center justify-between gap-4"><div><p className="mb-2 text-xs font-semibold text-primary">MATTURO · ENTREGAS</p><h1 className="section-title">{data.admin ? "Gestão de entregas" : "As minhas entregas"}</h1></div><Button variant="outline" onClick={() => run(async () => { stop(); await query.cancelQueries(); query.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); })}><LogOut />Sair</Button></div>
+  const [tab, setTab] = useState<"open" | "done">("open");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const active = data.deliveries.filter((d) => !["delivered", "cancelled"].includes(d.status));
+  const done = data.deliveries.filter((d) => ["delivered", "cancelled"].includes(d.status));
+  const list = tab === "open" ? active : done;
+  const today = new Date().toDateString();
+  const doneToday = done.filter((d) => d.status === "delivered" && data.events.some((e) => e.delivery_id === d.id && e.status === "delivered" && new Date(e.created_at).toDateString() === today)).length;
+  const onRoad = active.filter((d) => d.status === "active").length;
+  const freeCouriers = data.courierIds.filter((id) => !active.some((d) => d.courier_id === id) && data.availability.find((a) => a.user_id === id)?.state !== "inactive").length;
+  const tone = (s: string) => s === "active" ? "bg-primary text-primary-foreground" : s === "delivered" ? "bg-secondary text-muted-foreground" : s === "cancelled" ? "bg-destructive/10 text-destructive" : "bg-primary/15 text-primary";
+  const copy = async () => { try { await navigator.clipboard.writeText(link); toast.success("Link copiado"); } catch { /* ignore */ } };
+  const stats = data.admin
+    ? [{ label: "Entregas ativas", value: active.length, icon: Bike }, { label: "Em rota (GPS)", value: onRoad, icon: Radio }, { label: "Entregues hoje", value: doneToday, icon: CheckCircle2 }, { label: "Estafetas livres", value: `${freeCouriers}/${data.courierIds.length}`, icon: Users }]
+    : [{ label: "Ativas", value: ownOpen, icon: Bike }, { label: "Entregues hoje", value: doneToday, icon: CheckCircle2 }];
 
-    <section className="mt-8 border-y border-border py-6"><h2 className="font-semibold">O meu perfil</h2>
-      <div className="mt-4 flex flex-wrap items-center gap-4">{photo && <img src={photo} alt="Foto do estafeta" className="h-16 w-16 rounded object-cover" />}<label className="text-sm">Nome<input value={name} onChange={(event) => setName(event.target.value)} maxLength={100} className="ml-3 h-10 rounded-md border border-input bg-card px-3" /></label><Button variant="outline" disabled={busy} onClick={() => run(async () => { const result = await supabase.from("matturo_profiles").update({ name: name.trim() }).eq("id", data.userId); if (result.error) throw result.error; })}>Guardar</Button><label className="inline-flex cursor-pointer items-center gap-2 text-sm"><Camera />Foto<input type="file" accept="image/png,image/jpeg,image/webp" className="max-w-52 text-xs" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; void run(async () => { if (file.size > 2 * 1024 * 1024) throw new Error("A foto deve ter até 2 MB."); const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg"; const path = `${data.userId}/${crypto.randomUUID()}.${extension}`; const uploaded = await supabase.storage.from("matturo-courier-photos").upload(path, file); if (uploaded.error) throw uploaded.error; const updated = await supabase.from("matturo_profiles").update({ photo_path: path }).eq("id", data.userId); if (updated.error) throw updated.error; }); }} /></label></div>
-      {data.courier && <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-5"><p className="text-sm">Estado: <strong>{availability === "busy" ? `Ocupado · ${ownOpen} entrega${ownOpen === 1 ? "" : "s"} ativa${ownOpen === 1 ? "" : "s"}` : availability === "inactive" ? "Inativo" : "Disponível"}</strong></p><Button size="sm" variant="outline" disabled={busy || availability === "busy"} onClick={() => run(() => setCourierAvailability({ data: { state: availability === "inactive" ? "available" : "inactive" } }))}>{availability === "inactive" ? "Ficar disponível" : "Ficar inativo"}</Button>{availability === "busy" && <Button size="sm" variant="outline" disabled={busy} onClick={() => run(() => setCourierAvailability({ data: { state: "inactive" } }))}>Ficar inativo após as ativas</Button>}</div>}
-    </section>
+  return <div className="page-width py-6 sm:py-10">
+    <header className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        {data.admin && <Button asChild size="icon" variant="outline"><Link to="/painel" aria-label="Voltar ao painel"><ArrowLeft /></Link></Button>}
+        <div><p className="text-xs font-semibold tracking-wide text-primary">MATTURO · ENTREGAS</p><h1 className="text-2xl font-bold sm:text-3xl">{data.admin ? "Gestão de entregas" : "As minhas entregas"}</h1></div>
+        <span className="hidden items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary sm:inline-flex"><span className="h-2 w-2 animate-pulse rounded-full bg-primary" />Em direto</span>
+      </div>
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" onClick={() => setShowProfile((v) => !v)}>{photo ? <img src={photo} alt="" className="h-5 w-5 rounded-full object-cover" /> : <Camera />}Perfil</Button>
+        <Button variant="outline" size="sm" onClick={() => run(async () => { stop(); await query.cancelQueries(); query.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); })}><LogOut />Sair</Button>
+      </div>
+    </header>
+
+    <div className={`mt-6 grid gap-3 ${data.admin ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2"}`}>
+      {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><div className="flex items-center justify-between text-xs text-muted-foreground">{s.label}<s.icon className="h-4 w-4 text-primary" /></div><p className="mt-2 text-2xl font-bold">{s.value}</p></div>)}
+    </div>
+
+    {data.courier && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4">
+      <span className={`h-2.5 w-2.5 rounded-full ${availability === "inactive" ? "bg-muted-foreground" : "bg-primary"}`} />
+      <p className="text-sm">Estado: <strong>{availability === "busy" ? `Ocupado · ${ownOpen} entrega${ownOpen === 1 ? "" : "s"} ativa${ownOpen === 1 ? "" : "s"}` : availability === "inactive" ? "Inativo" : "Disponível"}</strong></p>
+      <div className="ml-auto flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" disabled={busy || availability === "busy"} onClick={() => run(() => setCourierAvailability({ data: { state: availability === "inactive" ? "available" : "inactive" } }))}>{availability === "inactive" ? "Ficar disponível" : "Ficar inativo"}</Button>
+        {availability === "busy" && <Button size="sm" variant="outline" disabled={busy} onClick={() => run(() => setCourierAvailability({ data: { state: "inactive" } }))}>Inativo após as ativas</Button>}
+      </div>
+    </div>}
+
+    {showProfile && <section className="mt-4 rounded-xl border border-border bg-card p-4"><h2 className="text-sm font-semibold">O meu perfil</h2>
+      <div className="mt-3 flex flex-wrap items-center gap-3">{photo && <img src={photo} alt="Foto do estafeta" className="h-14 w-14 rounded-full object-cover" />}<input aria-label="Nome" value={name} onChange={(event) => setName(event.target.value)} maxLength={100} className="h-10 rounded-md border border-input bg-background px-3 text-sm" /><Button size="sm" variant="outline" disabled={busy} onClick={() => run(async () => { const result = await supabase.from("matturo_profiles").update({ name: name.trim() }).eq("id", data.userId); if (result.error) throw result.error; toast.success("Perfil guardado"); })}>Guardar</Button><label className="inline-flex cursor-pointer items-center gap-2 text-sm"><Camera className="h-4 w-4" />Mudar foto<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; void run(async () => { if (file.size > 2 * 1024 * 1024) throw new Error("A foto deve ter até 2 MB."); const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg"; const path = `${data.userId}/${crypto.randomUUID()}.${extension}`; const uploaded = await supabase.storage.from("matturo-courier-photos").upload(path, file); if (uploaded.error) throw uploaded.error; const updated = await supabase.from("matturo_profiles").update({ photo_path: path }).eq("id", data.userId); if (updated.error) throw updated.error; }); }} /></label></div>
+    </section>}
 
     {!data.admin && !data.courier && <p className="mt-8">A sua conta aguarda atribuição de acesso pelo restaurante.</p>}
-    {data.admin && <section className="border-b border-border py-6"><h2 className="font-semibold">Equipa</h2><div className="mt-4 flex flex-wrap gap-4">{data.profiles.filter((profile) => !data.courierIds.includes(profile.id)).map((profile) => <Button key={profile.id} variant="outline" disabled={busy} onClick={() => run(() => authorizeCourier({ data: { userId: profile.id } }))}>Autorizar estafeta: {profile.name || profile.id}</Button>)}</div></section>}
-    {error && <p role="alert" className="my-5 text-sm text-destructive">{error}</p>}
-    {link && <div className="my-5 break-all border-y border-border py-4"><p className="text-sm">Link exclusivo — válido por 24 horas</p><a href={link} className="mt-2 block text-sm text-primary">{link}</a></div>}
+    {data.admin && data.profiles.some((p) => !data.courierIds.includes(p.id)) && <section className="mt-4 rounded-xl border border-dashed border-border p-4"><h2 className="text-sm font-semibold">Novos membros por autorizar</h2><div className="mt-3 flex flex-wrap gap-2">{data.profiles.filter((profile) => !data.courierIds.includes(profile.id)).map((profile) => <Button key={profile.id} size="sm" variant="outline" disabled={busy} onClick={() => run(() => authorizeCourier({ data: { userId: profile.id } }))}><Users />Autorizar {profile.name || "sem nome"}</Button>)}</div></section>}
+    {error && <p role="alert" className="mt-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
+    {link && <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3"><LinkIcon className="h-4 w-4 text-primary" /><span className="text-xs text-muted-foreground">Link do cliente (24 h):</span><a href={link} className="min-w-0 flex-1 truncate text-sm text-primary">{link}</a><Button size="sm" onClick={copy}><Copy />Copiar</Button></div>}
 
-    <section className="mt-8"><h2 className="text-lg font-semibold">Entregas</h2>{!data.deliveries.length && <p className="mt-5 text-sm text-muted-foreground">Sem entregas atribuídas.</p>}
-      <div className="mt-5 grid items-start gap-6 lg:grid-cols-2">{data.deliveries.map((delivery) => {
-        const position = delivery.status === "active" ? data.positions.find((item) => item.delivery_id === delivery.id) ?? null : null;
-        const order = data.orders.find((item) => item.id === delivery.order_id);
-        const next = nextDeliveryState[delivery.status];
-        return <article key={delivery.id} className="rounded-lg border border-border bg-card p-5">
-          <div className="flex flex-wrap justify-between gap-3"><h3 className="font-semibold">{delivery.reference}</h3><span className="text-sm text-primary">{deliveryLabels[delivery.status]}</span></div>
-          <p className="my-4 flex gap-2 text-sm"><MapPin className="h-4 w-4 shrink-0" />{delivery.destination}</p>
-          {order && <div className="mb-4 rounded-md bg-secondary/60 p-4 text-sm"><p className="font-semibold">{order.customer_name} · <a className="underline" href={`tel:${order.customer_phone}`}>{order.customer_phone}</a></p><p className="mt-1 text-xs text-muted-foreground">{order.address} · {order.postal_code}</p><ul className="mt-3 space-y-2 border-t border-border pt-3">{order.matturo_order_items.map((item, index) => <li key={index}><div className="flex justify-between gap-3"><span>{item.qty}× {item.name}</span><span>{money(item.line_total_cents / 100)}</span></div>{Object.entries(item.options as Record<string, string>).map(([key, value]) => <p key={key} className="text-xs text-muted-foreground">{key}: {value}</p>)}</li>)}</ul>{order.notes && <p className="mt-3 italic">“{order.notes}”</p>}<p className="mt-3 border-t border-border pt-3 font-semibold">Total: {money(order.total_cents / 100)}</p></div>}
-          {!["delivered", "cancelled"].includes(delivery.status) && <div className="mb-4 flex flex-wrap gap-2"><Button asChild size="sm" variant="outline"><a href={`https://www.google.com/maps/dir/?api=1&destination=${delivery.destination_lat},${delivery.destination_lng}&travelmode=driving`} target="_blank" rel="noopener noreferrer"><Navigation />Google Maps</a></Button><Button asChild size="sm" variant="outline"><a href={`https://waze.com/ul?ll=${delivery.destination_lat},${delivery.destination_lng}&navigate=yes`} target="_blank" rel="noopener noreferrer"><Navigation />Waze</a></Button></div>}
-          {data.admin && <p className="mb-4 text-sm">Estafeta: {data.profiles.find((profile) => profile.id === delivery.courier_id)?.name || "Sem nome"}</p>}
-          {delivery.status === "active" && <><ClientOnly><Suspense fallback={<div className="h-96 bg-muted" />}><Map lat={delivery.destination_lat} lng={delivery.destination_lng} position={position} /></Suspense></ClientOnly><p className="mt-3 text-xs text-muted-foreground">{position ? `Última atualização: ${new Date(position.recorded_at).toLocaleString("pt-PT")}` : "A aguardar GPS"}</p></>}
-          <div className="mt-5 flex flex-wrap gap-3">
-            {data.courier && delivery.courier_id === data.userId && next && (next === "active" ? <Button disabled={busy || tracking !== null} onClick={() => start(delivery.id)}><Play />Iniciar entrega e GPS</Button> : <Button disabled={busy} onClick={() => run(() => changeDelivery({ data: { id: delivery.id, status: next } }))}>{next === "to_restaurant" ? <Bike /> : next === "collected" ? <PackageCheck /> : <Check />}{next === "to_restaurant" ? "A caminho do restaurante" : next === "collected" ? "Pedido recolhido" : "Finalizar entrega"}</Button>)}
-            {data.courier && delivery.courier_id === data.userId && delivery.status === "active" && tracking !== delivery.id && <Button disabled={busy} variant="outline" onClick={() => start(delivery.id, true)}>Retomar GPS</Button>}
-            {data.admin && <Button variant="outline" disabled={busy} onClick={() => run(async () => { const result = await issueTrackingLink({ data: { id: delivery.id } }); setLink(`${window.location.origin}/acompanhar/${result.token}`); })}><LinkIcon />Novo link</Button>}
+    <div className="mt-6 flex gap-2 border-b border-border">
+      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length]] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
+    </div>
+
+    {!list.length && <p className="py-12 text-center text-sm text-muted-foreground">{tab === "open" ? "Sem entregas ativas." : "Sem entregas concluídas."}</p>}
+    <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">{list.map((delivery) => {
+      const position = delivery.status === "active" ? data.positions.find((item) => item.delivery_id === delivery.id) ?? null : null;
+      const order = data.orders.find((item) => item.id === delivery.order_id);
+      const next = nextDeliveryState[delivery.status];
+      const mine = data.courier && delivery.courier_id === data.userId;
+      const expanded = openId === delivery.id || (tab === "open" && !data.admin) || delivery.status === "active";
+      const courierName = data.profiles.find((profile) => profile.id === delivery.courier_id)?.name || "Sem nome";
+      return <article key={delivery.id} className={`overflow-hidden rounded-xl border bg-card ${delivery.status === "active" ? "border-primary/50 shadow-md" : "border-border"}`}>
+        <button type="button" onClick={() => setOpenId(openId === delivery.id ? null : delivery.id)} className="flex w-full items-start gap-3 p-4 text-left">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Bike className="h-5 w-5" /></div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold">{delivery.reference}</h3><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone(delivery.status)}`}>{deliveryLabels[delivery.status]}</span></div>
+            <p className="mt-1 truncate text-sm text-muted-foreground">{order?.customer_name ? `${order.customer_name} · ` : ""}{delivery.destination}</p>
+            {data.admin && <p className="mt-1 text-xs text-muted-foreground">Estafeta: <span className="font-medium text-foreground">{courierName}</span></p>}
           </div>
-          <details className="mt-5 text-xs"><summary className="cursor-pointer">Histórico de estados</summary>{data.events.filter((event) => event.delivery_id === delivery.id).map((event) => <p key={event.id} className="mt-2">{deliveryLabels[event.status]} · {new Date(event.created_at).toLocaleString("pt-PT")}</p>)}</details>
-        </article>;
-      })}</div>
-    </section>
+          <div className="flex shrink-0 flex-col items-end gap-1">{order && <span className="font-semibold">{money(order.total_cents / 100)}</span>}<ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} /></div>
+        </button>
+        {expanded && <div className="space-y-4 border-t border-border p-4">
+          <p className="flex gap-2 text-sm"><MapPin className="h-4 w-4 shrink-0 text-primary" />{delivery.destination}</p>
+          {order && <div className="rounded-lg bg-secondary/60 p-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-semibold">{order.customer_name}</p><a className="inline-flex items-center gap-1 text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3.5 w-3.5" />{order.customer_phone}</a></div>
+            <p className="mt-1 text-xs text-muted-foreground">{order.address} · {order.postal_code}</p>
+            <ul className="mt-3 space-y-2 border-t border-border pt-3">{order.matturo_order_items.flatMap((item) => Array.from({ length: Math.max(1, item.qty) }, () => item)).map((item, index) => <li key={index}><div className="flex justify-between gap-3"><span>1× {item.name}</span><span>{money(item.line_total_cents / Math.max(1, item.qty) / 100)}</span></div>{Object.entries(item.options as Record<string, string>).map(([key, value]) => <p key={key} className="text-xs text-muted-foreground">{key}: {value}</p>)}</li>)}</ul>
+            {order.notes && <p className="mt-3 italic">“{order.notes}”</p>}
+          </div>}
+          {delivery.status === "active" && <div><ClientOnly><Suspense fallback={<div className="h-72 rounded-lg bg-muted" />}><Map lat={delivery.destination_lat} lng={delivery.destination_lng} position={position} /></Suspense></ClientOnly><p className="mt-2 text-xs text-muted-foreground">{position ? `Última atualização: ${new Date(position.recorded_at).toLocaleTimeString("pt-PT")}` : "A aguardar GPS"}</p></div>}
+          <div className="flex flex-wrap gap-2">
+            {mine && next && (next === "active" ? <Button disabled={busy || tracking !== null} onClick={() => start(delivery.id)}><Play />Iniciar entrega e GPS</Button> : <Button disabled={busy} onClick={() => run(() => changeDelivery({ data: { id: delivery.id, status: next } }))}>{next === "to_restaurant" ? <Bike /> : next === "collected" ? <PackageCheck /> : <Check />}{next === "to_restaurant" ? "A caminho do restaurante" : next === "collected" ? "Pedido recolhido" : "Finalizar entrega"}</Button>)}
+            {mine && delivery.status === "active" && tracking !== delivery.id && <Button disabled={busy} variant="outline" onClick={() => start(delivery.id, true)}>Retomar GPS</Button>}
+            {!["delivered", "cancelled"].includes(delivery.status) && <><Button asChild size="sm" variant="outline"><a href={`https://www.google.com/maps/dir/?api=1&destination=${delivery.destination_lat},${delivery.destination_lng}&travelmode=driving`} target="_blank" rel="noopener noreferrer"><Navigation />Google Maps</a></Button><Button asChild size="sm" variant="outline"><a href={`https://waze.com/ul?ll=${delivery.destination_lat},${delivery.destination_lng}&navigate=yes`} target="_blank" rel="noopener noreferrer"><Navigation />Waze</a></Button></>}
+            {data.admin && !["delivered", "cancelled"].includes(delivery.status) && <Button size="sm" variant="outline" disabled={busy} onClick={() => run(async () => { const result = await issueTrackingLink({ data: { id: delivery.id } }); setLink(`${window.location.origin}/acompanhar/${result.token}`); })}><LinkIcon />Link do cliente</Button>}
+          </div>
+          <details className="text-xs"><summary className="cursor-pointer text-muted-foreground">Histórico de estados</summary><ol className="mt-2 space-y-1 border-l border-border pl-3">{data.events.filter((event) => event.delivery_id === delivery.id).map((event) => <li key={event.id}>{deliveryLabels[event.status]} · {new Date(event.created_at).toLocaleString("pt-PT")}</li>)}</ol></details>
+        </div>}
+      </article>;
+    })}</div>
     {data.courier && <p className="mt-8 text-sm text-muted-foreground">A localização é partilhada apenas durante a entrega ativa. Mantenha esta página aberta e o telemóvel desbloqueado.</p>}
   </div>;
 }
