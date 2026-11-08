@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import type { OrderService } from "./order-service";
 
 export type CartItem = {
   key: string;
@@ -12,6 +13,8 @@ export type CartItem = {
 };
 
 type CartCtx = {
+  service: OrderService;
+  setService: (service: OrderService) => void;
   items: CartItem[];
   count: number;
   subtotal: number;
@@ -29,6 +32,7 @@ export function cartKey(productId: string, options: Record<string, string>) {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const [service, setService] = useState<OrderService>("Retirada");
   const [items, setItems] = useState<CartItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -48,6 +52,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartCtx>(
     () => ({
+      service,
+      setService,
       items,
       count: items.reduce((s, i) => s + i.qty, 0),
       subtotal: items.reduce((s, i) => s + i.qty * i.price, 0),
@@ -63,7 +69,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       remove: (key) => setItems((prev) => prev.filter((i) => i.key !== key)),
       clear: () => setItems([]),
     }),
-    [items],
+    [items, service],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

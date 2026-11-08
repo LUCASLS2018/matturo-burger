@@ -16,3 +16,4 @@
 - [x] Ensure all product names remain fully separated from photos; verified at mobile, desktop and wide desktop sizes.
 - [x] Show all 54 products on the homepage, promotions first.
 - [x] Make the transparent logo black and increase its visible size further; verified on mobile and desktop.
+- [ ] Add Comer no local in cart and carry the selection into order completion.
