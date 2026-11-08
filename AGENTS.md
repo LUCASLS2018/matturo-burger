@@ -34,3 +34,4 @@ use the editor.
 - Restaurant cart uses a separate browser storage namespace; order submission uses the original restaurant channel until a restaurant-specific integration is authorized.
 - Preserve legacy public page paths as restaurant pages or redirects; do not reuse the NovaFix Stripe flow for restaurant orders.
 - Resolve all product cutouts through the shared dish-images module; use the shared DishCard on home and menu so original-photo edits and ordering controls stay consistent.
+- Keep order modality in the cart context and its allowed values in order-service so cart and checkout share the same selection.
