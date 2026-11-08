@@ -38,4 +38,5 @@ use the editor.
 - Delivery persistence uses isolated matturo_* resources; courier GPS/state RPCs enforce assignment under a row lock, and public tracking reads validate hashed expiring tokens on the server without anonymous table grants.
 - Authenticated delivery panels use the shared _authenticated gate and bearer function middleware; Leaflet loads dynamically after hydration to preserve SSR safety.
 - Restaurant settings and delivery zones use isolated Matturo tables, revision-checked admin writes and public allowlisted reads; checkout rechecks pause immediately before submission to prevent stale-page ordering.
-- Matturo orders are created only by a server function that reprices every line from the menu snapshot and rechecks pause/zones; customers read their order via an unguessable hashed token, admins via RLS — never trust browser prices.
+- Matturo menu edits live in isolated matturo_menu_items rows with revision-checked autosave and private admin-only photo uploads; public pages read current rows, while the verified snapshot supplies preserved option groups.
+- Matturo orders are created only by a server function that reprices every line from current menu rows and rechecks pause/zones; customers read their order via an unguessable hashed token, admins via RLS — never trust browser prices.

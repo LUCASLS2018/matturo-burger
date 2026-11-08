@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { dishes, dishTotal, selectionValid } from "./menu";
+import { dishes, dishTotal, menuItemToDish, selectionValid } from "./menu";
+import { priceLine } from "./order-pricing";
 describe("Original Matturo menu", () => {
   it("preserves the exact original Matturo burger price", () => {
     const dish = dishes.find(p => p.slug === "hamburguer-matturo");
