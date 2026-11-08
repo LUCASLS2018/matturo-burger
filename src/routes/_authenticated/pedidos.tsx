@@ -3,7 +3,7 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Ban, Bell, BellOff, Bike, Clock, MapPin, Phone, ReceiptText, ShoppingBag, Utensils } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Bike, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
@@ -23,14 +23,6 @@ export const Route = createFileRoute("/_authenticated/pedidos")({
   component: OrdersPage,
 });
 
-const columns: { key: OrderStatus; label: string; dot: string }[] = [
-  { key: "novo", label: "Por aceitar", dot: "bg-primary" },
-  { key: "aceite", label: "Aceite", dot: "bg-primary/70" },
-  { key: "em_preparacao", label: "Em preparação", dot: "bg-primary/45" },
-  { key: "pronto", label: "Em entrega", dot: "bg-primary/25" },
-  { key: "concluido", label: "Concluído", dot: "bg-muted-foreground/40" },
-];
-
 const boardLabels: Record<string, string> = { novo: "Por aceitar", aceite: "Aceite", em_preparacao: "Em preparação", pronto: "Em entrega", concluido: "Concluído", cancelado: "Cancelado" };
 const serviceIcon = (s: string) => s === "Delivery" ? Bike : s === "Comer no local" ? Utensils : ShoppingBag;
 const statusTone = (s: string) => s === "concluido" ? "bg-secondary text-muted-foreground" : s === "cancelado" ? "bg-destructive/10 text-destructive" : "bg-primary/15 text-primary";
@@ -44,7 +36,6 @@ function OrdersPage() {
   const { data: board } = useSuspenseQuery(boardQuery);
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
-  const [showCancelled, setShowCancelled] = useState(false);
   const sendToCourier = async (orderId: string) => {
     const courierId = pick[orderId] ?? board.couriers[0]?.id; if (!courierId) return;
     try { await assign({ data: { orderId, courierId } }); toast.success("Pedido enviado ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }
@@ -75,8 +66,6 @@ function OrdersPage() {
     try { await move({ data: { id, from, to } }); await qc.invalidateQueries({ queryKey: ordersQuery.queryKey }); }
     catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível guardar."); }
   };
-  const cancelled = data.filter((o) => o.status === "cancelado");
-
   return (
     <div className="page-width py-10">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
@@ -95,40 +84,29 @@ function OrdersPage() {
         {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-medium text-muted-foreground">{s.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p></div>)}
       </div>
 
-      <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:grid lg:grid-cols-5 lg:gap-3 lg:overflow-visible xl:gap-4">
-        {columns.map((col) => {
-          const items = data.filter((o) => o.status === col.key);
-          return (
-            <section key={col.key} className="w-[86vw] shrink-0 snap-start sm:w-[330px] lg:w-auto lg:min-w-0 lg:shrink">
-              <header className="sticky top-0 z-10 mb-3 flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2">
-                <span className="flex items-center gap-2 text-sm font-semibold"><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}</span>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold tabular-nums">{items.length}</span>
-              </header>
-              <div className="space-y-3">
-                {!items.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos</p>}
-                {items.map((o) => (
-                  <OrderCard
-                    key={o.id}
-                    order={o}
-                    board={board}
-                    courierPick={pick[o.id] ?? board.couriers[0]?.id ?? ""}
-                    onPick={(id, value) => setPick({ ...pick, [id]: value })}
-                    onSend={sendToCourier}
-                    onMove={change}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
-
-      {cancelled.length > 0 && (
-        <div className="mt-6">
-          <Button variant="outline" size="sm" onClick={() => setShowCancelled(!showCancelled)}><Ban />Cancelados<span className="ml-1 rounded-full bg-secondary px-2 text-xs tabular-nums">{cancelled.length}</span></Button>
-          {showCancelled && <div className="mt-4 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">{cancelled.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}</div>}
+      <section className="mt-8" aria-label="Lista de pedidos">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-bold">Todos os pedidos</h2>
+          <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold tabular-nums">{data.length}</span>
         </div>
-      )}
+        {!data.length ? (
+          <p className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">Sem pedidos</p>
+        ) : (
+          <div className="space-y-2">
+            {data.map((o) => (
+              <OrderCard
+                key={o.id}
+                order={o}
+                board={board}
+                courierPick={pick[o.id] ?? board.couriers[0]?.id ?? ""}
+                onPick={(id, value) => setPick({ ...pick, [id]: value })}
+                onSend={sendToCourier}
+                onMove={change}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
