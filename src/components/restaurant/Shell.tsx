@@ -12,7 +12,7 @@ export function RestaurantHeader() {
   return <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-lg">
     <div className="page-width flex h-24 items-center justify-between gap-4">
       <Link to="/" aria-label="Matturo Burger — início" className="shrink-0"><img src={logo} alt="Matturo Burger" className="h-20 w-52 object-contain lg:w-64" /></Link>
-      <nav aria-label="Navegação principal" className="hidden items-center gap-8 text-sm font-medium md:flex">
+      <nav aria-label="Navegação principal" className="hidden items-center gap-6 text-sm font-medium lg:flex">
         <Link to="/" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>Início</Link>
         <Link to="/cardapio" activeProps={{ className: "text-primary" }}>Cardápio</Link>
         <Link to="/sobre" activeProps={{ className: "text-primary" }}>O Matturo</Link>
@@ -22,10 +22,10 @@ export function RestaurantHeader() {
       <div className="flex items-center gap-3">
         <Button asChild variant="ghost" className="relative" aria-label={`Ver pedido, ${count} artigos`}><Link to="/carrinho"><ShoppingBag />{count > 0 && <span className="text-xs font-semibold">{count}</span>}</Link></Button>
         <Button asChild className="hidden h-11 sm:inline-flex"><Link to={restaurant.orderUrl}>Pedir agora <ArrowUpRight /></Link></Button>
-        <Button variant="ghost" size="icon" className="md:hidden" aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
+        <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
       </div>
     </div>
-    {open && <nav aria-label="Menu móvel" className="flex flex-col gap-5 border-t border-border px-6 py-6 md:hidden" onClick={() => setOpen(false)}><Link to="/">Início</Link><Link to="/cardapio">Cardápio</Link><Link to="/sobre">O Matturo</Link><Link to="/atendimento">Atendimento</Link><Link to="/contactos">Contactos</Link></nav>}
+    {open && <nav aria-label="Menu móvel" className="flex flex-col gap-5 border-t border-border px-6 py-6 lg:hidden" onClick={() => setOpen(false)}><Link to="/">Início</Link><Link to="/cardapio">Cardápio</Link><Link to="/sobre">O Matturo</Link><Link to="/atendimento">Atendimento</Link><Link to="/contactos">Contactos</Link></nav>}
   </header>;
 }
 
