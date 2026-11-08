@@ -33,6 +33,6 @@ function CustomerAuth() {
       <Button type="button" variant="link" onClick={() => setSignup(!signup)}>{signup ? "Já tenho conta" : "Criar conta de cliente"}</Button>
       <Button asChild variant="link"><Link to="/">Voltar ao Matturo</Link></Button>
     </form>
-    <p className="mt-8 border-t border-border pt-5 text-xs text-muted-foreground">É membro da equipa? <Link to="/auth" className="font-semibold text-primary">Use o acesso da equipa.</Link></p>
+    <p className="mt-8 border-t border-border pt-5 text-xs text-muted-foreground">A equipa do Matturo entra na administração num endereço próprio.</p>
   </div>;
 }

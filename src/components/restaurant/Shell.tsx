@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { restaurant } from "@/lib/restaurant";
 import logo from "@/assets/matturo/logo-black.png";
-import {TeamAccess} from "./TeamAccess";
+import {CustomerAccountAccess} from "./CustomerAccountAccess";
 
 export function RestaurantHeader() {
   const { count } = useCart();
@@ -21,7 +21,7 @@ export function RestaurantHeader() {
         <Link to="/contactos" activeProps={{ className: "text-primary" }}>Contactos</Link>
       </nav>
       <div className="flex items-center gap-3">
-        <TeamAccess/>
+        <CustomerAccountAccess/>
         <Button asChild variant="ghost" className="relative" aria-label={`Ver pedido, ${count} artigos`}><Link to="/carrinho"><ShoppingBag />{count > 0 && <span className="text-xs font-semibold">{count}</span>}</Link></Button>
         <Button asChild className="hidden h-11 sm:inline-flex"><Link to={restaurant.orderUrl}>Pedir agora <ArrowUpRight /></Link></Button>
         <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
