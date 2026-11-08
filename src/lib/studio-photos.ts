@@ -12,6 +12,7 @@ for (const [path, url] of Object.entries(files)) {
 }
 
 bySlug["caneca-de-time-500ml"] = canecaDeTimePhoto.url;
+bySlug["cachorro-dalmata-25cm"] = dalmataFrontPhoto.url;
 
 export function studioPhoto(slug: string): string | null {
   return bySlug[slug] ?? null;
