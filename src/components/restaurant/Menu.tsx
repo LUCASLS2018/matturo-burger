@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowUpRight, Search, Utensils, Minus, Plus, ShoppingBasket } from "lucide-react";
+import { Search, Utensils, Minus, Plus, ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { categories, dishes, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
@@ -9,7 +9,7 @@ import { dishCutout } from "@/lib/dish-images";
 export function DishCard({ dish }: { dish: Dish }) {
   const [quantity, setQuantity] = useState(1);
   const cutout = dishCutout(dish.slug);
-  if (cutout || dish.category === "pizza") return <article className="burger-card group">
+  return <article className="burger-card group">
     <div className="burger-card-panel" />
     <Link to="/produto/$slug" params={{ slug: dish.slug }} className="burger-card-photo" aria-label={dish.name}>{(cutout || dish.image) ? <img src={cutout || dish.image || undefined} alt={dish.name} loading="lazy" className={cutout ? "food-photo h-full w-full object-contain" : "food-photo mx-auto mt-4 aspect-square w-full rounded-full object-cover"} /> : <Utensils className="mx-auto mt-12 h-10 w-10 text-muted-foreground" />}</Link>
     <div className="burger-card-content">
@@ -23,10 +23,6 @@ export function DishCard({ dish }: { dish: Dish }) {
       <p className="mt-2 text-base font-semibold text-primary">{dish.available ? money(dish.price) : "Indisponível"}</p>
     </div>
   </article>;
-  return <Link to="/produto/$slug" params={{ slug: dish.slug }} className="group overflow-hidden rounded-lg border border-border bg-card">
-    <div className="relative aspect-[4/3] overflow-hidden bg-muted">{dish.image ? <img src={dish.image} alt={dish.name} loading="lazy" className="food-photo h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><Utensils className="h-10 w-10 text-muted-foreground/40" /></div>}{!dish.available && <span className="absolute left-3 top-3 rounded bg-background px-2 py-1 text-xs">Indisponível</span>}</div>
-    <div className="p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold leading-snug">{dish.name}</h3><ArrowUpRight className="h-4 w-4 shrink-0 text-primary" /></div><p className="mt-2 line-clamp-2 min-h-10 text-xs leading-relaxed text-muted-foreground">{dish.description}</p><p className="mt-4 font-semibold text-primary">{dish.price > 0 ? money(dish.price) : "Consultar disponibilidade"}</p></div>
-  </Link>;
 }
 
 export function MenuPage() {
