@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { routeTree } from "@/routeTree.gen";
 
 const getUser = vi.fn();
-const onAuthStateChange = vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
+const onAuthStateChange = vi.fn((_callback: unknown) => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
