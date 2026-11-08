@@ -52,7 +52,14 @@ export const orderByToken = createServerFn({ method: "GET" }).inputValidator((i)
   if (o.error || !o.data) return null;
   const items = await db.from("matturo_order_items").select("name,options,qty,line_total_cents").eq("order_id", o.data.id);
   const { id: _id, ...order } = o.data;
-  return { ...order, items: items.data ?? [] };
+  const d = await db.from("matturo_deliveries").select("id,status,courier_id,destination_lat,destination_lng").eq("order_id", o.data.id).maybeSingle();
+  let tracking = null as null | { status: string; courier: string; lat: number; lng: number; position: { latitude: number; longitude: number; recorded_at: string } | null };
+  if (d.data && d.data.status !== "cancelled") {
+    const c = d.data.courier_id ? await db.from("matturo_profiles").select("name").eq("id", d.data.courier_id).maybeSingle() : null;
+    const pos = d.data.status === "active" ? await db.from("matturo_delivery_positions").select("latitude,longitude,recorded_at").eq("delivery_id", d.data.id).maybeSingle() : null;
+    tracking = { status: d.data.status, courier: (c?.data?.name || "O estafeta").split(" ")[0] ?? "O estafeta", lat: d.data.destination_lat, lng: d.data.destination_lng, position: pos?.data ?? null };
+  }
+  return { ...order, items: items.data ?? [], tracking };
 });
 
 async function assertAdmin(supabase: { rpc: (n: "matturo_has_role", a: { wanted: string }) => PromiseLike<{ data: boolean | null; error: unknown }> }) {
