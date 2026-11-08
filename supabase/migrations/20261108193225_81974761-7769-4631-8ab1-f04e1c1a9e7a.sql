@@ -1,0 +1,1 @@
+ALTER TABLE public.matturo_deliveries ADD COLUMN order_id uuid UNIQUE REFERENCES public.matturo_orders(id) ON DELETE SET NULL;
