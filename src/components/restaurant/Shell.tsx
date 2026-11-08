@@ -11,8 +11,8 @@ export function RestaurantHeader() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   return <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-lg">
-    <div className="page-width flex h-24 items-center justify-between gap-4">
-      <Link to="/" aria-label="Matturo Burger — início" className="shrink-0"><img src={logo} alt="Matturo Burger" className="h-20 w-52 object-contain lg:w-64" /></Link>
+    <div className="page-width flex h-16 items-center justify-between gap-4 sm:h-24">
+      <Link to="/" aria-label="Matturo Burger — início" className="shrink-0"><img src={logo} alt="Matturo Burger" className="h-12 w-36 object-contain sm:h-20 sm:w-52 lg:w-64" /></Link>
       <nav aria-label="Navegação principal" className="hidden items-center gap-6 text-sm font-medium lg:flex">
         <Link to="/" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>Início</Link>
         <Link to="/cardapio" activeProps={{ className: "text-primary" }}>Cardápio</Link>
