@@ -2,9 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, Utensils, Minus, Plus, ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { categories, dishes, type Dish } from "@/lib/menu";
+import { categories, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { menuQuery } from "@/lib/menu-query";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const [quantity, setQuantity] = useState(1);

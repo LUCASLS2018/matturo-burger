@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ClipboardList, LogOut, MapPin, Settings, Truck } from "lucide-react";
+import { ClipboardList, LogOut, MapPin, Settings, Truck, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { teamSummary } from "@/lib/delivery.functions";

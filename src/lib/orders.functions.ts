@@ -6,6 +6,7 @@ import { orderServices, needsDeliveryAddress } from "./order-service";
 import { findZone } from "./restaurant-settings";
 import { priceLine, canMoveOrder, orderStatuses } from "./order-pricing";
 import { tokenHash } from "./delivery";
+import { menuItemToDish } from "./menu";
 
 const orderInput = z.object({
   name: z.string().trim().min(1).max(100),
