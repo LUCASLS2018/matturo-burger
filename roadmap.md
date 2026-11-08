@@ -17,4 +17,7 @@
 - [x] Show all 54 products on the homepage, promotions first.
 - [x] Make the transparent logo black and increase its visible size further; verified on mobile and desktop.
 - [x] Add Comer no local in cart and carry the selection into order completion; UI and order text verified.
-- [ ] Present GPS delivery architecture before any database changes; awaiting profile requirements and approval.
+- [x] Present GPS delivery architecture; approved with name/photo profiles.
+- [ ] Audit and create isolated Matturo delivery tables and private photo storage with authorization.
+- [ ] Implement authenticated courier/admin panels and token-based customer tracking.
+- [ ] Verify authorization, GPS lifecycle, realtime, photos and map with distinct accounts; first admin account requires owner identification.
