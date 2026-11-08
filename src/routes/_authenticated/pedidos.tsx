@@ -154,22 +154,23 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove }: {
         aria-expanded={expanded}
         aria-controls={detailsId}
         onClick={() => setExpanded((value) => !value)}
-        className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-secondary/30 sm:px-4"
+        className="block w-full px-3 py-3 text-left transition-colors hover:bg-secondary/30"
       >
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
-        <span className="min-w-0 flex-1">
-          <span className="flex min-w-0 items-center gap-2">
-            <b className="shrink-0 text-sm">#{order.reference}</b>
-            <span className="truncate text-sm font-semibold">{order.customer_name}</span>
+        <span className="flex items-center gap-2">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="flex min-w-0 items-center gap-2">
+              <b className="shrink-0 text-sm">#{order.reference}</b>
+              <span className="truncate text-xs font-semibold">{order.customer_name}</span>
+            </span>
+            <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
           </span>
-          <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
+          <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
         </span>
-        <span className={`hidden shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold sm:inline-flex ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
-        <span className="shrink-0 text-right">
-          <b className="block text-sm tabular-nums">{money(order.total_cents / 100)}</b>
-          <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold sm:hidden ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+        <span className="mt-2 flex items-center justify-between gap-2 pl-10">
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+          <b className="text-sm tabular-nums">{money(order.total_cents / 100)}</b>
         </span>
-        <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
 
       {expanded && (
