@@ -8,9 +8,9 @@ type SearchParams = { q?: string | undefined; categoria?: string | undefined; or
 
 export const Route = createFileRoute("/produtos")({
   validateSearch: (s: Record<string, unknown>): SearchParams => ({
-    q: typeof s.q === "string" && s.q ? s.q : undefined,
-    categoria: typeof s.categoria === "string" && s.categoria ? s.categoria : undefined,
-    ordem: s.ordem === "preco-asc" || s.ordem === "preco-desc" ? s.ordem : undefined,
+    q: typeof s['q'] === "string" && s['q'] ? s['q'] : undefined,
+    categoria: typeof s['categoria'] === "string" && s['categoria'] ? s['categoria'] : undefined,
+    ordem: s['ordem'] === "preco-asc" || s['ordem'] === "preco-desc" ? s['ordem'] : undefined,
   }),
   head: () => ({
     meta: [
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/produtos")({
   loader: ({ context }) =>
     Promise.all([context.queryClient.ensureQueryData(productsQuery), context.queryClient.ensureQueryData(categoriesQuery)]),
   component: Catalog,
-  errorComponent: ({ error }) => <p className="p-10 text-center text-destructive">{error.message}</p>,
+  errorComponent: ({ error }) => <p className="p-10 text-center text-destructive">{error instanceof Error ? error.message : String(error)}</p>,
 });
 
 const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();

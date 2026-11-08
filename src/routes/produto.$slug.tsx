@@ -36,7 +36,7 @@ export const Route = createFileRoute("/produto/$slug")({
       <Link to="/produtos" className="mt-4 inline-block text-primary hover:underline">Voltar à loja</Link>
     </div>
   ),
-  errorComponent: ({ error }) => <p className="p-10 text-center text-destructive">{error.message}</p>,
+  errorComponent: ({ error }) => <p className="p-10 text-center text-destructive">{error instanceof Error ? error.message : String(error)}</p>,
 });
 
 function ProductPage() {
