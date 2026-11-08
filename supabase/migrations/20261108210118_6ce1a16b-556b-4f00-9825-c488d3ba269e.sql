@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.matturo_order_audit() FROM PUBLIC, anon, authenticated;
