@@ -43,6 +43,8 @@ function MenuAdminPage() {
   const { data: categoryOptions } = useSuspenseQuery(adminCategoriesQuery);
   const queryClient = useQueryClient();
   const save = useServerFn(saveMenuItem);
+  const create = useServerFn(createMenuItem);
+  const remove = useServerFn(deleteMenuItem);
   const [selectedId, setSelectedId] = useState(data[0]?.id ?? "");
   const selected = data.find((dish) => dish.id === selectedId) ?? data[0];
   const [draft, setDraft] = useState<Draft | null>(selected ? toDraft(selected) : null);
@@ -68,9 +70,9 @@ function MenuAdminPage() {
       chain.current = chain.current.catch(() => undefined).then(async () => {
         if (currentSequence !== sequence.current) return;
         const amount = Number(draft.price.replace(",", "."));
-        if (!draft.name.trim() || !Number.isFinite(amount) || amount < 0 || amount > 1000) {
+        if (!draft.name.trim() || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(draft.slug) || !Number.isFinite(amount) || amount < 0 || amount > 1000) {
           setState("error");
-          setError("Indique um nome e um preço entre 0,00 € e 1000,00 €.");
+          setError("Indique nome, endereço válido e preço entre 0,00 € e 1000,00 €.");
           return;
         }
         setState("saving");
@@ -146,6 +148,29 @@ function MenuAdminPage() {
     }
   }
 
+  async function addProduct() {
+    if (dirty && !window.confirm("Há alterações por guardar. Quer continuar mesmo assim?")) return;
+    const name = window.prompt("Nome do novo produto")?.trim();
+    if (!name) return;
+    const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    try {
+      const created = await create({ data: { name, slug, description: "", category: categoryOptions[0]?.slug ?? "", position: data.length, price_cents: 0 } });
+      queryClient.setQueryData<EditableDish[]>(adminMenuQuery.queryKey, (old) => [...(old ?? []), created]);
+      setSelectedId(created.id); revision.current = created.revision; setDraft(toDraft(created)); setState("idle"); setError("");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível criar o produto."); }
+  }
+
+  async function removeProduct() {
+    if (!selected || !window.confirm(`Eliminar ${selected.name}? Os pedidos antigos mantêm o registo do produto.`)) return;
+    try {
+      await remove({ data: { id: selected.id } });
+      const remaining = data.filter((dish) => dish.id !== selected.id);
+      queryClient.setQueryData(adminMenuQuery.queryKey, remaining);
+      void queryClient.invalidateQueries({ queryKey: menuQuery.queryKey });
+      const next = remaining[0]; setSelectedId(next?.id ?? ""); setDraft(next ? toDraft(next) : null); revision.current = next?.revision ?? 1; setState("idle");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível eliminar."); }
+  }
+
   const filtered = data.filter((dish) => dish.name.toLocaleLowerCase("pt").includes(query.toLocaleLowerCase("pt")));
   const statusText = state === "pending" ? "Alterações por guardar…" : state === "saving" ? "A guardar…" : state === "saved" ? "Guardado" : "";
 
@@ -154,7 +179,7 @@ function MenuAdminPage() {
     <p className="mb-3 text-xs font-semibold text-primary">MATTURO · ADMINISTRAÇÃO</p>
     <h1 className="section-title">Produtos</h1>
     <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">Edite nomes, preços, descrições, categorias, opções, disponibilidade e fotografias. As alterações são guardadas automaticamente.</p>
-    <Button asChild variant="outline" className="mt-5"><Link to="/categorias">Gerir categorias</Link></Button>
+    <div className="mt-5 flex flex-wrap gap-3"><Button asChild variant="outline"><Link to="/categorias">Gerir categorias</Link></Button><Button type="button" onClick={() => void addProduct()}>Criar produto</Button></div>
     <div className="mt-8 grid items-start gap-8 lg:grid-cols-[320px_1fr]">
       <aside className="rounded-lg border border-border bg-card p-4 lg:sticky lg:top-28">
         <label className="relative block"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Procurar produto" aria-label="Procurar produto" className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm" /></label>
@@ -174,6 +199,7 @@ function MenuAdminPage() {
             <p className="mt-3 text-center text-xs text-muted-foreground">JPG, PNG ou WebP · até 5 MB</p>
           </div>
           <div className="space-y-5"><label className="block text-sm font-medium">Nome<input value={draft.name} onChange={(event) => update("name", event.target.value)} maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
+            <label className="block text-sm font-medium">Endereço do produto (slug)<input value={draft.slug} onChange={(event) => update("slug", event.target.value.toLowerCase())} pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
             <div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label><label className="block text-sm font-medium">Ordem no cardápio<input type="number" min={0} value={draft.position} onChange={(event) => update("position", Number(event.target.value))} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label></div>
             <label className="block text-sm font-medium">Categoria<select value={draft.category} onChange={(event) => update("category", event.target.value)} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{categoryOptions.map((category) => <option key={category.id} value={category.slug}>{category.name}{category.active ? "" : " (inativa)"}</option>)}</select></label>
             <label className="block text-sm font-medium">Descrição<textarea value={draft.description} onChange={(event) => update("description", event.target.value)} maxLength={2000} rows={6} className="mt-2 w-full rounded-md border border-input bg-background p-3 text-sm" /></label>
@@ -182,6 +208,7 @@ function MenuAdminPage() {
         </div>
         {state === "error" && <div role="alert" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/10 p-4"><p className="text-sm text-destructive">{error}</p><Button type="button" variant="outline" onClick={() => setDraft({ ...draft })}><RotateCcw />Tentar guardar novamente</Button></div>}
         <OptionsEditor dish={selected} adminQueryKey={adminMenuQuery.queryKey} />
+        <div className="mt-8 border-t border-border pt-5"><Button type="button" variant="ghost" className="text-destructive" onClick={() => void removeProduct()}>Eliminar produto</Button></div>
       </section> : <p>Nenhum produto encontrado.</p>}
     </div>
   </div>;
