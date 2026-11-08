@@ -13,7 +13,7 @@ export function InstallAppButton() {
   useEffect(() => {
     setInstalled(window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
     setIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
-    const w = window as Window & { __matturoInstall?: PromptEvent };
+    const w = window as Window & { __matturoInstall?: PromptEvent | undefined };
     const sync = () => { if (w.__matturoInstall) setPrompt(w.__matturoInstall); };
     sync();
     const onInstalled = () => setInstalled(true);
@@ -25,7 +25,7 @@ export function InstallAppButton() {
   if (installed) return null;
 
   const install = async () => {
-    if (prompt) { await prompt.prompt(); await prompt.userChoice; (window as Window & { __matturoInstall?: PromptEvent }).__matturoInstall = undefined; setPrompt(null); return; }
+    if (prompt) { await prompt.prompt(); await prompt.userChoice; (window as Window & { __matturoInstall?: PromptEvent | undefined }).__matturoInstall = undefined; setPrompt(null); return; }
     setHelp(true);
   };
 
