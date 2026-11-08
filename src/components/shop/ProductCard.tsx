@@ -42,7 +42,7 @@ export function ProductCard({ p }: { p: ProductCardDTO }) {
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
         {image ? (
-          <img src={image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <img src={image} alt={p.name} loading="lazy" className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="grid h-full place-items-center text-muted-foreground"><ImageOff /></div>
         )}
