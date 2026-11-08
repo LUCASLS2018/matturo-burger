@@ -14,7 +14,10 @@ import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as FinalizarRouteImport } from './routes/finalizar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as EncomendaCanceladaRouteImport } from './routes/encomenda.cancelada'
+import { Route as EncomendaSucessoRouteImport } from './routes/encomenda.sucesso'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,9 +44,24 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EncomendaCanceladaRoute = EncomendaCanceladaRouteImport.update({
+  id: '/encomenda/cancelada',
+  path: '/encomenda/cancelada',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EncomendaSucessoRoute = EncomendaSucessoRouteImport.update({
+  id: '/encomenda/sucesso',
+  path: '/encomenda/sucesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdutoSlugRoute = ProdutoSlugRouteImport.update({
   id: '/produto/$slug',
   path: '/produto/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -53,7 +71,10 @@ export interface FileRoutesByFullPath {
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/encomenda/cancelada': typeof EncomendaCanceladaRoute
+  '/encomenda/sucesso': typeof EncomendaSucessoRoute
   '/produto/$slug': typeof ProdutoSlugRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +82,10 @@ export interface FileRoutesByTo {
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/encomenda/cancelada': typeof EncomendaCanceladaRoute
+  '/encomenda/sucesso': typeof EncomendaSucessoRoute
   '/produto/$slug': typeof ProdutoSlugRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,15 +94,34 @@ export interface FileRoutesById {
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/encomenda/cancelada': typeof EncomendaCanceladaRoute
+  '/encomenda/sucesso': typeof EncomendaSucessoRoute
   '/produto/$slug': typeof ProdutoSlugRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/carrinho' | '/finalizar' | '/produtos' | '/sobre' | '/produto/$slug'
+    | '/'
+    | '/carrinho'
+    | '/finalizar'
+    | '/produtos'
+    | '/sobre'
+    | '/encomenda/cancelada'
+    | '/encomenda/sucesso'
+    | '/produto/$slug'
+    | '/api/public/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/carrinho' | '/finalizar' | '/produtos' | '/sobre' | '/produto/$slug'
+    | '/'
+    | '/carrinho'
+    | '/finalizar'
+    | '/produtos'
+    | '/sobre'
+    | '/encomenda/cancelada'
+    | '/encomenda/sucesso'
+    | '/produto/$slug'
+    | '/api/public/stripe-webhook'
   id:
     | '__root__'
     | '/'
@@ -86,7 +129,10 @@ export interface FileRouteTypes {
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/encomenda/cancelada'
+    | '/encomenda/sucesso'
     | '/produto/$slug'
+    | '/api/public/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,7 +141,10 @@ export interface RootRouteChildren {
   FinalizarRoute: typeof FinalizarRoute
   ProdutosRoute: typeof ProdutosRoute
   SobreRoute: typeof SobreRoute
+  EncomendaCanceladaRoute: typeof EncomendaCanceladaRoute
+  EncomendaSucessoRoute: typeof EncomendaSucessoRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,11 +184,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/encomenda/cancelada': {
+      id: '/encomenda/cancelada'
+      path: '/encomenda/cancelada'
+      fullPath: '/encomenda/cancelada'
+      preLoaderRoute: typeof EncomendaCanceladaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/encomenda/sucesso': {
+      id: '/encomenda/sucesso'
+      path: '/encomenda/sucesso'
+      fullPath: '/encomenda/sucesso'
+      preLoaderRoute: typeof EncomendaSucessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produto/$slug': {
       id: '/produto/$slug'
       path: '/produto/$slug'
       fullPath: '/produto/$slug'
       preLoaderRoute: typeof ProdutoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -151,7 +221,10 @@ const rootRouteChildren: RootRouteChildren = {
   FinalizarRoute: FinalizarRoute,
   ProdutosRoute: ProdutosRoute,
   SobreRoute: SobreRoute,
+  EncomendaCanceladaRoute: EncomendaCanceladaRoute,
+  EncomendaSucessoRoute: EncomendaSucessoRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
