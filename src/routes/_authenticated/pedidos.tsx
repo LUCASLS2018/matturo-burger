@@ -3,7 +3,7 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Bell, BellOff, Bike, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
+import { ArrowLeft, Ban, Bell, BellOff, Bike, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
@@ -23,6 +23,14 @@ export const Route = createFileRoute("/_authenticated/pedidos")({
   component: OrdersPage,
 });
 
+const columns: { key: OrderStatus; label: string; dot: string }[] = [
+  { key: "novo", label: "Por aceitar", dot: "bg-primary" },
+  { key: "aceite", label: "Aceite", dot: "bg-primary/70" },
+  { key: "em_preparacao", label: "Em preparação", dot: "bg-primary/45" },
+  { key: "pronto", label: "Em entrega", dot: "bg-primary/25" },
+  { key: "concluido", label: "Concluído", dot: "bg-muted-foreground/40" },
+];
+
 const boardLabels: Record<string, string> = { novo: "Por aceitar", aceite: "Aceite", em_preparacao: "Em preparação", pronto: "Em entrega", concluido: "Concluído", cancelado: "Cancelado" };
 const serviceIcon = (s: string) => s === "Delivery" ? Bike : s === "Comer no local" ? Utensils : ShoppingBag;
 const statusTone = (s: string) => s === "concluido" ? "bg-secondary text-muted-foreground" : s === "cancelado" ? "bg-destructive/10 text-destructive" : "bg-primary/15 text-primary";
@@ -36,6 +44,7 @@ function OrdersPage() {
   const { data: board } = useSuspenseQuery(boardQuery);
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
+  const [showCancelled, setShowCancelled] = useState(false);
   const sendToCourier = async (orderId: string) => {
     const courierId = pick[orderId] ?? board.couriers[0]?.id; if (!courierId) return;
     try { await assign({ data: { orderId, courierId } }); toast.success("Pedido enviado ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }
@@ -66,6 +75,8 @@ function OrdersPage() {
     try { await move({ data: { id, from, to } }); await qc.invalidateQueries({ queryKey: ordersQuery.queryKey }); }
     catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível guardar."); }
   };
+  const cancelled = data.filter((o) => o.status === "cancelado");
+
   return (
     <div className="page-width py-10">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
@@ -84,29 +95,40 @@ function OrdersPage() {
         {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-medium text-muted-foreground">{s.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p></div>)}
       </div>
 
-      <section className="mt-8" aria-label="Lista de pedidos">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Todos os pedidos</h2>
-          <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold tabular-nums">{data.length}</span>
+      <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:grid lg:grid-cols-5 lg:gap-3 lg:overflow-visible xl:gap-4">
+        {columns.map((col) => {
+          const items = data.filter((o) => o.status === col.key);
+          return (
+            <section key={col.key} className="w-[86vw] shrink-0 snap-start sm:w-[330px] lg:w-auto lg:min-w-0 lg:shrink">
+              <header className="sticky top-0 z-10 mb-3 flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                <span className="flex items-center gap-2 text-sm font-semibold"><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}</span>
+                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold tabular-nums">{items.length}</span>
+              </header>
+              <div className="space-y-2">
+                {!items.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos</p>}
+                {items.map((o) => (
+                  <OrderCard
+                    key={o.id}
+                    order={o}
+                    board={board}
+                    courierPick={pick[o.id] ?? board.couriers[0]?.id ?? ""}
+                    onPick={(id, value) => setPick({ ...pick, [id]: value })}
+                    onSend={sendToCourier}
+                    onMove={change}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      {cancelled.length > 0 && (
+        <div className="mt-6">
+          <Button variant="outline" size="sm" onClick={() => setShowCancelled(!showCancelled)}><Ban />Cancelados<span className="ml-1 rounded-full bg-secondary px-2 text-xs tabular-nums">{cancelled.length}</span></Button>
+          {showCancelled && <div className="mt-4 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">{cancelled.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}</div>}
         </div>
-        {!data.length ? (
-          <p className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">Sem pedidos</p>
-        ) : (
-          <div className="space-y-2">
-            {data.map((o) => (
-              <OrderCard
-                key={o.id}
-                order={o}
-                board={board}
-                courierPick={pick[o.id] ?? board.couriers[0]?.id ?? ""}
-                onPick={(id, value) => setPick({ ...pick, [id]: value })}
-                onSend={sendToCourier}
-                onMove={change}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      )}
     </div>
   );
 }
@@ -132,22 +154,23 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove }: {
         aria-expanded={expanded}
         aria-controls={detailsId}
         onClick={() => setExpanded((value) => !value)}
-        className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-secondary/30 sm:px-4"
+        className="block w-full px-3 py-3 text-left transition-colors hover:bg-secondary/30"
       >
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
-        <span className="min-w-0 flex-1">
-          <span className="flex min-w-0 items-center gap-2">
-            <b className="shrink-0 text-sm">#{order.reference}</b>
-            <span className="truncate text-sm font-semibold">{order.customer_name}</span>
+        <span className="flex items-center gap-2">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="flex min-w-0 items-center gap-2">
+              <b className="shrink-0 text-sm">#{order.reference}</b>
+              <span className="truncate text-xs font-semibold">{order.customer_name}</span>
+            </span>
+            <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
           </span>
-          <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
+          <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
         </span>
-        <span className={`hidden shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold sm:inline-flex ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
-        <span className="shrink-0 text-right">
-          <b className="block text-sm tabular-nums">{money(order.total_cents / 100)}</b>
-          <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold sm:hidden ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+        <span className="mt-2 flex items-center justify-between gap-2 pl-10">
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+          <b className="text-sm tabular-nums">{money(order.total_cents / 100)}</b>
         </span>
-        <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
 
       {expanded && (
