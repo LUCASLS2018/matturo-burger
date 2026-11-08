@@ -3,12 +3,12 @@ import { useState } from "react";
 import { Minus, Plus, ShoppingBag, ChevronLeft, Utensils } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { dishes, selectionValid, dishTotal } from "@/lib/menu";
+import { dishes, selectionValid, dishTotal, type Dish } from "@/lib/menu";
 import { useCart } from "@/lib/cart";
 import { money, restaurantHead } from "@/lib/restaurant";
-export const Route = createFileRoute("/produto/$slug")({validateSearch:(s:Record<string,unknown>):{editar?:string}=>({editar:typeof s.editar === "string"?s.editar:undefined}),loader:({params})=>{const p=dishes.find(p=>p.slug===params.slug);if(!p)throw notFound();return p;},head:({loaderData})=>restaurantHead(loaderData?.name??"Prato indisponível",loaderData?.description||"Consulte os pratos Matturo Burger."),component:ProductPage,notFoundComponent:()=> <div className="page-width py-20"><h1 className="section-title">Prato não encontrado</h1><Button asChild className="mt-6"><Link to="/cardapio">Ver cardápio</Link></Button></div>});
+export const Route = createFileRoute("/produto/$slug")({validateSearch:(s:Record<string,unknown>):{editar?:string | undefined}=>({editar:typeof s["editar"] === "string"?s["editar"]:undefined}),loader:({params})=>{const p=dishes.find(p=>p.slug===params.slug);if(!p)throw notFound();return p;},head:({loaderData})=>restaurantHead(loaderData?.name??"Prato indisponível",loaderData?.description||"Consulte os pratos Matturo Burger."),component:ProductPage,notFoundComponent:()=> <div className="page-width py-20"><h1 className="section-title">Prato não encontrado</h1><Button asChild className="mt-6"><Link to="/cardapio">Ver cardápio</Link></Button></div>});
 function ProductPage(){const p=Route.useLoaderData();return <DishDetail key={p.id} dish={p}/>;}
-function DishDetail({dish:p}:{dish:ReturnType<typeof Route.useLoaderData>}){
+function DishDetail({dish:p}:{dish:Dish}){
  const cart=useCart();const {editar}=Route.useSearch();const existing=cart.items.find(i=>i.key===editar&&i.productId===p.id);const [qty,setQty]=useState(existing?.qty??1);const [selected,setSelected]=useState<Record<string,number>>(()=>Object.fromEntries(p.groups.flatMap(g=>g.modifiers.map(m=>{const value=existing?.options[g.name]?.split(", ").find(v=>v.endsWith(`× ${m.name}`));return [m.id,value?Number(value.split("×")[0]):0];}))));const [notes,setNotes]=useState(existing?.options["Observações"]??"");
  const price=dishTotal(p,selected);const valid=selectionValid(p,selected);
  const add=()=>{if(!valid||!p.available)return;const options:Record<string,string>={};p.groups.forEach(g=>{const chosen=g.modifiers.filter(m=>(selected[m.id]??0)>0);if(chosen.length)options[g.name]=chosen.map(m=>`${selected[m.id]}× ${m.name}`).join(", ");});if(notes.trim())options["Observações"]=notes.trim();if(existing)cart.remove(existing.key);cart.add({productId:p.id,slug:p.slug,name:p.name,image:p.image,price,options},qty);toast.success(existing?"Pedido atualizado":"Adicionado ao seu pedido");};
