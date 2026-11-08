@@ -35,3 +35,5 @@ use the editor.
 - Preserve legacy public page paths as restaurant pages or redirects; do not reuse the NovaFix Stripe flow for restaurant orders.
 - Resolve all product cutouts through the shared dish-images module; use the shared DishCard on home and menu so original-photo edits and ordering controls stay consistent.
 - Keep order modality in the cart context and its allowed values in order-service so cart and checkout share the same selection.
+- Delivery persistence uses isolated matturo_* resources; courier GPS/state RPCs enforce assignment under a row lock, and public tracking reads validate hashed expiring tokens on the server without anonymous table grants.
+- Authenticated delivery panels use the shared _authenticated gate and bearer function middleware; Leaflet loads dynamically after hydration to preserve SSR safety.

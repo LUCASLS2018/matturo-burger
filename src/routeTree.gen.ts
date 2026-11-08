@@ -10,13 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AtendimentoRouteImport } from './routes/atendimento'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CardapioRouteImport } from './routes/cardapio'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as FinalizarRouteImport } from './routes/finalizar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
+import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
 import { Route as EncomendaCanceladaRouteImport } from './routes/encomenda.cancelada'
 import { Route as EncomendaSucessoRouteImport } from './routes/encomenda.sucesso'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
@@ -27,9 +31,18 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AtendimentoRoute = AtendimentoRouteImport.update({
   id: '/atendimento',
   path: '/atendimento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CardapioRoute = CardapioRouteImport.update({
@@ -62,6 +75,16 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
+  id: '/entregas',
+  path: '/entregas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AcompanharTokenRoute = AcompanharTokenRouteImport.update({
+  id: '/acompanhar/$token',
+  path: '/acompanhar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EncomendaCanceladaRoute = EncomendaCanceladaRouteImport.update({
   id: '/encomenda/cancelada',
   path: '/encomenda/cancelada',
@@ -86,12 +109,15 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atendimento': typeof AtendimentoRoute
+  '/auth': typeof AuthRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/entregas': typeof AuthenticatedEntregasRoute
+  '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
   '/produto/$slug': typeof ProdutoSlugRoute
@@ -100,12 +126,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atendimento': typeof AtendimentoRoute
+  '/auth': typeof AuthRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/entregas': typeof AuthenticatedEntregasRoute
+  '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
   '/produto/$slug': typeof ProdutoSlugRoute
@@ -114,13 +143,17 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/atendimento': typeof AtendimentoRoute
+  '/auth': typeof AuthRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
+  '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
   '/produto/$slug': typeof ProdutoSlugRoute
@@ -131,12 +164,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/atendimento'
+    | '/auth'
     | '/cardapio'
     | '/carrinho'
     | '/contactos'
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/entregas'
+    | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
     | '/produto/$slug'
@@ -145,12 +181,15 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/atendimento'
+    | '/auth'
     | '/cardapio'
     | '/carrinho'
     | '/contactos'
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/entregas'
+    | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
     | '/produto/$slug'
@@ -158,13 +197,17 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/atendimento'
+    | '/auth'
     | '/cardapio'
     | '/carrinho'
     | '/contactos'
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/_authenticated/entregas'
+    | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
     | '/produto/$slug'
@@ -173,13 +216,16 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AtendimentoRoute: typeof AtendimentoRoute
+  AuthRoute: typeof AuthRoute
   CardapioRoute: typeof CardapioRoute
   CarrinhoRoute: typeof CarrinhoRoute
   ContactosRoute: typeof ContactosRoute
   FinalizarRoute: typeof FinalizarRoute
   ProdutosRoute: typeof ProdutosRoute
   SobreRoute: typeof SobreRoute
+  AcompanharTokenRoute: typeof AcompanharTokenRoute
   EncomendaCanceladaRoute: typeof EncomendaCanceladaRoute
   EncomendaSucessoRoute: typeof EncomendaSucessoRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
@@ -195,11 +241,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/atendimento': {
       id: '/atendimento'
       path: '/atendimento'
       fullPath: '/atendimento'
       preLoaderRoute: typeof AtendimentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cardapio': {
@@ -244,6 +304,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/entregas': {
+      id: '/_authenticated/entregas'
+      path: '/entregas'
+      fullPath: '/entregas'
+      preLoaderRoute: typeof AuthenticatedEntregasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/acompanhar/$token': {
+      id: '/acompanhar/$token'
+      path: '/acompanhar/$token'
+      fullPath: '/acompanhar/$token'
+      preLoaderRoute: typeof AcompanharTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/encomenda/cancelada': {
       id: '/encomenda/cancelada'
       path: '/encomenda/cancelada'
@@ -275,15 +349,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AtendimentoRoute: AtendimentoRoute,
+  AuthRoute: AuthRoute,
   CardapioRoute: CardapioRoute,
   CarrinhoRoute: CarrinhoRoute,
   ContactosRoute: ContactosRoute,
   FinalizarRoute: FinalizarRoute,
   ProdutosRoute: ProdutosRoute,
   SobreRoute: SobreRoute,
+  AcompanharTokenRoute: AcompanharTokenRoute,
   EncomendaCanceladaRoute: EncomendaCanceladaRoute,
   EncomendaSucessoRoute: EncomendaSucessoRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
