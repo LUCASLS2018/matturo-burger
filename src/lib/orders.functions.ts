@@ -76,3 +76,35 @@ export const setOrderStatus = createServerFn({ method: "POST" }).middleware([req
   if (!r.data) throw new Error("Este pedido foi alterado noutra janela. Atualize a lista.");
   return { ok: true };
 });
+
+export const orderCourierBoard = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const db = context.supabase;
+  const ok = await db.rpc("matturo_has_role", { wanted: "admin" }); if (!ok.data) throw new Error("Sem acesso administrativo.");
+  const roles = await db.from("matturo_user_roles").select("user_id").eq("role", "courier"); if (roles.error) throw roles.error;
+  const ids = roles.data.map((r) => r.user_id);
+  const profiles = ids.length ? await db.from("matturo_profiles").select("id,name").in("id", ids) : { data: [] as { id: string; name: string }[] };
+  const deliveries = await db.from("matturo_deliveries").select("order_id,courier_id,status").not("order_id", "is", null); if (deliveries.error) throw deliveries.error;
+  return { couriers: (profiles.data ?? []).map((p) => ({ id: p.id, name: p.name || "Entregador" })), deliveries: deliveries.data };
+});
+
+export const assignOrderCourier = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ orderId: z.string().uuid(), courierId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const db = context.supabase;
+    const ok = await db.rpc("matturo_has_role", { wanted: "admin" }); if (!ok.data) throw new Error("Sem acesso administrativo.");
+    const o = await db.from("matturo_orders").select("reference,service,address,postal_code,customer_name,customer_phone,status").eq("id", data.orderId).single();
+    if (o.error) throw o.error;
+    if (o.data.service !== "Delivery" || !o.data.address) throw new Error("Só pedidos de delivery têm estafeta.");
+    if (["concluido", "cancelado"].includes(o.data.status)) throw new Error("Pedido já fechado.");
+    const query = `${o.data.address}, ${o.data.postal_code ?? ""}, Portugal`;
+    let lat = 38.9553, lng = -8.9897; // centro de Vila Franca de Xira se a morada não for encontrada
+    try {
+      const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=pt&q=${encodeURIComponent(query)}`, { headers: { "User-Agent": "MatturoBurger/1.0" } });
+      const j = (await g.json()) as { lat: string; lon: string }[];
+      if (j[0]) { lat = Number(j[0].lat); lng = Number(j[0].lon); }
+    } catch { /* mantém aproximação */ }
+    const destination = `${o.data.address} · ${o.data.postal_code ?? ""} — ${o.data.customer_name} (${o.data.customer_phone})`.slice(0, 300);
+    const r = await db.from("matturo_deliveries").insert({ order_id: data.orderId, reference: o.data.reference, destination, destination_lat: lat, destination_lng: lng, courier_id: data.courierId }).select("id").single();
+    if (r.error) throw new Error(r.error.code === "23505" ? "Este pedido já tem estafeta." : r.error.message);
+    return { id: r.data.id };
+  });
