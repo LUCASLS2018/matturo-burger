@@ -13,3 +13,4 @@
 - [x] Apply the same compact layout to pizzas using original photos.
 - [x] Remove photographic backgrounds from all original pizza photos.
 - [ ] Apply the compact ordering layout to every product and remove backgrounds from all remaining available photos.
+- [ ] Ensure all product names remain fully separated from photos.
