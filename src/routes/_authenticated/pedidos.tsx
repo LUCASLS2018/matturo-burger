@@ -5,15 +5,16 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { adminOrders, setOrderStatus } from "@/lib/orders.functions";
+import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
 import { nextOrderSteps, orderStatusLabels, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
 
 const ordersQuery = queryOptions({ queryKey: ["matturo-admin-orders"], queryFn: () => adminOrders() });
+const boardQuery = queryOptions({ queryKey: ["matturo-order-couriers"], queryFn: () => orderCourierBoard() });
 
 export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => restaurantHead("Pedidos", "Central privada de pedidos Matturo Burger."),
-  loader: ({ context }) => context.queryClient.ensureQueryData(ordersQuery),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(ordersQuery), context.queryClient.ensureQueryData(boardQuery)]),
   errorComponent: () => <div className="page-width py-16"><h1 className="section-title">Acesso indisponível</h1><p className="mt-4">Esta área exige acesso de administrador.</p><Button asChild className="mt-6"><Link to="/entregas">Voltar à equipa</Link></Button></div>,
   component: OrdersPage,
 });
@@ -24,6 +25,14 @@ function OrdersPage() {
   const { data } = useSuspenseQuery(ordersQuery);
   const qc = useQueryClient();
   const move = useServerFn(setOrderStatus);
+  const { data: board } = useSuspenseQuery(boardQuery);
+  const assign = useServerFn(assignOrderCourier);
+  const [pick, setPick] = useState<Record<string, string>>({});
+  const sendToCourier = async (orderId: string) => {
+    const courierId = pick[orderId] ?? board.couriers[0]?.id; if (!courierId) return;
+    try { await assign({ data: { orderId, courierId } }); toast.success("Pedido enviado ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); }
+  };
   const [filter, setFilter] = useState<(typeof filters)[number]>("ativos");
   const [sound, setSound] = useState(false);
   const soundRef = useRef(sound); soundRef.current = sound;
@@ -59,6 +68,7 @@ function OrdersPage() {
             <ul className="mt-3 space-y-1 border-t border-border pt-3 text-sm">{o.matturo_order_items.map((i, n) => <li key={n}><div className="flex justify-between"><span>{i.qty}× {i.name}</span><span>{money(i.line_total_cents / 100)}</span></div>{Object.entries(i.options as Record<string, string>).map(([k, v]) => <p key={k} className="text-xs text-muted-foreground">{k}: {v}</p>)}</li>)}</ul>
             {o.notes && <p className="mt-2 text-sm italic">“{o.notes}”</p>}
             <p className="mt-3 flex justify-between border-t border-border pt-3 font-semibold"><span>Total{o.delivery_fee_cents ? ` (inclui entrega ${money(o.delivery_fee_cents / 100)})` : ""}</span><span>{money(o.total_cents / 100)}</span></p>
+            {o.service === "Delivery" && !["concluido", "cancelado"].includes(o.status) && (() => { const d = board.deliveries.find((x) => x.order_id === o.id); if (d) return <p className="mt-3 rounded-md bg-secondary p-2 text-sm">Estafeta: <b>{board.couriers.find((c) => c.id === d.courier_id)?.name ?? "—"}</b> · {d.status === "active" ? "a caminho" : d.status === "delivered" ? "entregue" : "atribuído"}</p>; if (!board.couriers.length) return <p className="mt-3 text-sm text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>; return <div className="mt-3 flex flex-wrap gap-2"><select aria-label="Estafeta" className="h-9 rounded-md border border-input bg-card px-2 text-sm" value={pick[o.id] ?? board.couriers[0]?.id} onChange={(e) => setPick({ ...pick, [o.id]: e.target.value })}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" onClick={() => void sendToCourier(o.id)}>Enviar ao estafeta</Button></div>; })()}
             <div className="mt-4 flex flex-wrap gap-2">{nextOrderSteps(o.status as OrderStatus).map((s) => <Button key={s} size="sm" variant={s === "cancelado" ? "outline" : "default"} onClick={() => void change(o.id, o.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : orderStatusLabels[s]}</Button>)}</div>
           </article>
         ))}

@@ -24,6 +24,7 @@ export type Database = {
           destination_lat: number
           destination_lng: number
           id: string
+          order_id: string | null
           reference: string
           started_at: string | null
           status: string
@@ -38,6 +39,7 @@ export type Database = {
           destination_lat: number
           destination_lng: number
           id?: string
+          order_id?: string | null
           reference: string
           started_at?: string | null
           status?: string
@@ -52,6 +54,7 @@ export type Database = {
           destination_lat?: number
           destination_lng?: number
           id?: string
+          order_id?: string | null
           reference?: string
           started_at?: string | null
           status?: string
@@ -63,6 +66,13 @@ export type Database = {
             columns: ["courier_id"]
             isOneToOne: false
             referencedRelation: "matturo_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matturo_deliveries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "matturo_orders"
             referencedColumns: ["id"]
           },
         ]
