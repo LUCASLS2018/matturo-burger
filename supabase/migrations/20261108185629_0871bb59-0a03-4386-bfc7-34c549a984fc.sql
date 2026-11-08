@@ -1,0 +1,1 @@
+DROP POLICY zones_read ON public.matturo_delivery_zones; CREATE POLICY zones_public_read ON public.matturo_delivery_zones FOR SELECT TO anon USING(active); CREATE POLICY zones_team_read ON public.matturo_delivery_zones FOR SELECT TO authenticated USING(active OR public.matturo_has_role('admin'));
