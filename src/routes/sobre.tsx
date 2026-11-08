@@ -1,43 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/sobre")({
-  head: () => ({
-    meta: [
-      { title: "Como trabalhamos — NovaFix Tech Lab" },
-      { name: "description", content: "Saiba como a NovaFix fabrica artigos personalizados com impressão 3D, gravação e corte a laser." },
-      { property: "og:title", content: "Como trabalhamos — NovaFix Tech Lab" },
-      { property: "og:description", content: "Do pedido à peça final: impressão 3D e laser feitos à medida." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-  component: About,
-});
-
-const steps = [
-  { n: "01", t: "Escolha", d: "Escolha o produto e as opções: modelo, cor, tamanho ou time." },
-  { n: "02", t: "Produção", d: "Cada peça é fabricada à medida no nosso laboratório, em impressão 3D ou laser." },
-  { n: "03", t: "Acabamento", d: "Revemos cada detalhe antes de embalar com cuidado." },
-  { n: "04", t: "Entrega", d: "Combinamos consigo a entrega e o pagamento." },
-];
-
-function About() {
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-      <h1 className="font-display text-4xl font-bold sm:text-5xl">Como <span className="text-neon">trabalhamos</span></h1>
-      <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-        A NovaFix Tech Lab transforma ideias em objetos reais. Usamos impressão 3D, gravação a laser e corte a laser para criar peças únicas e personalizadas.
-      </p>
-      <div className="mt-12 grid gap-4 sm:grid-cols-2">
-        {steps.map((s) => (
-          <div key={s.n} className="rounded-xl border border-border bg-card p-6">
-            <span className="font-display text-3xl font-bold text-neon">{s.n}</span>
-            <p className="mt-3 font-display text-lg font-semibold">{s.t}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
-          </div>
-        ))}
-      </div>
-      <Link to="/produtos" className="mt-12 inline-flex rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground shadow-neon">Ver produtos</Link>
-    </div>
-  );
-}
+import { Button } from "@/components/ui/button";
+import { dishes } from "@/lib/menu";
+import { restaurant, restaurantHead } from "@/lib/restaurant";
+export const Route = createFileRoute("/sobre")({head:()=>restaurantHead("O Matturo", "Conheça o Matturo Burger: pizzas e hambúrgueres em Vila Franca de Xira."),component:About});
+function About(){ const image=dishes.find(p=>p.slug==="hamburguer-matturo")?.image;return <div className="page-width py-16"><p className="mb-3 text-sm font-semibold text-primary">O MATTURO</p><h1 className="section-title">Seja bem-vindo ao Matturo.</h1><p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">{restaurant.description}</p>{image&&<img src={image} alt="Hambúrguer Matturo" className="mt-10 max-h-[500px] w-full object-cover" />}<div className="mt-10 flex flex-wrap gap-4"><Button asChild><Link to="/cardapio">Consultar cardápio</Link></Button><Button asChild variant="outline"><Link to="/contactos">Contactos e localização</Link></Button></div></div>;}
