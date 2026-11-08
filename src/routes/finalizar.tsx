@@ -162,10 +162,12 @@ function CheckoutPage() {
             {reviewData.notes && <div className="mt-5 rounded-lg bg-muted p-4 text-sm"><span className="font-medium">Notas de entrega:</span> <span className="whitespace-pre-wrap text-muted-foreground">{reviewData.notes}</span></div>}
 
             <div className="mt-8 border-t border-border pt-6">
-              <button disabled className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground opacity-50">
-                <LockKeyhole className="h-4 w-4" /> Pagamento disponível na Etapa 3
+              {paymentError && <p role="alert" className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{paymentError}</p>}
+              <button onClick={beginPayment} disabled={paymentPending} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground shadow-neon transition-opacity disabled:cursor-wait disabled:opacity-60">
+                {paymentPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <LockKeyhole className="h-4 w-4" />}
+                {paymentPending ? "A preparar o Checkout…" : "Testar pagamento seguro na Stripe"}
               </button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">Nenhuma encomenda foi criada e nenhum pagamento foi efetuado.</p>
+              <p className="mt-3 text-center text-xs text-muted-foreground">Modo teste: não efetua cobranças reais. Não inclui portes nem IVA.</p>
             </div>
           </section>
         ) : (
