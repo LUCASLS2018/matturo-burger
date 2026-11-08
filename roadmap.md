@@ -18,6 +18,6 @@
 - [x] Make the transparent logo black and increase its visible size further; verified on mobile and desktop.
 - [x] Add Comer no local in cart and carry the selection into order completion; UI and order text verified.
 - [x] Present GPS delivery architecture; approved with name/photo profiles.
-- [ ] Audit and create isolated Matturo delivery tables and private photo storage with authorization.
-- [ ] Implement authenticated courier/admin panels and token-based customer tracking.
-- [ ] Verify authorization, GPS lifecycle, realtime, photos and map with distinct accounts; first admin account requires owner identification.
+- [x] Audit and create isolated Matturo delivery tables and private photo storage with authorization; anonymous privileged-function access revoked.
+- [x] Implement authenticated courier/admin panels and token-based customer tracking; no payments or NovaFix data changes.
+- [ ] Verify authenticated GPS lifecycle, realtime, photo upload and map with distinct accounts; blocked by first admin account identification and external Supabase authentication unavailable for automated sessions. Public access denial, invalid-token rejection and nine unit tests passed. Email auth settings remain unverified.
