@@ -68,9 +68,9 @@ function CartPage() {
             <span className="text-primary">{formatPrice(subtotal)}</span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">Portes e pagamento serão combinados na finalização.</p>
-          <button disabled className="mt-6 w-full cursor-not-allowed rounded-lg bg-neon py-3 font-semibold text-primary-foreground opacity-50">
-            Finalizar encomenda (em breve)
-          </button>
+          <Link to="/finalizar" className="mt-6 block w-full rounded-lg bg-neon py-3 text-center font-semibold text-primary-foreground shadow-neon">
+            Finalizar encomenda
+          </Link>
           <Link to="/produtos" className="mt-3 block text-center text-sm text-primary hover:underline">Continuar a comprar</Link>
         </aside>
       </div>
