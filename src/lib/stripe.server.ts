@@ -9,7 +9,15 @@ type ProductRow = { id: string; name: string; price: NumericValue };
 type VariationRow = { id: string; product_id: string | null; price: NumericValue };
 type OptionRow = { variation_id: string; attribute_name: string; option: string | null };
 
-export type ResolvedItem = { name: string; unitAmount: number; quantity: number };
+export type ResolvedItem = {
+  productId: string;
+  variationId: string | null;
+  lookupKey: string;
+  name: string;
+  optionText: string;
+  unitAmount: number;
+  quantity: number;
+};
 
 const asNumber = (value: NumericValue | undefined) => value === null || value === undefined || value === "" ? null : Number(value);
 
@@ -35,6 +43,7 @@ export function resolvePurchasedItems(
     const productVariations = variations.filter((variation) => variation.product_id === product.id);
     let unitPrice = asNumber(product.price);
     let selectedOptions: Record<string, string> = {};
+    let variationId: string | null = null;
 
     if (productVariations.length) {
       const variation = productVariations.find((candidate) => {
@@ -46,6 +55,7 @@ export function resolvePurchasedItems(
       if (!variation) throw new Error(`As opções de ${product.name} já não estão disponíveis.`);
       unitPrice = asNumber(variation.price) ?? unitPrice;
       selectedOptions = optionsByVariation.get(variation.id) ?? {};
+      variationId = variation.id;
     } else if (Object.keys(item.options).length) {
       throw new Error(`As opções de ${product.name} não são válidas.`);
     }
@@ -55,9 +65,15 @@ export function resolvePurchasedItems(
     }
 
     const optionText = Object.entries(selectedOptions).map(([key, value]) => `${key === "TIME" ? "Time" : key}: ${value}`).join(" · ");
+    const unitAmount = Math.round(unitPrice * 100);
+    const priceOwner = variationId ?? product.id;
     return {
-      name: `${product.name}${optionText ? ` — ${optionText}` : ""}`.slice(0, 240),
-      unitAmount: Math.round(unitPrice * 100),
+      productId: product.id,
+      variationId,
+      lookupKey: `novafix_${priceOwner}_${unitAmount}`,
+      name: product.name,
+      optionText,
+      unitAmount,
       quantity: item.qty,
     };
   });
@@ -71,9 +87,23 @@ const checkoutStatusSchema = z.object({
   amount_total: z.number().nullable(),
   currency: z.string().nullable(),
 });
+const priceSchema = z.object({ id: z.string(), lookup_key: z.string().nullable() });
+const priceListSchema = z.object({ data: z.array(priceSchema) });
+const productSchema = z.object({ id: z.string() });
 
-async function parseStripeResponse(response: Response) {
+async function stripeApi(path: string, secretKey: string, options: { method?: "GET" | "POST"; body?: URLSearchParams; idempotencyKey?: string; allowNotFound?: boolean } = {}) {
+  const response = await fetch(`https://api.stripe.com${path}`, {
+    method: options.method ?? "GET",
+    headers: {
+      Authorization: `Bearer ${secretKey}`,
+      "Stripe-Version": "2025-08-27.basil",
+      ...(options.body ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      ...(options.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
+    },
+    ...(options.body ? { body: options.body } : {}),
+  });
   const body: unknown = await response.json().catch(() => null);
+  if (options.allowNotFound && response.status === 404) return null;
   if (!response.ok) {
     const code = typeof body === "object" && body && "error" in body && typeof body.error === "object" && body.error && "code" in body.error
       ? String(body.error.code)
@@ -82,6 +112,58 @@ async function parseStripeResponse(response: Response) {
     throw new Error("A Stripe não conseguiu processar o pedido. Tente novamente.");
   }
   return body;
+}
+
+async function ensureStripePrices(items: ResolvedItem[], secretKey: string, submissionId: string) {
+  const uniqueItems = [...new Map(items.map((item) => [item.lookupKey, item])).values()];
+  const pricesByLookupKey = new Map<string, string>();
+
+  for (let offset = 0; offset < uniqueItems.length; offset += 10) {
+    const chunk = uniqueItems.slice(offset, offset + 10);
+    const query = new URLSearchParams();
+    query.set("active", "true");
+    query.set("currency", "eur");
+    query.set("type", "one_time");
+    query.set("limit", "100");
+    chunk.forEach((item) => query.append("lookup_keys[]", item.lookupKey));
+    const list = priceListSchema.parse(await stripeApi(`/v1/prices?${query.toString()}`, secretKey));
+    for (const price of list.data) if (price.lookup_key) pricesByLookupKey.set(price.lookup_key, price.id);
+  }
+
+  for (const item of uniqueItems) {
+    if (pricesByLookupKey.has(item.lookupKey)) continue;
+    const stripeProductId = `novafix_${item.productId}`;
+    let product = productSchema.nullable().parse(await stripeApi(`/v1/products/${encodeURIComponent(stripeProductId)}`, secretKey, { allowNotFound: true }));
+    if (!product) {
+      const productParams = new URLSearchParams();
+      productParams.set("id", stripeProductId);
+      productParams.set("name", item.name);
+      productParams.set("shippable", "true");
+      productParams.set("metadata[novafix_product_id]", item.productId);
+      product = productSchema.parse(await stripeApi("/v1/products", secretKey, {
+        method: "POST",
+        body: productParams,
+        idempotencyKey: `${submissionId}-product-${item.productId}`,
+      }));
+    }
+
+    const priceParams = new URLSearchParams();
+    priceParams.set("currency", "eur");
+    priceParams.set("unit_amount", String(item.unitAmount));
+    priceParams.set("product", product.id);
+    priceParams.set("lookup_key", item.lookupKey);
+    priceParams.set("nickname", item.optionText || "Preço base");
+    priceParams.set("metadata[novafix_product_id]", item.productId);
+    if (item.variationId) priceParams.set("metadata[novafix_variation_id]", item.variationId);
+    const price = priceSchema.parse(await stripeApi("/v1/prices", secretKey, {
+      method: "POST",
+      body: priceParams,
+      idempotencyKey: `${submissionId}-${item.lookupKey}`,
+    }));
+    pricesByLookupKey.set(item.lookupKey, price.id);
+  }
+
+  return items.map((item) => ({ ...item, priceId: pricesByLookupKey.get(item.lookupKey)! }));
 }
 
 function validReturnOrigin(origin: string) {
@@ -127,6 +209,7 @@ export async function createStripeSession(
   if (optionsError) throw new Error("Não foi possível confirmar as opções. Tente novamente.");
 
   const resolvedItems = resolvePurchasedItems(data.items, products ?? [], variations ?? [], optionRows ?? []);
+  const pricedItems = await ensureStripePrices(resolvedItems, stripeSecretKey, data.submissionId);
   const params = new URLSearchParams();
   params.set("mode", "payment");
   params.set("locale", "pt");
@@ -146,28 +229,20 @@ export async function createStripeSession(
   params.set("payment_intent_data[metadata][submission_id]", data.submissionId);
   params.set("payment_intent_data[metadata][store]", "NovaFix Tech Lab");
 
-  resolvedItems.forEach((item, index) => {
+  pricedItems.forEach((item, index) => {
+    params.set(`line_items[${index}][price]`, item.priceId);
     params.set(`line_items[${index}][quantity]`, String(item.quantity));
-    params.set(`line_items[${index}][price_data][currency]`, "eur");
-    params.set(`line_items[${index}][price_data][unit_amount]`, String(item.unitAmount));
-    params.set(`line_items[${index}][price_data][product_data][name]`, item.name);
   });
 
-  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+  const response = await stripeApi("/v1/checkout/sessions", stripeSecretKey, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${stripeSecretKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Idempotency-Key": data.submissionId,
-    },
     body: params,
+    idempotencyKey: data.submissionId,
   });
-  return checkoutSessionSchema.parse(await parseStripeResponse(response));
+  return checkoutSessionSchema.parse(response);
 }
 
 export async function retrieveStripeSession(sessionId: string, stripeSecretKey: string) {
-  const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
-    headers: { Authorization: `Bearer ${stripeSecretKey}` },
-  });
-  return checkoutStatusSchema.parse(await parseStripeResponse(response));
+  const response = await stripeApi(`/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, stripeSecretKey);
+  return checkoutStatusSchema.parse(response);
 }
