@@ -22,7 +22,7 @@ type CartCtx = {
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-const STORAGE_KEY = "novafix-cart-v1";
+const STORAGE_KEY = "matturo-cart-v1";
 
 export function cartKey(productId: string, options: Record<string, string>) {
   return productId + "|" + Object.keys(options).sort().map((k) => `${k}=${options[k]}`).join("&");
