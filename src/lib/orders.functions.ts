@@ -103,13 +103,10 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
     if (o.error) throw o.error;
     if (o.data.service !== "Delivery" || !o.data.address) throw new Error("Só pedidos de delivery têm estafeta.");
     if (["concluido", "cancelado"].includes(o.data.status)) throw new Error("Pedido já fechado.");
-    const query = `${o.data.address}, ${o.data.postal_code ?? ""}, Portugal`;
-    let lat = 38.9553, lng = -8.9897; // centro de Vila Franca de Xira se a morada não for encontrada
-    try {
-      const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=pt&q=${encodeURIComponent(query)}`, { headers: { "User-Agent": "MatturoBurger/1.0" } });
-      const j = (await g.json()) as { lat: string; lon: string }[];
-      if (j[0]) { lat = Number(j[0].lat); lng = Number(j[0].lon); }
-    } catch { /* mantém aproximação */ }
+    const { geocodePt } = await import("./geocode.server");
+    const g = await geocodePt(o.data.address, o.data.postal_code ?? "");
+    if (!g) throw new Error("Não consegui localizar este código postal. Confirme o código postal do cliente.");
+    const lat = g.lat, lng = g.lng;
     const destination = `${o.data.address} · ${o.data.postal_code ?? ""} — ${o.data.customer_name} (${o.data.customer_phone})`.slice(0, 300);
     const r = await db.from("matturo_deliveries").insert({ order_id: data.orderId, reference: o.data.reference, destination, destination_lat: lat, destination_lng: lng, courier_id: data.courierId }).select("id").single();
     if (r.error) throw new Error(r.error.code === "23505" ? "Este pedido já tem estafeta." : r.error.message);
