@@ -12,6 +12,6 @@
 - [x] Match the latest horizontal compact burger-card layout with original product photos.
 - [x] Apply the same compact layout to pizzas using original photos.
 - [x] Remove photographic backgrounds from all original pizza photos.
-- [ ] Apply the compact ordering layout to every product and remove backgrounds from all remaining available photos.
-- [ ] Ensure all product names remain fully separated from photos.
-- [ ] Show all products on the homepage, promotions first.
+- [x] Apply the compact ordering layout to every product and remove backgrounds from all remaining available photos; products without original photos retain a neutral icon.
+- [x] Ensure all product names remain fully separated from photos; verified at mobile, desktop and wide desktop sizes.
+- [x] Show all 54 products on the homepage, promotions first.
