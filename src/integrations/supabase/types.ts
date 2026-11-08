@@ -173,6 +173,110 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_order_items: {
+        Row: {
+          created_at: string
+          dish_id: string
+          id: string
+          line_total_cents: number
+          name: string
+          options: Json
+          order_id: string
+          qty: number
+          unit_price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dish_id: string
+          id?: string
+          line_total_cents: number
+          name: string
+          options?: Json
+          order_id: string
+          qty: number
+          unit_price_cents: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dish_id?: string
+          id?: string
+          line_total_cents?: number
+          name?: string
+          options?: Json
+          order_id?: string
+          qty?: number
+          unit_price_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_orders: {
+        Row: {
+          access_token_hash: string
+          address: string | null
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          delivery_fee_cents: number
+          id: string
+          notes: string | null
+          postal_code: string | null
+          reference: string
+          service: string
+          status: string
+          subtotal_cents: number
+          total_cents: number
+          updated_at: string
+          zone_name: string | null
+        }
+        Insert: {
+          access_token_hash: string
+          address?: string | null
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          delivery_fee_cents?: number
+          id?: string
+          notes?: string | null
+          postal_code?: string | null
+          reference: string
+          service: string
+          status?: string
+          subtotal_cents: number
+          total_cents: number
+          updated_at?: string
+          zone_name?: string | null
+        }
+        Update: {
+          access_token_hash?: string
+          address?: string | null
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          delivery_fee_cents?: number
+          id?: string
+          notes?: string | null
+          postal_code?: string | null
+          reference?: string
+          service?: string
+          status?: string
+          subtotal_cents?: number
+          total_cents?: number
+          updated_at?: string
+          zone_name?: string | null
+        }
+        Relationships: []
+      }
       matturo_profiles: {
         Row: {
           created_at: string
