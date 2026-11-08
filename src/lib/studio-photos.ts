@@ -1,4 +1,5 @@
 import canecaDeTimePhoto from "@/assets/products/caneca-de-time-500ml.png.asset.json";
+import dalmataFrontPhoto from "@/assets/products/cachorro-dalmata-25cm-frente.jpg.asset.json";
 
 // AI-cleaned studio photos (made from the real product photo), keyed by product slug.
 // Shown first on the product page and in the cart; the original photos stay in the gallery.

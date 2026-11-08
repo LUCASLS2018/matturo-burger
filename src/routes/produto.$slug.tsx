@@ -78,7 +78,10 @@ function ProductPage() {
   const gallery = studio
     ? p.slug === "caneca-de-time-500ml"
       ? [{ url: studio, alt: p.name }]
-      : [{ url: studio, alt: p.name }, ...p.images]
+      : [
+          { url: studio, alt: p.name },
+          ...p.images.filter((im) => p.slug !== "cachorro-dalmata-25cm" || !im.url.includes("2fcd29c9-393b-52c8-82ef-14c3881f0a82.jpg")),
+        ]
     : p.images;
   const img = gallery[imgIdx] ?? gallery[0];
   const paragraphs = cleanText(p.description).split(/\n{2,}/).filter(Boolean);
@@ -97,7 +100,7 @@ function ProductPage() {
       <div className="grid gap-10 lg:grid-cols-2">
         <div>
           <div className="relative overflow-hidden rounded-2xl border border-border bg-muted">
-            {img && <img src={img.url} alt={img.alt} className="aspect-square w-full object-cover" />}
+            {img && <img src={img.url} alt={img.alt} className="aspect-square w-full object-contain" />}
             <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">{p.ribbons.map((r) => <RibbonBadge key={r} name={r} />)}</div>
           </div>
           {gallery.length > 1 && (
