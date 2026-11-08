@@ -26,7 +26,7 @@ export const Route = createFileRoute("/produto/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
-        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+        ...(img && loaderData.slug !== "caneca-de-time-500ml" ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
       ],
     };
   },
@@ -75,7 +75,11 @@ function ProductPage() {
   };
 
   const studio = studioPhoto(p.slug);
-  const gallery = studio ? [{ url: studio, alt: p.name }, ...p.images] : p.images;
+  const gallery = studio
+    ? p.slug === "caneca-de-time-500ml"
+      ? [{ url: studio, alt: p.name }]
+      : [{ url: studio, alt: p.name }, ...p.images]
+    : p.images;
   const img = gallery[imgIdx] ?? gallery[0];
   const paragraphs = cleanText(p.description).split(/\n{2,}/).filter(Boolean);
 
