@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      matturo_courier_availability: {
+        Row: {
+          created_at: string
+          revision: number
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          revision?: number
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          revision?: number
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_courier_availability_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "matturo_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matturo_deliveries: {
         Row: {
           completed_at: string | null
@@ -1155,6 +1187,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      matturo_assign_order_courier: {
+        Args: {
+          p_admin_id: string
+          p_courier_id: string
+          p_destination: string
+          p_lat: number
+          p_lng: number
+          p_order_id: string
+        }
+        Returns: string
+      }
       matturo_has_role: { Args: { wanted: string }; Returns: boolean }
       matturo_place_order: {
         Args: { p_items: Json; p_order: Json }
@@ -1163,19 +1206,36 @@ export type Database = {
           reference: string
         }[]
       }
-      matturo_record_position: {
-        Args: {
-          delivery: string
-          lat: number
-          lng: number
-          precision_m: number
-        }
-        Returns: undefined
+      matturo_record_position:
+        | {
+            Args: {
+              actor: string
+              delivery: string
+              lat: number
+              lng: number
+              precision_m: number
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              delivery: string
+              lat: number
+              lng: number
+              precision_m: number
+            }
+            Returns: undefined
+          }
+      matturo_set_courier_availability: {
+        Args: { next_state: string; p_courier_id: string }
+        Returns: string
       }
-      matturo_set_delivery_state: {
-        Args: { delivery: string; next_state: string }
-        Returns: undefined
-      }
+      matturo_set_delivery_state:
+        | {
+            Args: { actor: string; delivery: string; next_state: string }
+            Returns: undefined
+          }
+        | { Args: { delivery: string; next_state: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
