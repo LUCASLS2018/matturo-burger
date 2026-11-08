@@ -32,6 +32,7 @@
 - [x] Management stage 2b: link orders to courier assignment and deliveries automatically; cancelling an order cancels its active delivery, hides the courier position and revokes the tracking link.
 - [x] Management stage 3: editable menu with autosave in the admin panel; owner verified the authenticated save flow end to end.
 - [ ] Finish editable categories and modifier groups/options, including public ordering and revision-checked admin autosave.
+- [ ] Owner requirement: every ingredient, stuffed-crust choice, modifier group, option price/limit/order and general catalogue detail must be editable in the admin panel, not only photos, prices and availability.
 - [ ] Add customer accounts and an owner-scoped order history without exposing team areas or other customers' orders.
 - [ ] Complete courier availability, assignment details and the full pickup/transit/completion state controls.
 - [ ] Review and remediate the four outstanding legacy security findings without changing retired NovaFix data.

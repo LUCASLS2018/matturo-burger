@@ -15,6 +15,7 @@ import { Route as AtendimentoRouteImport } from './routes/atendimento'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CardapioRouteImport } from './routes/cardapio'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as ContaRouteImport } from './routes/conta'
 import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as FinalizarRouteImport } from './routes/finalizar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedCategoriasRouteImport } from './routes/_authentic
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
 import { Route as AuthenticatedGerirMenuRouteImport } from './routes/_authenticated/gerir-menu'
+import { Route as AuthenticatedMinhaContaRouteImport } from './routes/_authenticated/minha-conta'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
@@ -59,6 +61,11 @@ const CardapioRoute = CardapioRouteImport.update({
 const CarrinhoRoute = CarrinhoRouteImport.update({
   id: '/carrinho',
   path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContaRoute = ContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactosRoute = ContactosRouteImport.update({
@@ -100,6 +107,11 @@ const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
 const AuthenticatedGerirMenuRoute = AuthenticatedGerirMenuRouteImport.update({
   id: '/gerir-menu',
   path: '/gerir-menu',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMinhaContaRoute = AuthenticatedMinhaContaRouteImport.update({
+  id: '/minha-conta',
+  path: '/minha-conta',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
@@ -149,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/conta': typeof ContaRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
@@ -157,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
   '/gerir-menu': typeof AuthenticatedGerirMenuRoute
+  '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
@@ -172,6 +186,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/conta': typeof ContaRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
@@ -180,6 +195,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
   '/gerir-menu': typeof AuthenticatedGerirMenuRoute
+  '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
@@ -197,6 +213,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/conta': typeof ContaRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
@@ -205,6 +222,7 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
   '/_authenticated/gerir-menu': typeof AuthenticatedGerirMenuRoute
+  '/_authenticated/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
@@ -222,6 +240,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cardapio'
     | '/carrinho'
+    | '/conta'
     | '/contactos'
     | '/finalizar'
     | '/produtos'
@@ -230,6 +249,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/entregas'
     | '/gerir-menu'
+    | '/minha-conta'
     | '/painel'
     | '/pedidos'
     | '/acompanhar/$token'
@@ -245,6 +265,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cardapio'
     | '/carrinho'
+    | '/conta'
     | '/contactos'
     | '/finalizar'
     | '/produtos'
@@ -253,6 +274,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/entregas'
     | '/gerir-menu'
+    | '/minha-conta'
     | '/painel'
     | '/pedidos'
     | '/acompanhar/$token'
@@ -269,6 +291,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cardapio'
     | '/carrinho'
+    | '/conta'
     | '/contactos'
     | '/finalizar'
     | '/produtos'
@@ -277,6 +300,7 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
     | '/_authenticated/gerir-menu'
+    | '/_authenticated/minha-conta'
     | '/_authenticated/painel'
     | '/_authenticated/pedidos'
     | '/acompanhar/$token'
@@ -294,6 +318,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CardapioRoute: typeof CardapioRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  ContaRoute: typeof ContaRoute
   ContactosRoute: typeof ContactosRoute
   FinalizarRoute: typeof FinalizarRoute
   ProdutosRoute: typeof ProdutosRoute
@@ -350,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CarrinhoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contactos': {
       id: '/contactos'
       path: '/contactos'
@@ -404,6 +436,13 @@ declare module '@tanstack/react-router' {
       path: '/gerir-menu'
       fullPath: '/gerir-menu'
       preLoaderRoute: typeof AuthenticatedGerirMenuRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/minha-conta': {
+      id: '/_authenticated/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof AuthenticatedMinhaContaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/painel': {
@@ -470,6 +509,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
   AuthenticatedGerirMenuRoute: typeof AuthenticatedGerirMenuRoute
+  AuthenticatedMinhaContaRoute: typeof AuthenticatedMinhaContaRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
 }
@@ -479,6 +519,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
   AuthenticatedGerirMenuRoute: AuthenticatedGerirMenuRoute,
+  AuthenticatedMinhaContaRoute: AuthenticatedMinhaContaRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
 }
@@ -493,6 +534,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CardapioRoute: CardapioRoute,
   CarrinhoRoute: CarrinhoRoute,
+  ContaRoute: ContaRoute,
   ContactosRoute: ContactosRoute,
   FinalizarRoute: FinalizarRoute,
   ProdutosRoute: ProdutosRoute,
