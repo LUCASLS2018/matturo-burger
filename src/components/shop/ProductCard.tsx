@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ImageOff } from "lucide-react";
 import { formatPrice, type ProductCardDTO } from "@/lib/shop";
+import { studioPhoto } from "@/lib/studio-photos";
 
 const ribbonStyle: Record<string, string> = {
   "Promoção": "bg-destructive text-destructive-foreground",
@@ -31,6 +32,8 @@ export function PriceTag({ p }: { p: ProductCardDTO }) {
 }
 
 export function ProductCard({ p }: { p: ProductCardDTO }) {
+  const image = p.slug === "caneca-de-time-500ml" ? studioPhoto(p.slug) : p.image;
+
   return (
     <Link
       to="/produto/$slug"
@@ -38,8 +41,8 @@ export function ProductCard({ p }: { p: ProductCardDTO }) {
       className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-neon"
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
-        {p.image ? (
-          <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        {image ? (
+          <img src={image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="grid h-full place-items-center text-muted-foreground"><ImageOff /></div>
         )}
