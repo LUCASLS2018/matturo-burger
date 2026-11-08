@@ -183,6 +183,42 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_menu_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          image: string | null
+          name: string
+          position: number
+          revision: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image?: string | null
+          name: string
+          position?: number
+          revision?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image?: string | null
+          name?: string
+          position?: number
+          revision?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       matturo_menu_items: {
         Row: {
           available: boolean
@@ -192,6 +228,7 @@ export type Database = {
           id: string
           image: string | null
           name: string
+          position: number
           price_cents: number
           revision: number
           slug: string
@@ -206,6 +243,7 @@ export type Database = {
           id: string
           image?: string | null
           name: string
+          position?: number
           price_cents: number
           revision?: number
           slug: string
@@ -220,6 +258,7 @@ export type Database = {
           id?: string
           image?: string | null
           name?: string
+          position?: number
           price_cents?: number
           revision?: number
           slug?: string
@@ -227,6 +266,100 @@ export type Database = {
           visible?: boolean
         }
         Relationships: []
+      }
+      matturo_modifier_groups: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          max: number
+          min: number
+          name: string
+          position: number
+          required: boolean
+          revision: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          item_id: string
+          max?: number
+          min?: number
+          name: string
+          position?: number
+          required?: boolean
+          revision?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          max?: number
+          min?: number
+          name?: string
+          position?: number
+          required?: boolean
+          revision?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_modifier_groups_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_modifiers: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          item_id: string
+          max: number
+          name: string
+          position: number
+          price_cents: number
+          revision: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id: string
+          item_id: string
+          max?: number
+          name: string
+          position?: number
+          price_cents?: number
+          revision?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          item_id?: string
+          max?: number
+          name?: string
+          position?: number
+          price_cents?: number
+          revision?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_modifiers_item_id_group_id_fkey"
+            columns: ["item_id", "group_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_modifier_groups"
+            referencedColumns: ["item_id", "id"]
+          },
+        ]
       }
       matturo_order_items: {
         Row: {
