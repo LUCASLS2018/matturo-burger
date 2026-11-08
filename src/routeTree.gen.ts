@@ -19,6 +19,7 @@ import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as FinalizarRouteImport } from './routes/finalizar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
 import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
 import { Route as EncomendaCanceladaRouteImport } from './routes/encomenda.cancelada'
@@ -75,6 +76,12 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
   id: '/entregas',
   path: '/entregas',
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/configuracoes'
     | '/entregas'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/configuracoes'
     | '/entregas'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
@@ -206,6 +218,7 @@ export interface FileRouteTypes {
     | '/finalizar'
     | '/produtos'
     | '/sobre'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/entregas': {
       id: '/_authenticated/entregas'
       path: '/entregas'
@@ -350,10 +370,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
 }
 

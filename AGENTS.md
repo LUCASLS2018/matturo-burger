@@ -37,3 +37,4 @@ use the editor.
 - Keep order modality in the cart context and its allowed values in order-service so cart and checkout share the same selection.
 - Delivery persistence uses isolated matturo_* resources; courier GPS/state RPCs enforce assignment under a row lock, and public tracking reads validate hashed expiring tokens on the server without anonymous table grants.
 - Authenticated delivery panels use the shared _authenticated gate and bearer function middleware; Leaflet loads dynamically after hydration to preserve SSR safety.
+- Restaurant settings and delivery zones use isolated Matturo tables, revision-checked admin writes and public allowlisted reads; checkout rechecks pause immediately before submission to prevent stale-page ordering.
