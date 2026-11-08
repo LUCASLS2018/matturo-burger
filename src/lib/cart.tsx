@@ -60,10 +60,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal: items.reduce((s, i) => s + i.qty * i.price, 0),
       add: (item, qty = 1) =>
         setItems((prev) => {
-          const key = cartKey(item.productId, item.options);
-          const found = prev.find((i) => i.key === key);
-          if (found) return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i));
-          return [...prev, { ...item, key, qty }];
+          // Every unit is its own line, even for identical dishes.
+          const base = cartKey(item.productId, item.options);
+          const lines = Array.from({ length: Math.max(1, qty) }, (_, n) => ({ ...item, key: `${base}#${Date.now().toString(36)}${n}${Math.random().toString(36).slice(2, 6)}`, qty: 1 }));
+          return [...prev, ...lines];
         }),
       setQty: (key, qty) =>
         setItems((prev) => (qty <= 0 ? prev.filter((i) => i.key !== key) : prev.map((i) => (i.key === key ? { ...i, qty } : i)))),
