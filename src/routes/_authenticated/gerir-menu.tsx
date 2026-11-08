@@ -151,7 +151,8 @@ function MenuAdminPage() {
     <Link to="/painel" onClick={(event) => { if (dirty && !window.confirm("Há alterações por guardar. Quer sair mesmo assim?")) event.preventDefault(); }} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"><ArrowLeft className="h-4 w-4" />Painel da equipa</Link>
     <p className="mb-3 text-xs font-semibold text-primary">MATTURO · ADMINISTRAÇÃO</p>
     <h1 className="section-title">Produtos</h1>
-    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">Edite nomes, preços, descrições, disponibilidade e fotografias. As alterações são guardadas automaticamente.</p>
+    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">Edite nomes, preços, descrições, categorias, opções, disponibilidade e fotografias. As alterações são guardadas automaticamente.</p>
+    <Button asChild variant="outline" className="mt-5"><Link to="/categorias">Gerir categorias</Link></Button>
     <div className="mt-8 grid items-start gap-8 lg:grid-cols-[320px_1fr]">
       <aside className="rounded-lg border border-border bg-card p-4 lg:sticky lg:top-28">
         <label className="relative block"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Procurar produto" aria-label="Procurar produto" className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm" /></label>
@@ -171,12 +172,14 @@ function MenuAdminPage() {
             <p className="mt-3 text-center text-xs text-muted-foreground">JPG, PNG ou WebP · até 5 MB</p>
           </div>
           <div className="space-y-5"><label className="block text-sm font-medium">Nome<input value={draft.name} onChange={(event) => update("name", event.target.value)} maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
-            <label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
+            <div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label><label className="block text-sm font-medium">Ordem no cardápio<input type="number" min={0} value={draft.position} onChange={(event) => update("position", Number(event.target.value))} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label></div>
+            <label className="block text-sm font-medium">Categoria<select value={draft.category} onChange={(event) => update("category", event.target.value)} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{categoryOptions.map((category) => <option key={category.id} value={category.slug}>{category.name}{category.active ? "" : " (inativa)"}</option>)}</select></label>
             <label className="block text-sm font-medium">Descrição<textarea value={draft.description} onChange={(event) => update("description", event.target.value)} maxLength={2000} rows={6} className="mt-2 w-full rounded-md border border-input bg-background p-3 text-sm" /></label>
             <div className="space-y-3 border-t border-border pt-5"><label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.available} onChange={(event) => update("available", event.target.checked)} className="h-4 w-4 accent-primary" />Disponível para pedidos</label><label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.visible} onChange={(event) => update("visible", event.target.checked)} className="h-4 w-4 accent-primary" />Visível no cardápio</label></div>
           </div>
         </div>
         {state === "error" && <div role="alert" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/10 p-4"><p className="text-sm text-destructive">{error}</p><Button type="button" variant="outline" onClick={() => setDraft({ ...draft })}><RotateCcw />Tentar guardar novamente</Button></div>}
+        <OptionsEditor dish={selected} adminQueryKey={adminMenuQuery.queryKey} />
       </section> : <p>Nenhum produto encontrado.</p>}
     </div>
   </div>;
