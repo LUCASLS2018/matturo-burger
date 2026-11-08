@@ -361,6 +361,48 @@ export type Database = {
           },
         ]
       }
+      matturo_order_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          order_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          order_id: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_order_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matturo_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matturo_order_items: {
         Row: {
           created_at: string
@@ -410,16 +452,21 @@ export type Database = {
       }
       matturo_orders: {
         Row: {
+          access_expires_at: string | null
+          access_revoked_at: string | null
           access_token_hash: string
           address: string | null
           created_at: string
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_fee_cents: number
           id: string
+          idempotency_key: string | null
           notes: string | null
           postal_code: string | null
           reference: string
+          request_fingerprint: string | null
           service: string
           status: string
           subtotal_cents: number
@@ -428,16 +475,21 @@ export type Database = {
           zone_name: string | null
         }
         Insert: {
+          access_expires_at?: string | null
+          access_revoked_at?: string | null
           access_token_hash: string
           address?: string | null
           created_at?: string
+          customer_id?: string | null
           customer_name: string
           customer_phone: string
           delivery_fee_cents?: number
           id?: string
+          idempotency_key?: string | null
           notes?: string | null
           postal_code?: string | null
           reference: string
+          request_fingerprint?: string | null
           service: string
           status?: string
           subtotal_cents: number
@@ -446,16 +498,21 @@ export type Database = {
           zone_name?: string | null
         }
         Update: {
+          access_expires_at?: string | null
+          access_revoked_at?: string | null
           access_token_hash?: string
           address?: string | null
           created_at?: string
+          customer_id?: string | null
           customer_name?: string
           customer_phone?: string
           delivery_fee_cents?: number
           id?: string
+          idempotency_key?: string | null
           notes?: string | null
           postal_code?: string | null
           reference?: string
+          request_fingerprint?: string | null
           service?: string
           status?: string
           subtotal_cents?: number
@@ -463,7 +520,15 @@ export type Database = {
           updated_at?: string
           zone_name?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "matturo_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       matturo_profiles: {
         Row: {
