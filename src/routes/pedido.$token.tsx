@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
+import { ClientOnly } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+const DeliveryMap = lazy(() => import("@/components/restaurant/DeliveryMap"));
 import { orderByToken } from "@/lib/orders.functions";
 import { orderStatusLabels, orderStatuses, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
@@ -30,6 +33,11 @@ function OrderPage() {
       <h1 className="section-title mt-2">{orderStatusLabels[current]}</h1>
       {current === "cancelado" ? <p className="mt-4 border-l-4 border-destructive bg-secondary p-4">Este pedido foi cancelado pelo restaurante.</p> :
         <ol className="mt-8 grid grid-cols-5 gap-2 text-center text-xs">{steps.map((s, i) => <li key={s} className={`rounded-md p-2 ${i <= steps.indexOf(current) ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>{orderStatusLabels[s]}</li>)}</ol>}
+      {o.tracking && <section className="mt-8 rounded-lg border border-border bg-card p-4">
+        <p className="font-semibold">{o.tracking.status === "active" ? `${o.tracking.courier} está a caminho` : o.tracking.status === "delivered" ? "Entregue" : `${o.tracking.courier} vai levar o seu pedido`}</p>
+        {o.tracking.status === "active" && <><div className="mt-3"><ClientOnly fallback={<div className="h-80 bg-muted" />}><Suspense fallback={<div className="h-80 bg-muted" />}><DeliveryMap lat={o.tracking.lat} lng={o.tracking.lng} position={o.tracking.position} /></Suspense></ClientOnly></div><p className="mt-2 text-xs text-muted-foreground">{o.tracking.position ? `Última atualização: ${new Date(o.tracking.position.recorded_at).toLocaleTimeString("pt-PT")}` : "A aguardar a localização do estafeta…"}</p></>}
+        {o.tracking.status === "confirmed" && <p className="mt-1 text-sm text-muted-foreground">Vai ver a localização aqui assim que a entrega começar.</p>}
+      </section>}
       <ul className="mt-8 divide-y divide-border border-y border-border">{o.items.map((i, n) => <li key={n} className="flex justify-between gap-3 py-3 text-sm"><span>{i.qty}× {i.name}</span><span className="font-semibold">{money(i.line_total_cents / 100)}</span></li>)}</ul>
       <div className="mt-4 space-y-1 text-sm">
         {o.delivery_fee_cents > 0 && <div className="flex justify-between"><span>Entrega ({o.zone_name})</span><span>{money(o.delivery_fee_cents / 100)}</span></div>}
