@@ -28,6 +28,7 @@ import { Route as AuthenticatedGerirMenuRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMinhaContaRouteImport } from './routes/_authenticated/minha-conta'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
+import { Route as AuthenticatedPedidosConcluidosRouteImport } from './routes/_authenticated/pedidos-concluidos'
 import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
 import { Route as EncomendaCanceladaRouteImport } from './routes/encomenda.cancelada'
 import { Route as EncomendaSucessoRouteImport } from './routes/encomenda.sucesso'
@@ -130,6 +131,12 @@ const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
   path: '/pedidos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPedidosConcluidosRoute =
+  AuthenticatedPedidosConcluidosRouteImport.update({
+    id: '/pedidos-concluidos',
+    path: '/pedidos-concluidos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AcompanharTokenRoute = AcompanharTokenRouteImport.update({
   id: '/acompanhar/$token',
   path: '/acompanhar/$token',
@@ -180,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
+  '/pedidos-concluidos': typeof AuthenticatedPedidosConcluidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
@@ -206,6 +214,7 @@ export interface FileRoutesByTo {
   '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
+  '/pedidos-concluidos': typeof AuthenticatedPedidosConcluidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
@@ -234,6 +243,7 @@ export interface FileRoutesById {
   '/_authenticated/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
+  '/_authenticated/pedidos-concluidos': typeof AuthenticatedPedidosConcluidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/painel'
     | '/pedidos'
+    | '/pedidos-concluidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/painel'
     | '/pedidos'
+    | '/pedidos-concluidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
@@ -315,6 +327,7 @@ export interface FileRouteTypes {
     | '/_authenticated/minha-conta'
     | '/_authenticated/painel'
     | '/_authenticated/pedidos'
+    | '/_authenticated/pedidos-concluidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
@@ -478,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPedidosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pedidos-concluidos': {
+      id: '/_authenticated/pedidos-concluidos'
+      path: '/pedidos-concluidos'
+      fullPath: '/pedidos-concluidos'
+      preLoaderRoute: typeof AuthenticatedPedidosConcluidosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/acompanhar/$token': {
       id: '/acompanhar/$token'
       path: '/acompanhar/$token'
@@ -532,6 +552,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMinhaContaRoute: typeof AuthenticatedMinhaContaRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
+  AuthenticatedPedidosConcluidosRoute: typeof AuthenticatedPedidosConcluidosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -543,6 +564,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMinhaContaRoute: AuthenticatedMinhaContaRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
+  AuthenticatedPedidosConcluidosRoute: AuthenticatedPedidosConcluidosRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

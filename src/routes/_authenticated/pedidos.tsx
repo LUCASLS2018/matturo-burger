@@ -3,7 +3,7 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Ban, Bell, BellOff, Bike, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
+import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
@@ -28,7 +28,6 @@ const columns: { key: OrderStatus; label: string; dot: string }[] = [
   { key: "aceite", label: "Aceite", dot: "bg-primary/70" },
   { key: "em_preparacao", label: "Em preparação", dot: "bg-primary/45" },
   { key: "pronto", label: "Em entrega", dot: "bg-primary/25" },
-  { key: "concluido", label: "Concluído", dot: "bg-muted-foreground/40" },
 ];
 
 const boardLabels: Record<string, string> = { novo: "Por aceitar", aceite: "Aceite", em_preparacao: "Em preparação", pronto: "Em entrega", concluido: "Concluído", cancelado: "Cancelado" };
@@ -85,8 +84,9 @@ function OrdersPage() {
           <p className="text-xs font-semibold tracking-widest text-primary">MATTURO · ADMINISTRAÇÃO</p>
           <h1 className="section-title mt-1">Central de pedidos</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 animate-pulse rounded-full bg-primary" />Em direto</span>
+          <Button asChild variant="outline" size="sm"><Link to="/pedidos-concluidos"><CheckCircle2 />Concluídos</Link></Button>
           <Button variant={sound ? "default" : "outline"} size="sm" onClick={() => setSound(!sound)}>{sound ? <Bell /> : <BellOff />}{sound ? "Som ligado" : "Som desligado"}</Button>
         </div>
       </div>
@@ -95,7 +95,7 @@ function OrdersPage() {
         {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-medium text-muted-foreground">{s.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p></div>)}
       </div>
 
-      <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:grid lg:grid-cols-5 lg:gap-3 lg:overflow-visible xl:gap-4">
+      <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:grid lg:grid-cols-4 lg:gap-3 lg:overflow-visible xl:gap-4">
         {columns.map((col) => {
           const items = data.filter((o) => o.status === col.key);
           return (
