@@ -141,8 +141,8 @@
 .section-title { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.25; }
 .burger-card { position: relative; min-height: 206px; display: flex; align-items: flex-end; padding-top: 30px; }
 .burger-card-panel { position: absolute; inset: 45px 0 0 44px; border-radius: 8px; background: var(--burger-panel); }
-.burger-card-photo { position: absolute; left: 0; top: 0; width: 31%; height: 145px; z-index: 1; }
-.burger-card-content { position: relative; width: 65%; margin-left: auto; padding: 12px 14px 18px 12px; }
+.burger-card-photo { position: absolute; left: 0; top: 0; width: 40%; height: 145px; z-index: 1; }
+.burger-card-content { position: relative; width: 57%; margin-left: auto; padding: 12px 14px 18px 0; }
 @media (max-width: 640px) { .page-width { width: calc(100% - 32px); } .matturo-hero { min-height: 560px; height: 72vh; } .matturo-hero { min-height: 690px; height: auto; align-items: flex-start; } .matturo-hero > img { height: 250px; top: auto; bottom: 0; width: 100%; object-fit: contain; object-position: center; } .matturo-hero::after { background: linear-gradient(180deg, var(--background) 52%, transparent 77%); } .matturo-hero .page-width { padding-top: 24px; padding-bottom: 250px; } .matturo-hero h1 { font-size: 44px; } .matturo-hero p { font-size: 14px; } .matturo-hero .mt-10 { margin-top: 24px; } .matturo-hero .mt-8 { margin-top: 24px; } .matturo-hero .mb-6 { margin-bottom: 20px; } .matturo-hero a { height: 44px; padding-inline: 14px; font-size: 12px; } .section-title { font-size: 1.6rem; } }
 @media (prefers-reduced-motion: no-preference) { .food-photo { transition: transform 350ms ease; } a:hover .food-photo { transform: scale(1.035); } }
 

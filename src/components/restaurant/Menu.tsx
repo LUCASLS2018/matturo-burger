@@ -19,7 +19,7 @@ export function DishCard({ dish }: { dish: Dish }) {
         <Button size="icon" className="h-7 w-7 rounded-md" title={`Aumentar quantidade de ${dish.name}`} aria-label={`Aumentar quantidade de ${dish.name}`} onClick={() => setQuantity(q => q + 1)}><Plus className="h-3 w-3" /></Button>
         <Button asChild size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" disabled={!dish.available} title={`Selecionar ${dish.name}`}><Link to="/produto/$slug" params={{ slug: dish.slug }} search={{ quantidade: quantity }} aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Link></Button>
       </div>
-      <Link to="/produto/$slug" params={{ slug: dish.slug }}><h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5">{dish.name}</h3></Link>
+      <Link to="/produto/$slug" params={{ slug: dish.slug }}><h3 className="min-h-10 break-words text-sm font-semibold leading-5">{dish.name}</h3></Link>
       <p className="mt-2 text-base font-semibold text-primary">{dish.available ? money(dish.price) : "Indisponível"}</p>
     </div>
   </article>;
