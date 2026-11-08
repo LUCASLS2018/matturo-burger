@@ -14,6 +14,215 @@ export type Database = {
   }
   public: {
     Tables: {
+      matturo_deliveries: {
+        Row: {
+          completed_at: string | null
+          confirmed_at: string
+          courier_id: string | null
+          created_at: string
+          destination: string
+          destination_lat: number
+          destination_lng: number
+          id: string
+          reference: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          confirmed_at?: string
+          courier_id?: string | null
+          created_at?: string
+          destination: string
+          destination_lat: number
+          destination_lng: number
+          id?: string
+          reference: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          confirmed_at?: string
+          courier_id?: string | null
+          created_at?: string
+          destination?: string
+          destination_lat?: number
+          destination_lng?: number
+          id?: string
+          reference?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_deliveries_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_delivery_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          delivery_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          delivery_id: string
+          id?: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          delivery_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_delivery_events_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_delivery_positions: {
+        Row: {
+          accuracy: number
+          created_at: string
+          delivery_id: string
+          latitude: number
+          longitude: number
+          recorded_at: string
+          updated_at: string
+        }
+        Insert: {
+          accuracy: number
+          created_at?: string
+          delivery_id: string
+          latitude: number
+          longitude: number
+          recorded_at?: string
+          updated_at?: string
+        }
+        Update: {
+          accuracy?: number
+          created_at?: string
+          delivery_id?: string
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_delivery_positions_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: true
+            referencedRelation: "matturo_deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          photo_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name?: string
+          photo_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          photo_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      matturo_tracking_links: {
+        Row: {
+          created_at: string
+          delivery_id: string
+          expires_at: string
+          id: string
+          revoked_at: string | null
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_id: string
+          expires_at: string
+          id?: string
+          revoked_at?: string | null
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delivery_id?: string
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_tracking_links_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_user_roles: {
+        Row: {
+          created_at: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_attribute_values: {
         Row: {
           attribute_id: string
@@ -532,7 +741,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      matturo_has_role: { Args: { wanted: string }; Returns: boolean }
+      matturo_record_position: {
+        Args: {
+          delivery: string
+          lat: number
+          lng: number
+          precision_m: number
+        }
+        Returns: undefined
+      }
+      matturo_set_delivery_state: {
+        Args: { delivery: string; next_state: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
