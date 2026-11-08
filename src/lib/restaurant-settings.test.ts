@@ -6,3 +6,6 @@ it('unmatched or malformed codes deliver nowhere',()=>{expect(findZone('2610-001
 it('pause prevents new ordering',()=>{expect(orderingAllowed(true)).toBe(false);expect(orderingAllowed(false)).toBe(true);});
 it('zones use configured Portuguese postal prefixes',()=>{expect(zoneMatches('2600-001',['2600'])).toBe(true);expect(zoneMatches('2610-001',['2600'])).toBe(false);expect(zoneMatches('2600',['2600'])).toBe(false);});
 it('fees require nonnegative integer cents',()=>{const zone={name:'Teste',postal_prefixes:['2600'],active:false};expect(zoneSchema.safeParse({...zone,fee_cents:250}).success).toBe(true);expect(zoneSchema.safeParse({...zone,fee_cents:-1}).success).toBe(false);expect(zoneSchema.safeParse({...zone,fee_cents:1.5}).success).toBe(false);});
+import { findZone as fz } from "./restaurant-settings";
+import { test as t2, expect as e2 } from "vitest";
+t2("short postal code 2600 matches its zone", () => { e2(fz("2600", [{ name: "vfx", postal_prefixes: ["2600"], fee_cents: 300 }])?.fee_cents).toBe(300); });
