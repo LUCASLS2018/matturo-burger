@@ -13,17 +13,19 @@ export function InstallAppButton() {
   useEffect(() => {
     setInstalled(window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
     setIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
-    const onPrompt = (e: Event) => { e.preventDefault(); setPrompt(e as PromptEvent); };
+    const w = window as Window & { __matturoInstall?: PromptEvent };
+    const sync = () => { if (w.__matturoInstall) setPrompt(w.__matturoInstall); };
+    sync();
     const onInstalled = () => setInstalled(true);
-    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("matturo-install-ready", sync);
     window.addEventListener("appinstalled", onInstalled);
-    return () => { window.removeEventListener("beforeinstallprompt", onPrompt); window.removeEventListener("appinstalled", onInstalled); };
+    return () => { window.removeEventListener("matturo-install-ready", sync); window.removeEventListener("appinstalled", onInstalled); };
   }, []);
 
   if (installed) return null;
 
   const install = async () => {
-    if (prompt) { await prompt.prompt(); await prompt.userChoice; setPrompt(null); return; }
+    if (prompt) { await prompt.prompt(); await prompt.userChoice; (window as Window & { __matturoInstall?: PromptEvent }).__matturoInstall = undefined; setPrompt(null); return; }
     setHelp(true);
   };
 

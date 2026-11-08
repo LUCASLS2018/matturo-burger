@@ -120,6 +120,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__matturoInstall=e;window.dispatchEvent(new Event('matturo-install-ready'));});" }} />
       </head>
       <body className="font-sans antialiased">
         {children}
