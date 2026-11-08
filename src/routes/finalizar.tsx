@@ -98,8 +98,27 @@ function CheckoutPage() {
 
   const submit = handleSubmit((data) => {
     setReviewData(data);
+    setPaymentError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+
+  const beginPayment = async () => {
+    if (!reviewData || paymentPending) return;
+    setPaymentPending(true);
+    setPaymentError(null);
+    try {
+      const session = await createCheckout({ data: {
+        customer: reviewData,
+        items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options })),
+        origin: window.location.origin,
+        submissionId: crypto.randomUUID(),
+      } });
+      window.location.assign(session.url);
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "Não foi possível iniciar o pagamento. Tente novamente.");
+      setPaymentPending(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
