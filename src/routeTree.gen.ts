@@ -21,6 +21,7 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
 import { Route as EncomendaCanceladaRouteImport } from './routes/encomenda.cancelada'
@@ -89,6 +90,11 @@ const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
   path: '/entregas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/configuracoes'
     | '/entregas'
+    | '/painel'
     | '/pedidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/configuracoes'
     | '/entregas'
+    | '/painel'
     | '/pedidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
+    | '/_authenticated/painel'
     | '/_authenticated/pedidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
@@ -356,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEntregasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/pedidos': {
       id: '/_authenticated/pedidos'
       path: '/pedidos'
@@ -411,12 +430,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
 }
 
