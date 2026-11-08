@@ -47,12 +47,15 @@ function PanelHub() {
           <div><h1 className="text-2xl font-bold">Painel da equipa</h1><p className="text-sm text-muted-foreground">{data.name ? `Bem-vindo, ${data.name}.` : "Bem-vindo."} Escolha a área que quer gerir.</p></div>
           <Button variant="outline" onClick={() => void signOut()}><LogOut />Sair</Button>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {areas.map((a) => (
-            <Link key={a.to} to={a.to} className="group rounded-xl border border-border bg-card p-3 shadow-sm transition hover:border-primary hover:shadow-md">
-              <div className="flex aspect-[16/9] items-center justify-center rounded-lg bg-muted transition group-hover:bg-primary/10"><a.icon className="h-12 w-12 text-primary transition group-hover:scale-110" /></div>
-              <div className="mt-3 flex items-center justify-between"><h2 className="font-semibold">{a.title}</h2><ArrowRight className="h-4 w-4 text-primary" /></div>
-              <p className="mt-1 text-sm text-muted-foreground">{a.text}</p>
+            <Link key={a.to} to={a.to} className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition hover:border-primary hover:shadow-md">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground"><a.icon className="h-5 w-5" /></span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold">{a.title}</span>
+                <span className="mt-0.5 block line-clamp-2 text-sm text-muted-foreground">{a.text}</span>
+              </span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
             </Link>
           ))}
         </div>
