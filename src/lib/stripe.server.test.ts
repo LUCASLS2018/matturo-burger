@@ -8,7 +8,7 @@ const options = [{ variation_id: "variation-1", attribute_name: "TIME", option: 
 describe("resolvePurchasedItems", () => {
   it("uses the published variation price and converts EUR to cents", () => {
     const result = resolvePurchasedItems([{ productId: "product-1", qty: 2, options: { TIME: "BENFICA" } }], products, variations, options);
-    expect(result).toEqual([{ name: "Caneca — Time: BENFICA", unitAmount: 3250, quantity: 2 }]);
+    expect(result).toEqual([{ productId: "product-1", variationId: "variation-1", lookupKey: "novafix_variation-1_3250", name: "Caneca", optionText: "Time: BENFICA", unitAmount: 3250, quantity: 2 }]);
   });
 
   it("rejects an unavailable variation combination", () => {

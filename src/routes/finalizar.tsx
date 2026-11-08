@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, CheckCircle2, LockKeyhole, MapPin, Pencil, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, LoaderCircle, LockKeyhole, MapPin, Pencil, UserRound } from "lucide-react";
+import { createStripeCheckout } from "@/lib/stripe.functions";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { checkoutDefaults, checkoutSchema, type CheckoutFormValues } from "@/lib/checkout";
