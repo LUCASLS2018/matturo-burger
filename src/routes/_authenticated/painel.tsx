@@ -53,7 +53,7 @@ function PanelHub() {
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground"><a.icon className="h-5 w-5" /></span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold">{a.title}</span>
-                <span className="mt-0.5 block truncate text-sm text-muted-foreground">{a.text}</span>
+                <span className="mt-0.5 block line-clamp-2 text-sm text-muted-foreground">{a.text}</span>
               </span>
               <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
             </Link>
