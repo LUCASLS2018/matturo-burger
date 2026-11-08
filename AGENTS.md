@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Restaurant architecture
+- Matturo uses a verified source snapshot and CDN asset pointers, not the retired NovaFix Supabase catalogue, to keep restaurant facts isolated from existing store data.
+- Restaurant cart uses a separate browser storage namespace; order submission uses the original restaurant channel until a restaurant-specific integration is authorized.
+- Preserve legacy public page paths as restaurant pages or redirects; do not reuse the NovaFix Stripe flow for restaurant orders.

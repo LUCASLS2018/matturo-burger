@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AtendimentoRouteImport } from './routes/atendimento'
+import { Route as CardapioRouteImport } from './routes/cardapio'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as FinalizarRouteImport } from './routes/finalizar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
@@ -24,9 +27,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtendimentoRoute = AtendimentoRouteImport.update({
+  id: '/atendimento',
+  path: '/atendimento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CardapioRoute = CardapioRouteImport.update({
+  id: '/cardapio',
+  path: '/cardapio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CarrinhoRoute = CarrinhoRouteImport.update({
   id: '/carrinho',
   path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactosRoute = ContactosRouteImport.update({
+  id: '/contactos',
+  path: '/contactos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinalizarRoute = FinalizarRouteImport.update({
@@ -67,7 +85,10 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atendimento': typeof AtendimentoRoute
+  '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
@@ -78,7 +99,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atendimento': typeof AtendimentoRoute
+  '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
@@ -90,7 +114,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atendimento': typeof AtendimentoRoute
+  '/cardapio': typeof CardapioRoute
   '/carrinho': typeof CarrinhoRoute
+  '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
@@ -103,7 +130,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atendimento'
+    | '/cardapio'
     | '/carrinho'
+    | '/contactos'
     | '/finalizar'
     | '/produtos'
     | '/sobre'
@@ -114,7 +144,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atendimento'
+    | '/cardapio'
     | '/carrinho'
+    | '/contactos'
     | '/finalizar'
     | '/produtos'
     | '/sobre'
@@ -125,7 +158,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/atendimento'
+    | '/cardapio'
     | '/carrinho'
+    | '/contactos'
     | '/finalizar'
     | '/produtos'
     | '/sobre'
@@ -137,7 +173,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtendimentoRoute: typeof AtendimentoRoute
+  CardapioRoute: typeof CardapioRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  ContactosRoute: typeof ContactosRoute
   FinalizarRoute: typeof FinalizarRoute
   ProdutosRoute: typeof ProdutosRoute
   SobreRoute: typeof SobreRoute
@@ -156,11 +195,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atendimento': {
+      id: '/atendimento'
+      path: '/atendimento'
+      fullPath: '/atendimento'
+      preLoaderRoute: typeof AtendimentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cardapio': {
+      id: '/cardapio'
+      path: '/cardapio'
+      fullPath: '/cardapio'
+      preLoaderRoute: typeof CardapioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/carrinho': {
       id: '/carrinho'
       path: '/carrinho'
       fullPath: '/carrinho'
       preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contactos': {
+      id: '/contactos'
+      path: '/contactos'
+      fullPath: '/contactos'
+      preLoaderRoute: typeof ContactosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/finalizar': {
@@ -217,7 +277,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtendimentoRoute: AtendimentoRoute,
+  CardapioRoute: CardapioRoute,
   CarrinhoRoute: CarrinhoRoute,
+  ContactosRoute: ContactosRoute,
   FinalizarRoute: FinalizarRoute,
   ProdutosRoute: ProdutosRoute,
   SobreRoute: SobreRoute,

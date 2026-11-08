@@ -1,11 +1,8 @@
-# NovaFix Tech Lab
+# Matturo Burger
 
-- [x] Etapa 1 — Página inicial, catálogo dinâmico, pesquisa, filtros, categorias, cartões, etiquetas, páginas de produto, galerias, variações e preços.
-- [x] Fotos do catálogo — 54 fotos de estúdio; fotos reais preservadas nos 8 produtos bloqueados pela IA; dálmata com foto real de frente como principal.
-- [x] Carrinho — Fotos, opções, quantidades, remoção e subtotal.
-- [x] Etapa 2 — Formulário validado de identificação e entrega, resumo da encomenda e revisão dos dados; sem envio, gravação de encomendas ou pagamentos.
-- [ ] Etapa 3 — Implementar e testar Stripe Checkout em EUR, cartões e Klarna elegível, com preços Stripe reutilizáveis e webhook assinado; sem IVA. Confirmar pagamentos por webhook e verificação no servidor, nunca apenas pelo retorno do navegador. Portes variáveis ficam por configurar antes do modo real. Apresentar testes e requisitos de produção; não publicar nem ativar pagamentos reais.
-  - [x] Cartão em modo de teste, webhook com assinatura válida e rejeição de assinatura inválida validados na loja publicada.
-  - [ ] Klarna em modo de teste — confirmar disponibilidade em EUR e Portugal, testar sucesso/falha assíncrona e verificar que pagamentos pendentes não são marcados como pagos.
-- [ ] Etapa 4 — Apresentar proposta mínima de encomendas, itens, entrega e pagamento; não aplicar migrações sem autorização expressa.
-- [ ] Etapa 5 — Testes finais, responsividade, SEO e preparação da publicação; não publicar sem autorização.
+- [x] Extract and verify original identity, photographs, menu and business information: 54 products, 6 categories, 41 customized dishes.
+- [x] Replace NovaFix pages and navigation with restaurant home, menu, product details, cart, service and contacts.
+- [x] Keep Matturo cart separate; direct order completion to original restaurant WhatsApp without using NovaFix Stripe or Supabase.
+- [x] Verify real product selection, extras, quantities, cart editing, search, WhatsApp order text without sending, and mobile layout; tests passed.
+- [x] Identify unavailable business information: retain website address; embedded Google listing differs. Onsite online ordering is disabled; confirm in-person conditions with restaurant. Products without photos remain without invented images.
+- [x] Follow the newly uploaded visual reference while keeping original restaurant product photographs.
