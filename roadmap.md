@@ -3,7 +3,7 @@
 - [x] Present and obtain approval for the complete Matturo management architecture: onsite orders, live order administration, autosaved catalogue/categories, courier assignment, customer access and restaurant pause controls.
 - [x] Create isolated restaurant settings and zone resources and administration page with revision-checked persistence; preserve existing catalogue and ordering channel until the order stage.
 - [x] Owner activated both delivery zones (2600 → 3,00 €, 1111 → 4,00 €) and wired checkout to charge the matched zone fee, block delivery outside active zones and carry the fee into the order text.
-- [ ] Verify settings controls signed in as the authorized administrator before proceeding to the next migration stage; automated external Supabase sessions unavailable.
+- [x] Verify settings controls signed in as the authorized administrator: owner added, priced and activated both delivery zones and the live checkout reads them.
 - [ ] Implement catalogue/order/dispatch/customer stages after first-stage verification; delivery activation also requires actual zone prefixes and fees.
 - [x] Extract and verify original identity, photographs, menu and business information: 54 products, 6 categories, 41 customized dishes.
 - [x] Replace NovaFix pages and navigation with restaurant home, menu, product details, cart, service and contacts.
