@@ -5,8 +5,8 @@ describe("Original Matturo menu", () => {
     const dish = dishes.find(p => p.slug === "hamburguer-matturo");
     expect(dish?.price).toBe(8);
   });
-  it("does not accept a burger without its required selection", () => {
-    const dish = dishes.find(p => p.slug === "hamburguer-matturo");
+  it("does not accept a combo without its required fries selection", () => {
+    const dish = dishes.find(p => p.slug === "combo-2-hamburguinho");
     if (!dish) throw new Error("Missing original burger");
     expect(selectionValid(dish, {})).toBe(false);
   });
