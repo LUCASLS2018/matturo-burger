@@ -25,7 +25,7 @@ function PanelHub() {
     { to: "/entregas" as const, icon: Truck, title: "Entregas", text: "Entregas atribuídas, perfil de estafeta e rastreamento.", admin: false },
     { to: "/configuracoes" as const, icon: Settings, title: "Configurações", text: "Pausar pedidos e gerir zonas de delivery com portes.", admin: true },
   ].filter((a) => !a.admin || data.admin);
-  const signOut = async () => { await supabase.auth.signOut(); await qc.cancelQueries(); qc.clear(); await navigate({ to: "/auth", replace: true }); };
+  const signOut = async () => { await supabase.auth.signOut(); await qc.cancelQueries(); qc.clear(); await navigate({ to: "/admin", replace: true }); };
 
   return (
     <div className="flex min-h-[calc(100vh-5rem)] bg-muted/40">
