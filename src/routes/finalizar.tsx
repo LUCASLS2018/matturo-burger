@@ -67,9 +67,9 @@ function OrderSummary() {
       </ul>
       <dl className="mt-5 space-y-3 border-t border-border pt-5 text-sm">
         <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Subtotal</dt><dd className="font-semibold">{formatPrice(subtotal)}</dd></div>
-        <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Portes</dt><dd>A calcular</dd></div>
+        <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Portes</dt><dd>Não incluídos no teste</dd></div>
       </dl>
-      <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Os portes serão calculados antes do pagamento. Nenhum valor será cobrado nesta etapa.</p>
+      <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Os portes variam por encomenda e serão configurados antes dos pagamentos reais.</p>
     </aside>
   );
 }
