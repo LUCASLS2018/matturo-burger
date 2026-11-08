@@ -76,7 +76,10 @@ function OrderSummary() {
 
 function CheckoutPage() {
   const { items } = useCart();
+  const createCheckout = useServerFn(createStripeCheckout);
   const [reviewData, setReviewData] = useState<CheckoutFormValues | null>(null);
+  const [paymentPending, setPaymentPending] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: checkoutDefaults,
