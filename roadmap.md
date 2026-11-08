@@ -1,11 +1,7 @@
-# NovaFix Tech Lab
+# Matturo Burger
 
-- [x] Etapa 1 — Página inicial, catálogo dinâmico, pesquisa, filtros, categorias, cartões, etiquetas, páginas de produto, galerias, variações e preços.
-- [x] Fotos do catálogo — 54 fotos de estúdio; fotos reais preservadas nos 8 produtos bloqueados pela IA; dálmata com foto real de frente como principal.
-- [x] Carrinho — Fotos, opções, quantidades, remoção e subtotal.
-- [x] Etapa 2 — Formulário validado de identificação e entrega, resumo da encomenda e revisão dos dados; sem envio, gravação de encomendas ou pagamentos.
-- [ ] Etapa 3 — Implementar e testar Stripe Checkout em EUR, cartões e Klarna elegível, com preços Stripe reutilizáveis e webhook assinado; sem IVA. Confirmar pagamentos por webhook e verificação no servidor, nunca apenas pelo retorno do navegador. Portes variáveis ficam por configurar antes do modo real. Apresentar testes e requisitos de produção; não publicar nem ativar pagamentos reais.
-  - [x] Cartão em modo de teste, webhook com assinatura válida e rejeição de assinatura inválida validados na loja publicada.
-  - [ ] Klarna em modo de teste — confirmar disponibilidade em EUR e Portugal, testar sucesso/falha assíncrona e verificar que pagamentos pendentes não são marcados como pagos.
-- [ ] Etapa 4 — Apresentar proposta mínima de encomendas, itens, entrega e pagamento; não aplicar migrações sem autorização expressa.
-- [ ] Etapa 5 — Testes finais, responsividade, SEO e preparação da publicação; não publicar sem autorização.
+- [ ] Extract and verify original identity, photographs, menu and business information.
+- [ ] Replace NovaFix pages and navigation with restaurant home, menu, product details, cart, service and contacts.
+- [ ] Keep Matturo cart separate; direct order completion to original restaurant without using NovaFix Stripe or Supabase.
+- [ ] Verify real product selection, extras, quantities, cart and mobile layout.
+- [ ] Identify any unavailable original business information without inventing it.
