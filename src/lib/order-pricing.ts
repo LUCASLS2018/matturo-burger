@@ -1,6 +1,6 @@
 import { dishes, dishTotal, selectionValid, type Dish } from "./menu";
 
-export type OrderLineInput = { productId: string; qty: number; options?: Record<string, string>; selected?: Record<string, number> };
+export type OrderLineInput = { productId: string; qty: number; options?: Record<string, string> | undefined; selected?: Record<string, number> | undefined };
 export type PricedLine = { dish_id: string; name: string; options: Record<string, string>; unit_price_cents: number; qty: number; line_total_cents: number };
 
 const cents = (euros: number) => Math.round(euros * 100);

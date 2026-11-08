@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ClipboardList, LogOut, MapPin, Settings, Truck, Utensils } from "lucide-react";
+import { ClipboardList, LogOut, MapPin, Settings, Truck, Users, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { teamSummary } from "@/lib/delivery.functions";
@@ -20,6 +20,7 @@ function PanelHub() {
   const navigate = useNavigate();
   const areas = [
     { to: "/pedidos" as const, icon: ClipboardList, title: "Pedidos", text: "Lista ao vivo dos pedidos recebidos, com estados e cancelamentos.", admin: true },
+    { to: "/clientes" as const, icon: Users, title: "Clientes", text: "Nome, telemóvel, morada, últimos pedidos e total gasto de cada cliente.", admin: true },
     { to: "/gerir-menu" as const, icon: Utensils, title: "Produtos", text: "Editar nomes, preços, descrições, disponibilidade e fotografias.", admin: true },
     { to: "/entregas" as const, icon: Truck, title: "Entregas", text: "As suas entregas atribuídas, perfil de estafeta e rastreamento.", admin: false },
     { to: "/configuracoes" as const, icon: Settings, title: "Configurações", text: "Pausar pedidos e gerir zonas de delivery com portes.", admin: true },

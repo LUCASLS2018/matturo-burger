@@ -37,3 +37,4 @@
 - [ ] Complete courier availability, assignment details and the full pickup/transit/completion state controls.
 - [ ] Review and remediate the four outstanding legacy security findings without changing retired NovaFix data.
 - [ ] Recheck the complete GPS lifecycle with distinct accounts and a real mobile permission flow; identify any step that still requires the owner.
+- [x] Aba Clientes no painel (telemóvel, morada, últimos pedidos, total gasto) — aguarda verificação com a conta de administrador

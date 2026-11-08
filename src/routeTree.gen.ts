@@ -21,6 +21,7 @@ import { Route as FinalizarRouteImport } from './routes/finalizar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedCategoriasRouteImport } from './routes/_authenticated/categorias'
+import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
 import { Route as AuthenticatedGerirMenuRouteImport } from './routes/_authenticated/gerir-menu'
@@ -91,6 +92,11 @@ const SobreRoute = SobreRouteImport.update({
 const AuthenticatedCategoriasRoute = AuthenticatedCategoriasRouteImport.update({
   id: '/categorias',
   path: '/categorias',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedConfiguracoesRoute =
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
   '/categorias': typeof AuthenticatedCategoriasRoute
+  '/clientes': typeof AuthenticatedClientesRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
   '/gerir-menu': typeof AuthenticatedGerirMenuRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
   '/categorias': typeof AuthenticatedCategoriasRoute
+  '/clientes': typeof AuthenticatedClientesRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
   '/gerir-menu': typeof AuthenticatedGerirMenuRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
   '/_authenticated/categorias': typeof AuthenticatedCategoriasRoute
+  '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
   '/_authenticated/gerir-menu': typeof AuthenticatedGerirMenuRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/sobre'
     | '/categorias'
+    | '/clientes'
     | '/configuracoes'
     | '/entregas'
     | '/gerir-menu'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/sobre'
     | '/categorias'
+    | '/clientes'
     | '/configuracoes'
     | '/entregas'
     | '/gerir-menu'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/sobre'
     | '/_authenticated/categorias'
+    | '/_authenticated/clientes'
     | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
     | '/_authenticated/gerir-menu'
@@ -417,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCategoriasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/clientes': {
+      id: '/_authenticated/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/configuracoes': {
       id: '/_authenticated/configuracoes'
       path: '/configuracoes'
@@ -506,6 +525,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCategoriasRoute: typeof AuthenticatedCategoriasRoute
+  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
   AuthenticatedGerirMenuRoute: typeof AuthenticatedGerirMenuRoute
@@ -516,6 +536,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCategoriasRoute: AuthenticatedCategoriasRoute,
+  AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
   AuthenticatedGerirMenuRoute: AuthenticatedGerirMenuRoute,

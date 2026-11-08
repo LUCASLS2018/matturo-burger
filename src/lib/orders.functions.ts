@@ -173,3 +173,12 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
     if (result.error) throw new Error(result.error.message.includes("inativo") ? "Este estafeta está inativo." : result.error.message.includes("duplicate") ? "Este pedido já tem estafeta." : "Não foi possível atribuir o estafeta.");
     return { id: result.data };
   });
+
+export const adminCustomers = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  setResponseHeader("Cache-Control", "no-store");
+  await assertAdmin(context.supabase);
+  const result = await context.supabase.from("matturo_orders").select("reference,customer_name,customer_phone,address,postal_code,service,total_cents,status,created_at").order("created_at", { ascending: false }).limit(5000);
+  if (result.error) throw new Error("Não foi possível carregar os clientes.");
+  const { groupCustomers } = await import("./customers");
+  return groupCustomers(result.data);
+});

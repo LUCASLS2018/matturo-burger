@@ -116,13 +116,14 @@ export const createCategory = createServerFn({ method: "POST" }).middleware([req
   return result.data;
 });
 
-const menuEdit = z.object({
+const menuBase = z.object({
   id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(120),
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
   description: z.string().trim().max(2000), category: z.string().trim().min(1).max(80),
   position: z.number().int().min(0).max(10000), price_cents: z.number().int().min(0).max(100000),
   available: z.boolean(), visible: z.boolean(), imagePath: z.string().max(500).nullable(),
-}).superRefine((value, context) => {
+});
+const menuEdit = menuBase.superRefine((value, context) => {
   if (value.imagePath && !value.imagePath.startsWith("/__l5e/") && !value.imagePath.startsWith(`${value.id}/`)) context.addIssue({ code: z.ZodIssueCode.custom, message: "Fotografia inválida." });
 });
 
@@ -140,7 +141,7 @@ export const saveMenuItem = createServerFn({ method: "POST" }).middleware([requi
   return (await withSignedImages([result.data], context.supabase))[0]!;
 });
 
-const newMenuItem = menuEdit.omit({ id: true, revision: true, available: true, visible: true, imagePath: true });
+const newMenuItem = menuBase.omit({ id: true, revision: true, available: true, visible: true, imagePath: true });
 export const createMenuItem = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => newMenuItem.parse(input)).handler(async ({ data, context }): Promise<EditableDish> => {
   await assertAdmin(context.supabase);
   const category = await context.supabase.from("matturo_menu_categories").select("slug").eq("slug", data.category).maybeSingle();
@@ -170,7 +171,9 @@ export const deleteCategory = createServerFn({ method: "POST" }).middleware([req
   return { ok: true };
 });
 
-const groupEdit = z.object({ itemId: z.string().uuid(), id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(160), required: z.boolean(), min: z.number().int().min(0).max(100), max: z.number().int().min(1).max(100), position: z.number().int().min(0).max(10000) }).refine((value) => value.min <= value.max, { message: "O mínimo não pode ser superior ao máximo." });
+const groupBase = z.object({ itemId: z.string().uuid(), id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(160), required: z.boolean(), min: z.number().int().min(0).max(100), max: z.number().int().min(1).max(100), position: z.number().int().min(0).max(10000) });
+const minMax = (value: { min: number; max: number }) => value.min <= value.max;
+const groupEdit = groupBase.refine(minMax, { message: "O mínimo não pode ser superior ao máximo." });
 export const saveModifierGroup = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => groupEdit.parse(input)).handler(async ({ data, context }) => {
   await assertAdmin(context.supabase);
   const result = await context.supabase.from("matturo_modifier_groups").update({ name: data.name, required: data.required, min: data.min, max: data.max, position: data.position, revision: data.revision + 1 }).eq("item_id", data.itemId).eq("id", data.id).eq("revision", data.revision).select("revision").maybeSingle();
@@ -179,7 +182,7 @@ export const saveModifierGroup = createServerFn({ method: "POST" }).middleware([
   return result.data;
 });
 
-export const addModifierGroup = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => groupEdit.omit({ id: true, revision: true }).parse(input)).handler(async ({ data, context }) => {
+export const addModifierGroup = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => groupBase.omit({ id: true, revision: true }).refine(minMax, { message: "O mínimo não pode ser superior ao máximo." }).parse(input)).handler(async ({ data, context }) => {
   await assertAdmin(context.supabase);
   const id = crypto.randomUUID();
   const result = await context.supabase.from("matturo_modifier_groups").insert({ item_id: data.itemId, id, name: data.name, required: data.required, min: data.min, max: data.max, position: data.position });
