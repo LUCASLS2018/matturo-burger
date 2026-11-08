@@ -10,6 +10,8 @@ for (const [path, url] of Object.entries(files)) {
   bySlug[slug] = url;
 }
 
+bySlug["caneca-de-time-500ml"] = canecaDeTimePhoto.url;
+
 export function studioPhoto(slug: string): string | null {
   return bySlug[slug] ?? null;
 }
