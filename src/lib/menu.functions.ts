@@ -116,13 +116,14 @@ export const createCategory = createServerFn({ method: "POST" }).middleware([req
   return result.data;
 });
 
-const menuEdit = z.object({
+const menuBase = z.object({
   id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(120),
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
   description: z.string().trim().max(2000), category: z.string().trim().min(1).max(80),
   position: z.number().int().min(0).max(10000), price_cents: z.number().int().min(0).max(100000),
   available: z.boolean(), visible: z.boolean(), imagePath: z.string().max(500).nullable(),
-}).superRefine((value, context) => {
+});
+const menuEdit = menuBase.superRefine((value, context) => {
   if (value.imagePath && !value.imagePath.startsWith("/__l5e/") && !value.imagePath.startsWith(`${value.id}/`)) context.addIssue({ code: z.ZodIssueCode.custom, message: "Fotografia inválida." });
 });
 
@@ -140,7 +141,7 @@ export const saveMenuItem = createServerFn({ method: "POST" }).middleware([requi
   return (await withSignedImages([result.data], context.supabase))[0]!;
 });
 
-const newMenuItem = menuEdit.omit({ id: true, revision: true, available: true, visible: true, imagePath: true });
+const newMenuItem = menuBase.omit({ id: true, revision: true, available: true, visible: true, imagePath: true });
 export const createMenuItem = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => newMenuItem.parse(input)).handler(async ({ data, context }): Promise<EditableDish> => {
   await assertAdmin(context.supabase);
   const category = await context.supabase.from("matturo_menu_categories").select("slug").eq("slug", data.category).maybeSingle();
