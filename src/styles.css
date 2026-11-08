@@ -58,7 +58,7 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
   --color-neon-violet: var(--neon-violet);
-  --font-display: "Poppins", ui-sans-serif, sans-serif;
+  --font-display: "Lilita One", ui-sans-serif, sans-serif;
   --font-sans: "Poppins", ui-sans-serif, sans-serif;
   --color-brand-gold: var(--brand-gold);
   --color-hero-foreground: var(--hero-foreground);
@@ -80,13 +80,13 @@
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.985 0.002 250);
+  --background: oklch(0.975 0.007 85);
   --foreground: oklch(0.18 0.014 250);
   --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.55 0.23 259);
+  --primary: oklch(0.64 0.13 65);
   --primary-foreground: oklch(1 0 0);
   --brand-gold: oklch(0.79 0.16 83);
   --hero-foreground: oklch(0.99 0 0);
@@ -133,11 +133,12 @@
   button, a, input, select { -webkit-tap-highlight-color: transparent; }
 }
 
-.matturo-hero { isolation: isolate; min-height: 590px; height: min(700px, 76vh); }
-.matturo-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, color-mix(in oklab, var(--hero-surface) 93%, transparent), color-mix(in oklab, var(--hero-surface) 60%, transparent) 46%, color-mix(in oklab, var(--hero-surface) 8%, transparent)); }
+.matturo-hero { isolation: isolate; min-height: 580px; height: min(670px, 74vh); }
+.matturo-hero > img { object-fit: contain; object-position: right center; }
+.matturo-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--background) 0%, var(--background) 38%, color-mix(in oklab, var(--background) 90%, transparent) 48%, transparent 69%); }
 .page-width { width: min(1240px, calc(100% - 48px)); margin-inline: auto; }
 .section-title { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.25; }
-@media (max-width: 640px) { .page-width { width: calc(100% - 32px); } .matturo-hero { min-height: 560px; height: 72vh; } .matturo-hero::after { background: linear-gradient(0deg, color-mix(in oklab, var(--hero-surface) 97%, transparent), color-mix(in oklab, var(--hero-surface) 42%, transparent)); } .section-title { font-size: 1.6rem; } }
+@media (max-width: 640px) { .page-width { width: calc(100% - 32px); } .matturo-hero { min-height: 560px; height: 72vh; } .matturo-hero { min-height: 690px; height: auto; align-items: flex-start; } .matturo-hero > img { height: 320px; top: auto; bottom: 0; width: 100%; object-fit: cover; object-position: center; } .matturo-hero::after { background: linear-gradient(180deg, var(--background) 52%, transparent 77%); } .matturo-hero .page-width { padding-top: 32px; padding-bottom: 310px; } .section-title { font-size: 1.6rem; } }
 @media (prefers-reduced-motion: no-preference) { .food-photo { transition: transform 350ms ease; } a:hover .food-photo { transform: scale(1.035); } }
 
 @utility text-neon {
