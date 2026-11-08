@@ -118,6 +118,7 @@ export const createCategory = createServerFn({ method: "POST" }).middleware([req
 
 const menuEdit = z.object({
   id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(120),
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
   description: z.string().trim().max(2000), category: z.string().trim().min(1).max(80),
   position: z.number().int().min(0).max(10000), price_cents: z.number().int().min(0).max(100000),
   available: z.boolean(), visible: z.boolean(), imagePath: z.string().max(500).nullable(),
@@ -131,12 +132,42 @@ export const saveMenuItem = createServerFn({ method: "POST" }).middleware([requi
   const category = await context.supabase.from("matturo_menu_categories").select("slug").eq("slug", data.category).maybeSingle();
   if (category.error || !category.data) throw new Error("Escolha uma categoria existente.");
   const result = await context.supabase.from("matturo_menu_items").update({
-    name: data.name, description: data.description, category: data.category, position: data.position,
+    name: data.name, slug: data.slug, description: data.description, category: data.category, position: data.position,
     price_cents: data.price_cents, available: data.available, visible: data.visible, image: data.imagePath, revision: data.revision + 1,
   }).eq("id", data.id).eq("revision", data.revision).select(fields).maybeSingle();
   if (result.error) throw new Error("Não foi possível guardar o produto. Tente novamente.");
   if (!result.data) throw new Error("Este produto foi alterado noutra janela. Atualize a página antes de editar.");
   return (await withSignedImages([result.data], context.supabase))[0]!;
+});
+
+const newMenuItem = menuEdit.omit({ id: true, revision: true, available: true, visible: true, imagePath: true });
+export const createMenuItem = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => newMenuItem.parse(input)).handler(async ({ data, context }): Promise<EditableDish> => {
+  await assertAdmin(context.supabase);
+  const category = await context.supabase.from("matturo_menu_categories").select("slug").eq("slug", data.category).maybeSingle();
+  if (category.error || !category.data) throw new Error("Escolha uma categoria existente.");
+  const id = crypto.randomUUID();
+  const result = await context.supabase.from("matturo_menu_items").insert({ id, name: data.name, slug: data.slug, description: data.description, category: data.category, position: data.position, price_cents: data.price_cents, available: false, visible: false }).select(fields).single();
+  if (result.error) throw new Error("Não foi possível criar o produto. Verifique se o endereço já existe.");
+  return (await withSignedImages([result.data], context.supabase))[0]!;
+});
+
+export const deleteMenuItem = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input)).handler(async ({ data, context }) => {
+  await assertAdmin(context.supabase);
+  const result = await context.supabase.from("matturo_menu_items").delete().eq("id", data.id);
+  if (result.error) throw new Error("Não foi possível eliminar o produto.");
+  return { ok: true };
+});
+
+export const deleteCategory = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input)).handler(async ({ data, context }) => {
+  await assertAdmin(context.supabase);
+  const category = await context.supabase.from("matturo_menu_categories").select("slug").eq("id", data.id).single();
+  if (category.error) throw new Error("Categoria não encontrada.");
+  const items = await context.supabase.from("matturo_menu_items").select("id").eq("category", category.data.slug).limit(1);
+  if (items.error) throw new Error("Não foi possível validar a categoria.");
+  if (items.data.length) throw new Error("Mova os produtos desta categoria antes de a eliminar.");
+  const result = await context.supabase.from("matturo_menu_categories").delete().eq("id", data.id);
+  if (result.error) throw new Error("Não foi possível eliminar a categoria.");
+  return { ok: true };
 });
 
 const groupEdit = z.object({ itemId: z.string().uuid(), id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(160), required: z.boolean(), min: z.number().int().min(0).max(100), max: z.number().int().min(1).max(100), position: z.number().int().min(0).max(10000) }).refine((value) => value.min <= value.max, { message: "O mínimo não pode ser superior ao máximo." });

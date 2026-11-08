@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Camera, Check, ImageOff, LoaderCircle, RotateCcw, Search, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { adminCategories, adminMenu, saveMenuItem } from "@/lib/menu.functions";
+import { adminCategories, adminMenu, createMenuItem, deleteMenuItem, saveMenuItem } from "@/lib/menu.functions";
 import { menuQuery } from "@/lib/menu-query";
 import type { EditableDish } from "@/lib/menu";
 import { OptionsEditor } from "@/components/restaurant/OptionsEditor";
@@ -14,11 +14,12 @@ import { supabase } from "@/integrations/supabase/client";
 const adminMenuQuery = queryOptions({ queryKey: ["matturo-admin-menu"], queryFn: () => adminMenu() });
 const adminCategoriesQuery = queryOptions({ queryKey: ["matturo-admin-categories"], queryFn: () => adminCategories() });
 
-type Draft = { name: string; description: string; price: string; category: string; position: number; available: boolean; visible: boolean; imagePath: string | null };
+type Draft = { name: string; slug: string; description: string; price: string; category: string; position: number; available: boolean; visible: boolean; imagePath: string | null };
 type SaveState = "idle" | "pending" | "saving" | "saved" | "error";
 
 const toDraft = (dish: EditableDish): Draft => ({
   name: dish.name,
+  slug: dish.slug,
   description: dish.description,
   price: dish.price.toFixed(2),
   category: dish.category,
@@ -78,6 +79,7 @@ function MenuAdminPage() {
             id: selected.id,
             revision: revision.current,
             name: draft.name,
+            slug: draft.slug,
             description: draft.description,
             category: draft.category,
             position: draft.position,
