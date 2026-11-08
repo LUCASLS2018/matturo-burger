@@ -1,0 +1,4 @@
+CREATE POLICY matturo_photo_read ON storage.objects FOR SELECT TO authenticated USING(bucket_id='matturo-courier-photos' AND ((storage.foldername(name))[1]=auth.uid()::text OR public.matturo_has_role('admin')));
+CREATE POLICY matturo_photo_upload ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='matturo-courier-photos' AND (storage.foldername(name))[1]=auth.uid()::text AND lower(storage.extension(name)) IN ('jpg','jpeg','png','webp'));
+CREATE POLICY matturo_photo_update ON storage.objects FOR UPDATE TO authenticated USING(bucket_id='matturo-courier-photos' AND (storage.foldername(name))[1]=auth.uid()::text) WITH CHECK(bucket_id='matturo-courier-photos' AND (storage.foldername(name))[1]=auth.uid()::text);
+CREATE POLICY matturo_photo_delete ON storage.objects FOR DELETE TO authenticated USING(bucket_id='matturo-courier-photos' AND (storage.foldername(name))[1]=auth.uid()::text);
