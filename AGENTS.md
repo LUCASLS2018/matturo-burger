@@ -33,3 +33,4 @@ use the editor.
 - Matturo uses a verified source snapshot and CDN asset pointers, not the retired NovaFix Supabase catalogue, to keep restaurant facts isolated from existing store data.
 - Restaurant cart uses a separate browser storage namespace; order submission uses the original restaurant channel until a restaurant-specific integration is authorized.
 - Preserve legacy public page paths as restaurant pages or redirects; do not reuse the NovaFix Stripe flow for restaurant orders.
+- Resolve all product cutouts through the shared dish-images module; use the shared DishCard on home and menu so original-photo edits and ordering controls stay consistent.
