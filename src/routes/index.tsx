@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Box, Flame, Scissors, Sparkles } from "lucide-react";
 import { categoriesQuery, productsQuery } from "@/lib/shop";
+import { studioPhoto } from "@/lib/studio-photos";
 import { ProductCard } from "@/components/shop/ProductCard";
 
 export const Route = createFileRoute("/")({
@@ -56,7 +57,7 @@ function Home() {
           <div className="grid grid-cols-2 gap-4">
             {heroImgs.map((p, i) => (
               <Link key={p.id} to="/produto/$slug" params={{ slug: p.slug }} className={`overflow-hidden rounded-2xl border border-border shadow-neon ${i % 2 ? "translate-y-8" : ""}`}>
-                <img src={p.image!} alt={p.name} className="aspect-square w-full object-cover transition-transform duration-500 hover:scale-105" />
+                <img src={studioPhoto(p.slug) ?? p.image!} alt={p.name} className="aspect-square w-full object-cover transition-transform duration-500 hover:scale-105" />
               </Link>
             ))}
           </div>

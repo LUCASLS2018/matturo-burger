@@ -32,7 +32,7 @@ export function PriceTag({ p }: { p: ProductCardDTO }) {
 }
 
 export function ProductCard({ p }: { p: ProductCardDTO }) {
-  const image = p.slug === "caneca-de-time-500ml" ? studioPhoto(p.slug) : p.image;
+  const image = studioPhoto(p.slug) ?? p.image;
 
   return (
     <Link
