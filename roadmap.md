@@ -20,4 +20,5 @@
 - [x] Present GPS delivery architecture; approved with name/photo profiles.
 - [x] Audit and create isolated Matturo delivery tables and private photo storage with authorization; anonymous privileged-function access revoked.
 - [x] Implement authenticated courier/admin panels and token-based customer tracking; no payments or NovaFix data changes.
-- [ ] Verify authenticated GPS lifecycle, realtime, photo upload and map with distinct accounts; blocked by first admin account identification and external Supabase authentication unavailable for automated sessions. Public access denial, invalid-token rejection and nine unit tests passed. Email auth settings remain unverified.
+- [ ] Assign first Matturo administrator after the owner creates and confirms the selected account; lookup found no account for the provided email.
+- [ ] Verify authenticated GPS lifecycle, realtime, photo upload and map with distinct accounts; blocked by account creation and external Supabase authentication unavailable for automated sessions. Public access denial, invalid-token rejection and nine unit tests passed. Email auth settings remain unverified.
