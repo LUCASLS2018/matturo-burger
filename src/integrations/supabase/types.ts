@@ -1156,6 +1156,13 @@ export type Database = {
     }
     Functions: {
       matturo_has_role: { Args: { wanted: string }; Returns: boolean }
+      matturo_place_order: {
+        Args: { p_items: Json; p_order: Json }
+        Returns: {
+          id: string
+          reference: string
+        }[]
+      }
       matturo_record_position: {
         Args: {
           delivery: string
