@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Camera, Check, ImageOff, LoaderCircle, RotateCcw, Search, Utensils } from "lucide-react";
+import { Check, ImageOff, LayoutDashboard, LayoutGrid, LoaderCircle, Plus, Receipt, RotateCcw, Search, Settings, Upload, Users, Utensils } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { adminCategories, adminMenu, createMenuItem, deleteMenuItem, saveMenuItem } from "@/lib/menu.functions";
 import { menuQuery } from "@/lib/menu-query";
@@ -51,6 +53,8 @@ function MenuAdminPage() {
   const [state, setState] = useState<SaveState>("idle");
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [open, setOpen] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [localPhoto, setLocalPhoto] = useState("");
   const sequence = useRef(0);
@@ -171,45 +175,92 @@ function MenuAdminPage() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível eliminar."); }
   }
 
-  const filtered = data.filter((dish) => dish.name.toLocaleLowerCase("pt").includes(query.toLocaleLowerCase("pt")));
-  const statusText = state === "pending" ? "Alterações por guardar…" : state === "saving" ? "A guardar…" : state === "saved" ? "Guardado" : "";
+  async function quickToggle(dish: EditableDish, visible: boolean) {
+    if (dish.id === selected?.id && draft) { update("visible", visible); return; }
+    try {
+      const saved = await save({ data: { id: dish.id, revision: dish.revision, name: dish.name, slug: dish.slug, description: dish.description, category: dish.category, position: dish.position, price_cents: Math.round(dish.price * 100), available: dish.available, visible, imagePath: dish.imagePath } });
+      queryClient.setQueryData<EditableDish[]>(adminMenuQuery.queryKey, (old) => old?.map((item) => item.id === saved.id ? saved : item));
+      void queryClient.invalidateQueries({ queryKey: menuQuery.queryKey });
+    } catch (cause) { window.alert(cause instanceof Error ? cause.message : "Não foi possível alterar."); }
+  }
 
-  return <div className="page-width py-10">
-    <Link to="/painel" onClick={(event) => { if (dirty && !window.confirm("Há alterações por guardar. Quer sair mesmo assim?")) event.preventDefault(); }} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"><ArrowLeft className="h-4 w-4" />Painel da equipa</Link>
-    <p className="mb-3 text-xs font-semibold text-primary">MATTURO · ADMINISTRAÇÃO</p>
-    <h1 className="section-title">Produtos</h1>
-    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">Edite nomes, preços, descrições, categorias, opções, disponibilidade e fotografias. As alterações são guardadas automaticamente.</p>
-    <div className="mt-5 flex flex-wrap gap-3"><Button asChild variant="outline"><Link to="/categorias">Gerir categorias</Link></Button><Button type="button" onClick={() => void addProduct()}>Criar produto</Button></div>
-    <div className="mt-8 grid items-start gap-8 lg:grid-cols-[320px_1fr]">
-      <aside className="rounded-lg border border-border bg-card p-4 lg:sticky lg:top-28">
-        <label className="relative block"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Procurar produto" aria-label="Procurar produto" className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm" /></label>
-        <div className="mt-4 max-h-[65vh] space-y-1 overflow-y-auto pr-1">
-          {filtered.map((dish) => <button key={dish.id} type="button" onClick={() => choose(dish)} className={`w-full rounded-md px-3 py-3 text-left text-sm ${dish.id === selected?.id ? "bg-primary font-semibold text-primary-foreground" : "hover:bg-accent"}`}>
-            <span className="block">{dish.name}</span><span className={`mt-1 block text-xs ${dish.id === selected?.id ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{money(dish.price)} · {dish.available ? "Disponível" : "Indisponível"}</span>
-          </button>)}
+  const filtered = data.filter((dish) => (category === "all" || dish.category === category) && dish.name.toLocaleLowerCase("pt").includes(query.toLocaleLowerCase("pt")));
+  const statusText = state === "pending" ? "Alterações por guardar…" : state === "saving" ? "A guardar…" : state === "saved" ? "Guardado" : "";
+  const guard = (event: { preventDefault: () => void }) => { if (dirty && !window.confirm("Há alterações por guardar. Quer sair mesmo assim?")) event.preventDefault(); };
+  const rail = [
+    { to: "/painel", icon: LayoutDashboard, label: "Painel" },
+    { to: "/gerir-menu", icon: LayoutGrid, label: "Produtos", active: true },
+    { to: "/pedidos", icon: Receipt, label: "Pedidos" },
+    { to: "/clientes", icon: Users, label: "Clientes" },
+    { to: "/configuracoes", icon: Settings, label: "Configurações" },
+  ] as const;
+  const input = "mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+
+  return <div className="flex min-h-[calc(100vh-5rem)] bg-muted/40">
+    <nav aria-label="Administração" className="sticky top-0 hidden h-[calc(100vh-5rem)] w-16 shrink-0 flex-col items-center gap-3 bg-foreground py-5 md:flex">
+      {rail.map((item) => <Link key={item.to} to={item.to} onClick={guard} title={item.label} aria-label={item.label} className={`flex h-10 w-10 items-center justify-center rounded-lg transition ${"active" in item ? "bg-primary text-primary-foreground" : "text-background/60 hover:bg-background/10 hover:text-background"}`}><item.icon className="h-5 w-5" /></Link>)}
+    </nav>
+    <aside className="hidden w-56 shrink-0 border-r border-border bg-card p-5 lg:block">
+      <p className="text-lg font-bold">Matturo · Menu</p>
+      <p className="mt-6 text-sm font-semibold">Categorias</p>
+      <div className="mt-3 space-y-1">
+        {[{ slug: "all", name: "Todos" }, ...categoryOptions].map((cat) => <button key={cat.slug} type="button" onClick={() => setCategory(cat.slug)} className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${category === cat.slug ? "bg-primary font-semibold text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground"}`}>{cat.name}</button>)}
+      </div>
+      <Button asChild variant="outline" size="sm" className="mt-6 w-full"><Link to="/categorias" onClick={guard}>Gerir categorias</Link></Button>
+    </aside>
+    <main className="min-w-0 flex-1 p-5 lg:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div><h1 className="text-2xl font-bold">Produtos</h1><p className="text-sm text-muted-foreground">{filtered.length} de {data.length} produtos · guardado automaticamente</p></div>
+        <div className="flex flex-wrap gap-2">
+          <label className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Procurar produto" aria-label="Procurar produto" className="h-10 w-56 rounded-lg border border-input bg-card pl-9 pr-3 text-sm" /></label>
+          <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Categoria" className="h-10 rounded-lg border border-input bg-card px-3 text-sm lg:hidden"><option value="all">Todas</option>{categoryOptions.map((cat) => <option key={cat.id} value={cat.slug}>{cat.name}</option>)}</select>
+          <Button type="button" onClick={() => void addProduct().then(() => setOpen(true))}><Plus />Criar produto</Button>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">{data.length} produtos</p>
-      </aside>
-      {selected && draft ? <section aria-label={`Editar ${selected.name}`} className="rounded-lg border border-border bg-card p-5 sm:p-7">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-5"><div><h2 className="text-xl font-semibold">Editar produto</h2><p className="mt-1 text-xs text-muted-foreground">Revisão {revision.current}</p></div><div aria-live="polite" className="flex items-center gap-2 text-sm">{state === "saved" && <Check className="h-4 w-4 text-primary" />}{(state === "pending" || state === "saving") && <LoaderCircle className="h-4 w-4 animate-spin text-primary" />}<span className={state === "saved" ? "font-semibold text-primary" : "text-muted-foreground"}>{statusText}</span></div></div>
-        <div className="mt-6 grid gap-7 md:grid-cols-[220px_1fr]">
-          <div><div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-muted">{(localPhoto || selected.image) ? <img src={localPhoto || selected.image || undefined} alt={selected.name} className="h-full w-full object-contain" /> : <Utensils className="h-12 w-12 text-muted-foreground" />}</div>
-            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-input px-3 py-2 text-sm font-semibold"><Camera className="h-4 w-4" />{photoBusy ? "A enviar…" : "Mudar fotografia"}<input type="file" disabled={photoBusy} accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => void uploadPhoto(event.target.files?.[0])} /></label>
-            {draft.imagePath && <Button type="button" variant="ghost" className="mt-2 w-full" onClick={() => { setLocalPhoto(""); update("imagePath", null); }}><ImageOff />Sem fotografia</Button>}
-            <p className="mt-3 text-center text-xs text-muted-foreground">JPG, PNG ou WebP · até 5 MB</p>
+      </div>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+        {filtered.map((dish) => {
+          const isSel = open && dish.id === selected?.id;
+          const visible = dish.id === selected?.id && draft ? draft.visible : dish.visible;
+          return <div key={dish.id} className={`group overflow-hidden rounded-xl border bg-card p-3 shadow-sm transition hover:shadow-md ${isSel ? "border-primary ring-2 ring-primary/30" : "border-border"}`}>
+            <button type="button" onClick={() => { choose(dish); setOpen(true); }} className="block w-full text-left">
+              <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg bg-muted">{dish.image ? <img src={dish.image} alt={dish.name} loading="lazy" className="h-full w-full object-contain transition group-hover:scale-105" /> : <Utensils className="h-10 w-10 text-muted-foreground" />}</div>
+              <p className="mt-3 truncate font-semibold">{dish.name}</p>
+              <p className="text-sm font-semibold text-primary">{money(dish.price)}</p>
+            </button>
+            <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground"><span>{visible ? "Publicado" : "Oculto"}{dish.available ? "" : " · Esgotado"}</span><Switch checked={visible} onCheckedChange={(value) => void quickToggle(dish, value)} aria-label={`Publicar ${dish.name}`} /></div>
+          </div>;
+        })}
+        {filtered.length === 0 && <p className="text-sm text-muted-foreground">Nenhum produto encontrado.</p>}
+      </div>
+    </main>
+    <Sheet open={open && !!selected && !!draft} onOpenChange={(value) => { if (!value && dirty && !window.confirm("Há alterações por guardar. Fechar mesmo assim?")) return; setOpen(value); }}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+        {selected && draft && <>
+          <SheetHeader><p className="text-xs text-muted-foreground">Editar produto</p><SheetTitle className="text-xl">{draft.name || selected.name}</SheetTitle>
+            <div aria-live="polite" className="flex items-center gap-2 text-sm">{state === "saved" && <Check className="h-4 w-4 text-primary" />}{(state === "pending" || state === "saving") && <LoaderCircle className="h-4 w-4 animate-spin text-primary" />}<span className={state === "saved" ? "font-semibold text-primary" : "text-muted-foreground"}>{statusText}</span></div>
+          </SheetHeader>
+          <div className="mt-6 space-y-5">
+            <label className="block text-sm font-medium">Nome<input value={draft.name} onChange={(event) => update("name", event.target.value)} maxLength={120} className={input} /></label>
+            <div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className={input} /></label><label className="block text-sm font-medium">Ordem<input type="number" min={0} value={draft.position} onChange={(event) => update("position", Number(event.target.value))} className={input} /></label></div>
+            <label className="block text-sm font-medium">Categoria<select value={draft.category} onChange={(event) => update("category", event.target.value)} className={input}>{categoryOptions.map((cat) => <option key={cat.id} value={cat.slug}>{cat.name}{cat.active ? "" : " (inativa)"}</option>)}</select></label>
+            <label className="block text-sm font-medium">Descrição<textarea value={draft.description} onChange={(event) => update("description", event.target.value)} maxLength={2000} rows={4} className="mt-2 w-full rounded-lg border border-input bg-background p-3 text-sm focus:border-primary focus:outline-none" /></label>
+            <div><p className="text-sm font-medium">Imagem</p>
+              <label className="mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-muted/40 p-4 text-center hover:border-primary">
+                {(localPhoto || selected.image) ? <img src={localPhoto || selected.image || undefined} alt={selected.name} className="h-32 object-contain" /> : <Upload className="h-6 w-6 text-muted-foreground" />}
+                <span className="text-sm font-semibold">{photoBusy ? "A enviar…" : "Enviar fotografia"}</span><span className="text-xs text-muted-foreground">JPG, PNG ou WebP · até 5 MB</span>
+                <input type="file" disabled={photoBusy} accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => void uploadPhoto(event.target.files?.[0])} />
+              </label>
+              {draft.imagePath && <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => { setLocalPhoto(""); update("imagePath", null); }}><ImageOff />Sem fotografia</Button>}
+            </div>
+            <label className="block text-sm font-medium">Endereço do produto (slug)<input value={draft.slug} onChange={(event) => update("slug", event.target.value.toLowerCase())} maxLength={120} className={input} /></label>
+            <div className="space-y-3 rounded-lg border border-border p-4"><label className="flex items-center justify-between text-sm">Disponível para pedidos<Switch checked={draft.available} onCheckedChange={(value) => update("available", value)} /></label><label className="flex items-center justify-between text-sm">Visível no cardápio<Switch checked={draft.visible} onCheckedChange={(value) => update("visible", value)} /></label></div>
+            {state === "error" && <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3"><p className="text-sm text-destructive">{error}</p><Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setDraft({ ...draft })}><RotateCcw />Tentar novamente</Button></div>}
+            <OptionsEditor dish={selected} adminQueryKey={adminMenuQuery.queryKey} />
+            <div className="flex gap-3 border-t border-border pt-5"><Button type="button" className="flex-1" onClick={() => { setDraft({ ...draft }); if (!dirty) setOpen(false); }}>Guardar alterações</Button><Button type="button" variant="outline" className="flex-1" onClick={() => { setDraft(toDraft(selected)); setLocalPhoto(""); setOpen(false); }}>Cancelar</Button></div>
+            <Button type="button" variant="ghost" className="w-full text-destructive" onClick={() => void removeProduct().then(() => setOpen(false))}>Eliminar produto</Button>
           </div>
-          <div className="space-y-5"><label className="block text-sm font-medium">Nome<input value={draft.name} onChange={(event) => update("name", event.target.value)} maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
-            <label className="block text-sm font-medium">Endereço do produto (slug)<input value={draft.slug} onChange={(event) => update("slug", event.target.value.toLowerCase())} pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
-            <div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label><label className="block text-sm font-medium">Ordem no cardápio<input type="number" min={0} value={draft.position} onChange={(event) => update("position", Number(event.target.value))} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label></div>
-            <label className="block text-sm font-medium">Categoria<select value={draft.category} onChange={(event) => update("category", event.target.value)} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{categoryOptions.map((category) => <option key={category.id} value={category.slug}>{category.name}{category.active ? "" : " (inativa)"}</option>)}</select></label>
-            <label className="block text-sm font-medium">Descrição<textarea value={draft.description} onChange={(event) => update("description", event.target.value)} maxLength={2000} rows={6} className="mt-2 w-full rounded-md border border-input bg-background p-3 text-sm" /></label>
-            <div className="space-y-3 border-t border-border pt-5"><label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.available} onChange={(event) => update("available", event.target.checked)} className="h-4 w-4 accent-primary" />Disponível para pedidos</label><label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.visible} onChange={(event) => update("visible", event.target.checked)} className="h-4 w-4 accent-primary" />Visível no cardápio</label></div>
-          </div>
-        </div>
-        {state === "error" && <div role="alert" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/30 bg-destructive/10 p-4"><p className="text-sm text-destructive">{error}</p><Button type="button" variant="outline" onClick={() => setDraft({ ...draft })}><RotateCcw />Tentar guardar novamente</Button></div>}
-        <OptionsEditor dish={selected} adminQueryKey={adminMenuQuery.queryKey} />
-        <div className="mt-8 border-t border-border pt-5"><Button type="button" variant="ghost" className="text-destructive" onClick={() => void removeProduct()}>Eliminar produto</Button></div>
-      </section> : <p>Nenhum produto encontrado.</p>}
-    </div>
+        </>}
+      </SheetContent>
+    </Sheet>
   </div>;
 }
