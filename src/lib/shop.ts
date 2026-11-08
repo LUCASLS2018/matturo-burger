@@ -117,8 +117,10 @@ async function fetchProduct(slug: string): Promise<ProductDetailDTO | null> {
   const { data, error } = await supabase
     .from("products")
     .select(
-      CARD_SELECT +
-        ",description,attributes," +
+      "id,name,slug,price,regular_price,sale_price,on_sale,short_description,featured,created_at," +
+        "product_images(storage_path,alt_text,position,is_primary)," +
+        "product_ribbon_links(product_ribbons(name))," +
+        "description,attributes," +
         "product_variations(id,price,regular_price,on_sale,stock_status,menu_order,status,product_variation_attribute_values(attribute_name,option))," +
         "product_category_links(category_id,product_categories(id,name,slug,parent_id))",
     )

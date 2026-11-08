@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) =>
     Promise.all([context.queryClient.ensureQueryData(productsQuery), context.queryClient.ensureQueryData(categoriesQuery)]),
   component: Home,
-  errorComponent: ({ error }) => <p className="p-10 text-center text-destructive">{error.message}</p>,
+  errorComponent: ({ error }) => <p className="p-10 text-center text-destructive">{error instanceof Error ? error.message : String(error)}</p>,
 });
 
 function Home() {
