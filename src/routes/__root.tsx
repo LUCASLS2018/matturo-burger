@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -132,6 +133,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isAdmin = useRouterState({ select: (s) => s.matches.some((m) => m.routeId.startsWith("/_authenticated")) });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -142,7 +144,7 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
-          <RestaurantFooter />
+          {!isAdmin && <RestaurantFooter />}
         </div>
         <Toaster theme="light" position="bottom-right" />
       </CartProvider>
