@@ -4,21 +4,25 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Camera, Check, ImageOff, LoaderCircle, RotateCcw, Search, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { adminMenu, saveMenuItem } from "@/lib/menu.functions";
+import { adminCategories, adminMenu, saveMenuItem } from "@/lib/menu.functions";
 import { menuQuery } from "@/lib/menu-query";
 import type { EditableDish } from "@/lib/menu";
+import { OptionsEditor } from "@/components/restaurant/OptionsEditor";
 import { money, restaurantHead } from "@/lib/restaurant";
 import { supabase } from "@/integrations/supabase/client";
 
 const adminMenuQuery = queryOptions({ queryKey: ["matturo-admin-menu"], queryFn: () => adminMenu() });
+const adminCategoriesQuery = queryOptions({ queryKey: ["matturo-admin-categories"], queryFn: () => adminCategories() });
 
-type Draft = { name: string; description: string; price: string; available: boolean; visible: boolean; imagePath: string | null };
+type Draft = { name: string; description: string; price: string; category: string; position: number; available: boolean; visible: boolean; imagePath: string | null };
 type SaveState = "idle" | "pending" | "saving" | "saved" | "error";
 
 const toDraft = (dish: EditableDish): Draft => ({
   name: dish.name,
   description: dish.description,
   price: dish.price.toFixed(2),
+  category: dish.category,
+  position: dish.position,
   available: dish.available,
   visible: dish.visible,
   imagePath: dish.imagePath,
@@ -28,13 +32,14 @@ const sameDraft = (a: Draft, b: Draft) => JSON.stringify(a) === JSON.stringify(b
 
 export const Route = createFileRoute("/_authenticated/gerir-menu")({
   head: () => restaurantHead("Editar produtos", "Área privada para editar os produtos, preços e fotografias do Matturo Burger."),
-  loader: ({ context }) => context.queryClient.ensureQueryData(adminMenuQuery),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(adminMenuQuery), context.queryClient.ensureQueryData(adminCategoriesQuery)]),
   component: MenuAdminPage,
   errorComponent: () => <div className="page-width py-16"><h1 className="section-title">Produtos indisponíveis</h1><p className="mt-4 text-muted-foreground">Esta área exige acesso de administrador.</p><Button asChild className="mt-6"><Link to="/painel">Voltar ao painel</Link></Button></div>,
 });
 
 function MenuAdminPage() {
   const { data } = useSuspenseQuery(adminMenuQuery);
+  const { data: categoryOptions } = useSuspenseQuery(adminCategoriesQuery);
   const queryClient = useQueryClient();
   const save = useServerFn(saveMenuItem);
   const [selectedId, setSelectedId] = useState(data[0]?.id ?? "");
@@ -74,6 +79,8 @@ function MenuAdminPage() {
             revision: revision.current,
             name: draft.name,
             description: draft.description,
+            category: draft.category,
+            position: draft.position,
             price_cents: Math.round(amount * 100),
             available: draft.available,
             visible: draft.visible,
