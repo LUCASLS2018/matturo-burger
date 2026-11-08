@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { restaurant } from "@/lib/restaurant";
-import logo from "@/assets/matturo/logo-transparent.png";
+import logo from "@/assets/matturo/logo-black.png";
 
 export function RestaurantHeader() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   return <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-lg">
     <div className="page-width flex h-24 items-center justify-between gap-4">
-      <Link to="/" aria-label="Matturo Burger — início" className="shrink-0"><img src={logo} alt="Matturo Burger" className="h-16 w-40 object-contain sm:w-48" /></Link>
+      <Link to="/" aria-label="Matturo Burger — início" className="shrink-0"><img src={logo} alt="Matturo Burger" className="h-20 w-52 object-contain lg:w-64" /></Link>
       <nav aria-label="Navegação principal" className="hidden items-center gap-8 text-sm font-medium md:flex">
         <Link to="/" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>Início</Link>
         <Link to="/cardapio" activeProps={{ className: "text-primary" }}>Cardápio</Link>
@@ -32,7 +32,7 @@ export function RestaurantHeader() {
 export function RestaurantFooter() {
   return <footer className="bg-hero-surface text-hero-foreground">
     <div className="page-width grid gap-10 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
-      <div><img src={logo} alt="Matturo Burger" className="h-24 w-60 object-contain" /><p className="mt-4 max-w-xs text-sm leading-relaxed text-hero-foreground/70">Pizzas deliciosas e hambúrgueres incríveis, em Vila Franca de Xira.</p></div>
+      <div><img src={logo} alt="Matturo Burger" className="h-28 w-72 max-w-full bg-background p-3 object-contain" /><p className="mt-4 max-w-xs text-sm leading-relaxed text-hero-foreground/70">Pizzas deliciosas e hambúrgueres incríveis, em Vila Franca de Xira.</p></div>
       <div><h2 className="mb-5 font-semibold">Venha até ao Matturo</h2><a href={restaurant.maps} target="_blank" rel="noopener noreferrer" className="flex gap-2 text-sm leading-relaxed text-hero-foreground/70"><MapPin className="h-5 w-5 shrink-0" />{restaurant.address}</a><a href={restaurant.whatsapp} className="mt-4 block text-sm text-hero-foreground/70">{restaurant.phone}</a></div>
       <div><h2 className="mb-5 font-semibold">À sua maneira</h2><div className="flex flex-col gap-3 text-sm text-hero-foreground/70"><Link to="/cardapio">Cardápio</Link><Link to="/atendimento">Retirada e delivery</Link><Link to="/contactos">Contactos e horários</Link></div><div className="mt-5 flex gap-4"><a href={restaurant.instagram} aria-label="Instagram" target="_blank" rel="noopener noreferrer"><Instagram className="h-5 w-5" /></a><a href={restaurant.tiktok} target="_blank" rel="noopener noreferrer" className="text-sm">TikTok ↗</a></div></div>
     </div><div className="page-width border-t border-hero-foreground/15 py-6 text-xs text-hero-foreground/60">© Matturo Burger · Vila Franca de Xira</div>
