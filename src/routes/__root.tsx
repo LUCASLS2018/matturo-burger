@@ -134,17 +134,18 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const isAdmin = useRouterState({ select: (s) => s.matches.some((m) => m.routeId.startsWith("/_authenticated")) });
+  const isAdminLogin = useRouterState({ select: (s) => s.location.pathname === "/admin" });
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <CartProvider>
         <div className="flex min-h-screen flex-col">
-          <RestaurantHeader />
+          {!isAdmin && !isAdminLogin && <RestaurantHeader />}
           <main className="flex-1">
             <Outlet />
           </main>
-          {!isAdmin && <RestaurantFooter />}
+          {!isAdmin && !isAdminLogin && <RestaurantFooter />}
         </div>
         <Toaster theme="light" position="bottom-right" />
       </CartProvider>
