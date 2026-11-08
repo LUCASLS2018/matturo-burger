@@ -17,19 +17,20 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-function renderStore() {
+async function renderStore() {
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: ["/conta"] }),
     context: { queryClient: new QueryClient() },
   });
+  await router.load();
   return render(<RouterProvider router={router} />);
 }
 
 describe("Public store header", () => {
   it("offers only the customer account when nobody is signed in", async () => {
     getUser.mockResolvedValue({ data: { user: null } });
-    renderStore();
+    await renderStore();
 
     const account = await screen.findByRole("link", { name: "Criar conta de cliente" });
     expect(account).toHaveAttribute("href", "/conta");
@@ -39,7 +40,7 @@ describe("Public store header", () => {
 
   it("sends a signed-in customer to their own orders, not to the team panel", async () => {
     getUser.mockResolvedValue({ data: { user: { id: "customer-1" } } });
-    renderStore();
+    await renderStore();
 
     const account = await screen.findByRole("link", { name: "A minha conta" });
     expect(account).toHaveAttribute("href", "/minha-conta");
