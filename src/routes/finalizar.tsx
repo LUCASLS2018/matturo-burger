@@ -206,7 +206,7 @@ function CheckoutPage() {
             <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground shadow-neon transition-transform hover:scale-[1.01]">
               Rever dados e encomenda <ArrowRight className="h-4 w-4" />
             </button>
-            <p className="text-center text-xs text-muted-foreground">Os dados ficam apenas nesta página e não são enviados nem guardados.</p>
+            <p className="text-center text-xs text-muted-foreground">Os dados ficam apenas nesta página até avançar para o pagamento seguro na Stripe.</p>
           </form>
         )}
         <OrderSummary />
