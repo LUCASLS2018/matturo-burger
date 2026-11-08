@@ -28,5 +28,6 @@
 - [x] Assign first Matturo administrator to the confirmed account selected and explicitly authorized by the owner; administrator role verified by database readback.
 - [ ] Verify authenticated GPS lifecycle, realtime, photo upload and map with distinct accounts; external Supabase authentication unavailable for automated sessions. Public access denial, invalid-token rejection and nine unit tests passed. Email auth settings remain unverified.
 - [x] Management stage 2a: orders saved on the site (server-priced snapshots), customer status page, admin order centre with live updates and optional sound.
+- [x] Add a visible team panel entry point: header "Painel" button and a /painel hub with pedidos, entregas and configurações areas (admin-only cards hidden for couriers).
 - [ ] Management stage 2b: link orders to courier assignment and deliveries automatically.
 - [ ] Management stage 3: editable menu with autosave in the admin panel.
