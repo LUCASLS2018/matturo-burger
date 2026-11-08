@@ -15,4 +15,4 @@
 - [x] Apply the compact ordering layout to every product and remove backgrounds from all remaining available photos; products without original photos retain a neutral icon.
 - [x] Ensure all product names remain fully separated from photos; verified at mobile, desktop and wide desktop sizes.
 - [x] Show all 54 products on the homepage, promotions first.
-- [ ] Make the transparent logo black and increase its visible size further.
+- [x] Make the transparent logo black and increase its visible size further; verified on mobile and desktop.
