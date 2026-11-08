@@ -21,6 +21,7 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
+import { Route as AuthenticatedGerirMenuRouteImport } from './routes/_authenticated/gerir-menu'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
@@ -90,6 +91,11 @@ const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
   path: '/entregas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGerirMenuRoute = AuthenticatedGerirMenuRouteImport.update({
+  id: '/gerir-menu',
+  path: '/gerir-menu',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/gerir-menu': typeof AuthenticatedGerirMenuRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/gerir-menu': typeof AuthenticatedGerirMenuRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
+  '/_authenticated/gerir-menu': typeof AuthenticatedGerirMenuRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/configuracoes'
     | '/entregas'
+    | '/gerir-menu'
     | '/painel'
     | '/pedidos'
     | '/acompanhar/$token'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/configuracoes'
     | '/entregas'
+    | '/gerir-menu'
     | '/painel'
     | '/pedidos'
     | '/acompanhar/$token'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
+    | '/_authenticated/gerir-menu'
     | '/_authenticated/painel'
     | '/_authenticated/pedidos'
     | '/acompanhar/$token'
@@ -368,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEntregasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gerir-menu': {
+      id: '/_authenticated/gerir-menu'
+      path: '/gerir-menu'
+      fullPath: '/gerir-menu'
+      preLoaderRoute: typeof AuthenticatedGerirMenuRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -430,6 +449,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
+  AuthenticatedGerirMenuRoute: typeof AuthenticatedGerirMenuRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
 }
@@ -437,6 +457,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
+  AuthenticatedGerirMenuRoute: AuthenticatedGerirMenuRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
 }

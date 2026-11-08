@@ -20,13 +20,15 @@ const orderInput = z.object({
 
 export const placeOrder = createServerFn({ method: "POST" }).inputValidator((i) => orderInput.parse(i)).handler(async ({ data }) => {
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-  const [settings, zones] = await Promise.all([
+  const [settings, zones, menu] = await Promise.all([
     db.from("matturo_restaurant_settings").select("orders_paused").eq("id", true).single(),
     db.from("matturo_delivery_zones").select("name,postal_prefixes,fee_cents").eq("active", true),
+    db.from("matturo_menu_items").select("id,name,slug,description,category,price_cents,image,available,visible,revision").eq("visible", true),
   ]);
-  if (settings.error || zones.error) throw new Error("Não foi possível registar o pedido. Tente novamente.");
+  if (settings.error || zones.error || menu.error) throw new Error("Não foi possível registar o pedido. Tente novamente.");
   if (settings.data.orders_paused) throw new Error("O Matturo está temporariamente sem aceitar pedidos.");
-  const lines = data.items.map((l) => priceLine(l));
+  const currentMenu = menu.data.map(menuItemToDish);
+  const lines = data.items.map((l) => priceLine(l, currentMenu));
   const delivery = needsDeliveryAddress(data.service);
   const zone = delivery ? findZone(data.postal ?? "", zones.data) : null;
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");

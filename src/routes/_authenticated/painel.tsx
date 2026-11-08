@@ -20,6 +20,7 @@ function PanelHub() {
   const navigate = useNavigate();
   const areas = [
     { to: "/pedidos" as const, icon: ClipboardList, title: "Pedidos", text: "Lista ao vivo dos pedidos recebidos, com estados e cancelamentos.", admin: true },
+    { to: "/gerir-menu" as const, icon: Utensils, title: "Produtos", text: "Editar nomes, preços, descrições, disponibilidade e fotografias.", admin: true },
     { to: "/entregas" as const, icon: Truck, title: "Entregas", text: "As suas entregas atribuídas, perfil de estafeta e rastreamento.", admin: false },
     { to: "/configuracoes" as const, icon: Settings, title: "Configurações", text: "Pausar pedidos e gerir zonas de delivery com portes.", admin: true },
   ].filter((a) => !a.admin || data.admin);

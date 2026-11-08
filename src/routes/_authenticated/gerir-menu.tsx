@@ -70,7 +70,7 @@ function MenuAdminPage() {
         setState("saving");
         try {
           const saved = await save({ data: {
-            id: draft === null ? selected.id : selected.id,
+            id: selected.id,
             revision: revision.current,
             name: draft.name,
             description: draft.description,
