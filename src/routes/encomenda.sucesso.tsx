@@ -9,7 +9,7 @@ type SearchParams = { session_id?: string | undefined };
 type PaymentResult = { status: string; paymentStatus: string; amountTotal: number | null; currency: string | null };
 
 export const Route = createFileRoute("/encomenda/sucesso")({
-  validateSearch: (search: Record<string, unknown>): SearchParams => ({ session_id: typeof search.session_id === "string" ? search.session_id : undefined }),
+  validateSearch: (search: Record<string, unknown>): SearchParams => ({ session_id: typeof search["session_id"] === "string" ? search["session_id"] : undefined }),
   head: () => ({
     meta: [
       { title: "Confirmação de pagamento — NovaFix Tech Lab" },

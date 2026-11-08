@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, CheckCircle2, LockKeyhole, MapPin, Pencil, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, LoaderCircle, LockKeyhole, MapPin, Pencil, UserRound } from "lucide-react";
+import { createStripeCheckout } from "@/lib/stripe.functions";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { checkoutDefaults, checkoutSchema, type CheckoutFormValues } from "@/lib/checkout";
@@ -65,16 +67,19 @@ function OrderSummary() {
       </ul>
       <dl className="mt-5 space-y-3 border-t border-border pt-5 text-sm">
         <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Subtotal</dt><dd className="font-semibold">{formatPrice(subtotal)}</dd></div>
-        <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Portes</dt><dd>A calcular</dd></div>
+        <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Portes</dt><dd>Não incluídos no teste</dd></div>
       </dl>
-      <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Os portes serão calculados antes do pagamento. Nenhum valor será cobrado nesta etapa.</p>
+      <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Os portes variam por encomenda e serão configurados antes dos pagamentos reais.</p>
     </aside>
   );
 }
 
 function CheckoutPage() {
   const { items } = useCart();
+  const createCheckout = useServerFn(createStripeCheckout);
   const [reviewData, setReviewData] = useState<CheckoutFormValues | null>(null);
+  const [paymentPending, setPaymentPending] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: checkoutDefaults,
@@ -93,8 +98,27 @@ function CheckoutPage() {
 
   const submit = handleSubmit((data) => {
     setReviewData(data);
+    setPaymentError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+
+  const beginPayment = async () => {
+    if (!reviewData || paymentPending) return;
+    setPaymentPending(true);
+    setPaymentError(null);
+    try {
+      const session = await createCheckout({ data: {
+        customer: reviewData,
+        items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options })),
+        origin: window.location.origin,
+        submissionId: crypto.randomUUID(),
+      } });
+      window.location.assign(session.url);
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "Não foi possível iniciar o pagamento. Tente novamente.");
+      setPaymentPending(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
@@ -114,7 +138,7 @@ function CheckoutPage() {
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <h2 className="font-semibold">Dados prontos para a próxima etapa</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Confirme as informações abaixo. Ainda não enviámos nem guardámos os seus dados.</p>
+                <p className="mt-1 text-sm text-muted-foreground">Confirme as informações. Ao continuar, os dados da encomenda serão enviados de forma segura à Stripe.</p>
               </div>
             </div>
 
@@ -138,10 +162,12 @@ function CheckoutPage() {
             {reviewData.notes && <div className="mt-5 rounded-lg bg-muted p-4 text-sm"><span className="font-medium">Notas de entrega:</span> <span className="whitespace-pre-wrap text-muted-foreground">{reviewData.notes}</span></div>}
 
             <div className="mt-8 border-t border-border pt-6">
-              <button disabled className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground opacity-50">
-                <LockKeyhole className="h-4 w-4" /> Pagamento disponível na Etapa 3
+              {paymentError && <p role="alert" className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{paymentError}</p>}
+              <button onClick={beginPayment} disabled={paymentPending} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground shadow-neon transition-opacity disabled:cursor-wait disabled:opacity-60">
+                {paymentPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <LockKeyhole className="h-4 w-4" />}
+                {paymentPending ? "A preparar o Checkout…" : "Testar pagamento seguro na Stripe"}
               </button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">Nenhuma encomenda foi criada e nenhum pagamento foi efetuado.</p>
+              <p className="mt-3 text-center text-xs text-muted-foreground">Modo teste: não efetua cobranças reais. Não inclui portes nem IVA.</p>
             </div>
           </section>
         ) : (
@@ -180,7 +206,7 @@ function CheckoutPage() {
             <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-neon px-6 py-3 font-semibold text-primary-foreground shadow-neon transition-transform hover:scale-[1.01]">
               Rever dados e encomenda <ArrowRight className="h-4 w-4" />
             </button>
-            <p className="text-center text-xs text-muted-foreground">Os dados ficam apenas nesta página e não são enviados nem guardados.</p>
+            <p className="text-center text-xs text-muted-foreground">Os dados ficam apenas nesta página até avançar para o pagamento seguro na Stripe.</p>
           </form>
         )}
         <OrderSummary />
