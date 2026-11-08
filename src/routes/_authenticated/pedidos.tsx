@@ -122,36 +122,59 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove }: {
   const Icon = serviceIcon(order.service);
   const delivery = board.deliveries.find((d) => d.order_id === order.id);
   const steps = nextOrderSteps(order.status as OrderStatus);
+  const [expanded, setExpanded] = useState(false);
+  const detailsId = `pedido-${order.id}-detalhes`;
+
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <header className="flex items-start justify-between gap-2 border-b border-border bg-secondary/40 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
-          <div><p className="text-sm font-bold">#{order.reference}</p><p className="flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3" />{timeAgo(order.created_at)} · {order.service}</p></div>
+    <article className={`overflow-hidden rounded-xl border bg-card shadow-sm transition-colors ${expanded ? "border-primary/40" : "border-border"}`}>
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-controls={detailsId}
+        onClick={() => setExpanded((value) => !value)}
+        className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-secondary/30 sm:px-4"
+      >
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
+        <span className="min-w-0 flex-1">
+          <span className="flex min-w-0 items-center gap-2">
+            <b className="shrink-0 text-sm">#{order.reference}</b>
+            <span className="truncate text-sm font-semibold">{order.customer_name}</span>
+          </span>
+          <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
+        </span>
+        <span className={`hidden shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold sm:inline-flex ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+        <span className="shrink-0 text-right">
+          <b className="block text-sm tabular-nums">{money(order.total_cents / 100)}</b>
+          <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold sm:hidden ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+        </span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
+      </button>
+
+      {expanded && (
+        <div id={detailsId}>
+          <div className="space-y-3 border-t border-border px-4 py-4 sm:px-5">
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold">{order.customer_name}</p>
+              <a className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3 w-3" />{order.customer_phone}</a>
+              {order.address && <p className="flex items-start gap-1.5 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3 shrink-0" />{order.address} · {order.postal_code} ({order.zone_name})</p>}
+            </div>
+            <ul className="space-y-1.5 rounded-lg bg-secondary/40 p-3 text-xs">
+              {order.matturo_order_items.map((i, n) => <li key={n}><div className="flex justify-between gap-2"><span><b>{i.qty}×</b> {i.name}</span><span className="shrink-0 tabular-nums">{money(i.line_total_cents / 100)}</span></div>{Object.entries(i.options as Record<string, string>).map(([k, v]) => <p key={k} className="pl-4 text-[11px] text-muted-foreground">{k}: {v}</p>)}</li>)}
+            </ul>
+            {order.notes && <p className="rounded-lg border-l-4 border-primary bg-primary/5 px-2.5 py-1.5 text-xs italic">“{order.notes}”</p>}
+            <div className="flex items-end justify-between border-t border-border pt-3">
+              <span className="text-[11px] text-muted-foreground">{order.delivery_fee_cents ? `Inclui entrega ${money(order.delivery_fee_cents / 100)}` : "Total"}</span>
+              <span className="text-lg font-bold tabular-nums">{money(order.total_cents / 100)}</span>
+            </div>
+            {order.service === "Delivery" && isActive(order.status) && (delivery
+              ? <p className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs"><Bike className="h-3.5 w-3.5 text-primary" />Estafeta: <b>{board.couriers.find((c) => c.id === delivery.courier_id)?.name ?? "—"}</b> · {delivery.status === "active" ? "a caminho" : delivery.status === "delivered" ? "entregue" : "atribuído"}</p>
+              : !board.couriers.length
+                ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
+                : <div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div>)}
+          </div>
+          {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
         </div>
-        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
-      </header>
-      <div className="space-y-3 px-4 py-3">
-        <div className="space-y-0.5 text-sm">
-          <p className="font-semibold">{order.customer_name}</p>
-          <a className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3 w-3" />{order.customer_phone}</a>
-          {order.address && <p className="flex items-start gap-1.5 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3 shrink-0" />{order.address} · {order.postal_code} ({order.zone_name})</p>}
-        </div>
-        <ul className="space-y-1.5 rounded-lg bg-secondary/40 p-2.5 text-xs">
-          {order.matturo_order_items.map((i, n) => <li key={n}><div className="flex justify-between gap-2"><span><b>{i.qty}×</b> {i.name}</span><span className="shrink-0 tabular-nums">{money(i.line_total_cents / 100)}</span></div>{Object.entries(i.options as Record<string, string>).map(([k, v]) => <p key={k} className="pl-4 text-[11px] text-muted-foreground">{k}: {v}</p>)}</li>)}
-        </ul>
-        {order.notes && <p className="rounded-lg border-l-4 border-primary bg-primary/5 px-2.5 py-1.5 text-xs italic">“{order.notes}”</p>}
-        <div className="flex items-end justify-between border-t border-border pt-2">
-          <span className="text-[11px] text-muted-foreground">{order.delivery_fee_cents ? `Inclui entrega ${money(order.delivery_fee_cents / 100)}` : "Total"}</span>
-          <span className="text-lg font-bold tabular-nums">{money(order.total_cents / 100)}</span>
-        </div>
-        {order.service === "Delivery" && isActive(order.status) && (delivery
-          ? <p className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs"><Bike className="h-3.5 w-3.5 text-primary" />Estafeta: <b>{board.couriers.find((c) => c.id === delivery.courier_id)?.name ?? "—"}</b> · {delivery.status === "active" ? "a caminho" : delivery.status === "delivered" ? "entregue" : "atribuído"}</p>
-          : !board.couriers.length
-            ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
-            : <div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div>)}
-      </div>
-      {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-2.5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
+      )}
     </article>
   );
 }
