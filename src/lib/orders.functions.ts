@@ -57,7 +57,7 @@ export const orderByToken = createServerFn({ method: "GET" }).inputValidator((i)
   if (d.data && d.data.status !== "cancelled") {
     const c = d.data.courier_id ? await db.from("matturo_profiles").select("name").eq("id", d.data.courier_id).maybeSingle() : null;
     const pos = d.data.status === "active" ? await db.from("matturo_delivery_positions").select("latitude,longitude,recorded_at").eq("delivery_id", d.data.id).maybeSingle() : null;
-    tracking = { status: d.data.status, courier: (c?.data?.name || "O estafeta").split(" ")[0], lat: d.data.destination_lat, lng: d.data.destination_lng, position: pos?.data ?? null };
+    tracking = { status: d.data.status, courier: (c?.data?.name || "O estafeta").split(" ")[0] ?? "O estafeta", lat: d.data.destination_lat, lng: d.data.destination_lng, position: pos?.data ?? null };
   }
   return { ...order, items: items.data ?? [], tracking };
 });
