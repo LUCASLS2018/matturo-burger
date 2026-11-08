@@ -21,9 +21,11 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
+import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
 import { Route as AcompanharTokenRouteImport } from './routes/acompanhar.$token'
 import { Route as EncomendaCanceladaRouteImport } from './routes/encomenda.cancelada'
 import { Route as EncomendaSucessoRouteImport } from './routes/encomenda.sucesso'
+import { Route as PedidoTokenRouteImport } from './routes/pedido.$token'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
@@ -87,6 +89,11 @@ const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
   path: '/entregas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AcompanharTokenRoute = AcompanharTokenRouteImport.update({
   id: '/acompanhar/$token',
   path: '/acompanhar/$token',
@@ -100,6 +107,11 @@ const EncomendaCanceladaRoute = EncomendaCanceladaRouteImport.update({
 const EncomendaSucessoRoute = EncomendaSucessoRouteImport.update({
   id: '/encomenda/sucesso',
   path: '/encomenda/sucesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidoTokenRoute = PedidoTokenRouteImport.update({
+  id: '/pedido/$token',
+  path: '/pedido/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProdutoSlugRoute = ProdutoSlugRouteImport.update({
@@ -125,9 +137,11 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
+  '/pedido/$token': typeof PedidoTokenRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
@@ -143,9 +157,11 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
+  '/pedido/$token': typeof PedidoTokenRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
@@ -163,9 +179,11 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
+  '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
   '/acompanhar/$token': typeof AcompanharTokenRoute
   '/encomenda/cancelada': typeof EncomendaCanceladaRoute
   '/encomenda/sucesso': typeof EncomendaSucessoRoute
+  '/pedido/$token': typeof PedidoTokenRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
@@ -183,9 +201,11 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/configuracoes'
     | '/entregas'
+    | '/pedidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
+    | '/pedido/$token'
     | '/produto/$slug'
     | '/api/public/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -201,9 +221,11 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/configuracoes'
     | '/entregas'
+    | '/pedidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
+    | '/pedido/$token'
     | '/produto/$slug'
     | '/api/public/stripe-webhook'
   id:
@@ -220,9 +242,11 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
+    | '/_authenticated/pedidos'
     | '/acompanhar/$token'
     | '/encomenda/cancelada'
     | '/encomenda/sucesso'
+    | '/pedido/$token'
     | '/produto/$slug'
     | '/api/public/stripe-webhook'
   fileRoutesById: FileRoutesById
@@ -241,6 +265,7 @@ export interface RootRouteChildren {
   AcompanharTokenRoute: typeof AcompanharTokenRoute
   EncomendaCanceladaRoute: typeof EncomendaCanceladaRoute
   EncomendaSucessoRoute: typeof EncomendaSucessoRoute
+  PedidoTokenRoute: typeof PedidoTokenRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
@@ -331,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEntregasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pedidos': {
+      id: '/_authenticated/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof AuthenticatedPedidosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/acompanhar/$token': {
       id: '/acompanhar/$token'
       path: '/acompanhar/$token'
@@ -350,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/encomenda/sucesso'
       fullPath: '/encomenda/sucesso'
       preLoaderRoute: typeof EncomendaSucessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedido/$token': {
+      id: '/pedido/$token'
+      path: '/pedido/$token'
+      fullPath: '/pedido/$token'
+      preLoaderRoute: typeof PedidoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produto/$slug': {
@@ -372,11 +411,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
+  AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
+  AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -396,6 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcompanharTokenRoute: AcompanharTokenRoute,
   EncomendaCanceladaRoute: EncomendaCanceladaRoute,
   EncomendaSucessoRoute: EncomendaSucessoRoute,
+  PedidoTokenRoute: PedidoTokenRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
