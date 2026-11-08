@@ -1,0 +1,1 @@
+UPDATE public.matturo_modifier_groups SET required = true, min = 1 WHERE name = 'Adicionar extras';
