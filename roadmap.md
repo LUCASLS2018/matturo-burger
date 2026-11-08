@@ -10,3 +10,4 @@
 - [ ] Restyle every hamburger selection card to match the new compact reference, with original burger cutouts and functional controls.
 - [ ] Keep all ordering buttons on this site instead of the discontinued external menu.
 - [ ] Match the latest horizontal compact burger-card layout with original product photos.
+- [ ] Apply the same compact layout to pizzas using original photos.

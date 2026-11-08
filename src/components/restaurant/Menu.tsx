@@ -9,9 +9,9 @@ import { dishCutout } from "@/lib/dish-images";
 export function DishCard({ dish }: { dish: Dish }) {
   const [quantity, setQuantity] = useState(1);
   const cutout = dishCutout(dish.slug);
-  if (cutout) return <article className="burger-card group">
+  if (cutout || dish.category === "pizza") return <article className="burger-card group">
     <div className="burger-card-panel" />
-    <Link to="/produto/$slug" params={{ slug: dish.slug }} className="burger-card-photo" aria-label={dish.name}><img src={cutout} alt={dish.name} loading="lazy" className="food-photo h-full w-full object-contain" /></Link>
+    <Link to="/produto/$slug" params={{ slug: dish.slug }} className="burger-card-photo" aria-label={dish.name}>{(cutout || dish.image) ? <img src={cutout || dish.image || undefined} alt={dish.name} loading="lazy" className={cutout ? "food-photo h-full w-full object-contain" : "food-photo mx-auto mt-4 aspect-square w-full rounded-full object-cover"} /> : <Utensils className="mx-auto mt-12 h-10 w-10 text-muted-foreground" />}</Link>
     <div className="burger-card-content">
       <div className="mb-4 flex items-center justify-end gap-2">
         <Button size="icon" variant="outline" className="h-7 w-7 rounded-md border-0 bg-primary/15 text-primary" title={`Diminuir quantidade de ${dish.name}`} aria-label={`Diminuir quantidade de ${dish.name}`} disabled={quantity === 1} onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus className="h-3 w-3" /></Button>
