@@ -8,6 +8,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -139,6 +140,8 @@
 .matturo-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--background) 0%, var(--background) 38%, color-mix(in oklab, var(--background) 90%, transparent) 48%, transparent 69%); }
 .page-width { width: min(1240px, calc(100% - 48px)); margin-inline: auto; }
 .section-title { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.25; }
+.delivery-destination { fill: var(--foreground); stroke: var(--background); fill-opacity: 1; }
+.delivery-courier { fill: var(--primary); stroke: var(--background); fill-opacity: 1; }
 .burger-card { position: relative; min-height: 206px; display: flex; align-items: flex-end; padding-top: 30px; }
 .burger-card-panel { position: absolute; inset: 45px 0 0 44px; border-radius: 8px; background: var(--burger-panel); }
 .burger-card-photo { position: absolute; left: 0; top: 0; width: 40%; height: 145px; z-index: 1; }
