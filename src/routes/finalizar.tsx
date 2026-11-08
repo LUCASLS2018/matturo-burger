@@ -138,7 +138,7 @@ function CheckoutPage() {
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <h2 className="font-semibold">Dados prontos para a próxima etapa</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Confirme as informações abaixo. Ainda não enviámos nem guardámos os seus dados.</p>
+                <p className="mt-1 text-sm text-muted-foreground">Confirme as informações. Ao continuar, os dados da encomenda serão enviados de forma segura à Stripe.</p>
               </div>
             </div>
 
