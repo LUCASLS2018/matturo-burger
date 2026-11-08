@@ -27,7 +27,7 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
     admin ? db.from("matturo_profiles").select("*") : Promise.resolve(profile),
     admin ? db.from("matturo_user_roles").select("user_id").eq("role", "courier") : Promise.resolve(null),
     db.from("matturo_courier_availability").select("*"),
-    orderIds.length ? db.from("matturo_orders").select("id,reference,customer_name,customer_phone,address,postal_code,notes,service,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as unknown[], error: null }),
+    orderIds.length ? db.from("matturo_orders").select("id,reference,customer_name,customer_phone,address,postal_code,notes,service,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
   ]);
   if (positions.error || events.error || availability.error || orders.error) throw new Error("Não foi possível carregar as entregas.");
   return {
