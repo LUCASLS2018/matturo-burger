@@ -116,7 +116,7 @@ function CompletedOrderRow({ order, expanded, onToggle }: { order: AdminOrder; e
             {order.address && <p className="flex items-start gap-1.5 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3 shrink-0" />{order.address} · {order.postal_code} ({order.zone_name})</p>}
           </div>
           <ul className="space-y-1.5 rounded-lg bg-secondary/40 p-3 text-xs">
-            {order.matturo_order_items.map((item, index) => (
+            {order.matturo_order_items.flatMap((i) => Array.from({ length: Math.max(1, i.qty) }, () => ({ ...i, qty: 1, line_total_cents: Math.round(i.line_total_cents / Math.max(1, i.qty)) }))).map((item, index) => (
               <li key={index}>
                 <div className="flex justify-between gap-2"><span><b>{item.qty}×</b> {item.name}</span><span className="shrink-0 tabular-nums">{money(item.line_total_cents / 100)}</span></div>
                 {Object.entries(item.options as Record<string, string>).map(([key, value]) => <p key={key} className="pl-4 text-[11px] text-muted-foreground">{key}: {value}</p>)}
