@@ -9,6 +9,7 @@ export type CartItem = {
   image: string | null;
   price: number;
   options: Record<string, string>;
+  selected?: Record<string, number>;
   qty: number;
 };
 

@@ -2,11 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, Utensils, Minus, Plus, ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { categories, type Dish } from "@/lib/menu";
+import { type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { menuQuery } from "@/lib/menu-query";
+import { menuCategoriesQuery, menuQuery } from "@/lib/menu-query";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const [quantity, setQuantity] = useState(1);
@@ -31,6 +31,7 @@ export function DishCard({ dish }: { dish: Dish }) {
 
 export function MenuPage() {
   const { data: dishes } = useSuspenseQuery(menuQuery);
+  const { data: categories } = useSuspenseQuery(menuCategoriesQuery);
   const [category,setCategory] = useState("todas"); const [query,setQuery] = useState("");
   const normalize = (s:string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
   const list = dishes.filter(p => (category === "todas" || p.category === category) && normalize(p.name+" "+p.description).includes(normalize(query)));
