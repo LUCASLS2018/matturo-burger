@@ -4,6 +4,6 @@
 - [x] Fotos do catálogo — 54 fotos de estúdio; fotos reais preservadas nos 8 produtos bloqueados pela IA; dálmata com foto real de frente como principal.
 - [x] Carrinho — Fotos, opções, quantidades, remoção e subtotal.
 - [x] Etapa 2 — Formulário validado de identificação e entrega, resumo da encomenda e revisão dos dados; sem envio, gravação de encomendas ou pagamentos.
-- [ ] Etapa 3 — Stripe Checkout em EUR, cartões e Klarna elegível, usando a conta Stripe existente; webhooks e chaves apenas no backend.
+- [ ] Etapa 3 — Implementar e testar Stripe Checkout em EUR, cartões e Klarna elegível, com preços Stripe reutilizáveis e webhook assinado; sem IVA. Portes variáveis ficam por configurar antes do modo real.
 - [ ] Etapa 4 — Apresentar proposta mínima de encomendas, itens, entrega e pagamento; não aplicar migrações sem autorização expressa.
 - [ ] Etapa 5 — Testes finais, responsividade, SEO e preparação da publicação; não publicar sem autorização.
