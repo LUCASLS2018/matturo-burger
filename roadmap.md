@@ -14,3 +14,4 @@
 - [x] Remove photographic backgrounds from all original pizza photos.
 - [ ] Apply the compact ordering layout to every product and remove backgrounds from all remaining available photos.
 - [ ] Ensure all product names remain fully separated from photos.
+- [ ] Show all products on the homepage, promotions first.
