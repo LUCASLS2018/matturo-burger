@@ -25,7 +25,7 @@ export const Route = createFileRoute("/finalizar")({
 
 const inputClass = "mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary";
 
-function Field({ label, error, optional, children }: { label: string; error?: string; optional?: boolean; children: ReactNode }) {
+function Field({ label, error, optional, children }: { label: string; error?: string | undefined; optional?: boolean; children: ReactNode }) {
   return (
     <label className="block text-sm font-medium">
       <span>{label}{optional && <span className="font-normal text-muted-foreground"> (opcional)</span>}</span>
