@@ -35,7 +35,7 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((i) 
   const reference = "M" + Date.now().toString(36).toUpperCase().slice(-6);
   const order = await db.from("matturo_orders").insert({
     reference, customer_name: data.name, customer_phone: data.phone, service: data.service,
-    address: delivery ? data.address : null, postal_code: delivery ? data.postal : null, zone_name: zone?.name ?? null,
+    address: delivery ? data.address ?? null : null, postal_code: delivery ? data.postal ?? null : null, zone_name: zone?.name ?? null,
     delivery_fee_cents: fee, subtotal_cents: subtotal, total_cents: subtotal + fee, notes: data.notes || null,
     access_token_hash: await tokenHash(token),
   }).select("id").single();

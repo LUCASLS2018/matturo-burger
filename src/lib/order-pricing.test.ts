@@ -7,7 +7,7 @@ const burger = dishes.find((d) => d.name.toLowerCase().includes("matturo") && d.
 describe("order pricing", () => {
   it("uses the menu price, not the browser price", () => {
     const required = burger.groups.filter((g) => g.required);
-    const options = Object.fromEntries(required.map((g) => [g.name, `${g.min}× ${g.modifiers.find((m) => m.price === 0)?.name ?? g.modifiers[0].name}`]));
+    const options = Object.fromEntries(required.map((g) => [g.name, `${g.min}× ${g.modifiers.find((m) => m.price === 0)?.name ?? g.modifiers[0]!.name}`]));
     const line = priceLine({ productId: burger.id, qty: 2, options });
     expect(line.unit_price_cents).toBeGreaterThanOrEqual(800);
     expect(line.line_total_cents).toBe(line.unit_price_cents * 2);
