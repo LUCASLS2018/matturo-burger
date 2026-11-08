@@ -1,0 +1,15 @@
+CREATE TABLE public.matturo_restaurant_settings (id boolean PRIMARY KEY DEFAULT true CHECK(id), orders_paused boolean NOT NULL DEFAULT false, revision integer NOT NULL DEFAULT 1, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT,UPDATE ON public.matturo_restaurant_settings TO authenticated; GRANT SELECT ON public.matturo_restaurant_settings TO anon; GRANT ALL ON public.matturo_restaurant_settings TO service_role;
+ALTER TABLE public.matturo_restaurant_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY settings_read ON public.matturo_restaurant_settings FOR SELECT TO anon,authenticated USING(true);
+CREATE POLICY settings_admin_update ON public.matturo_restaurant_settings FOR UPDATE TO authenticated USING(public.matturo_has_role('admin')) WITH CHECK(public.matturo_has_role('admin'));
+CREATE TRIGGER settings_touch BEFORE UPDATE ON public.matturo_restaurant_settings FOR EACH ROW EXECUTE FUNCTION public.matturo_touch();
+INSERT INTO public.matturo_restaurant_settings(id) VALUES(true);
+CREATE TABLE public.matturo_delivery_zones (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text NOT NULL CHECK(length(trim(name)) BETWEEN 1 AND 100), postal_prefixes text[] NOT NULL, fee_cents integer NOT NULL CHECK(fee_cents>=0 AND fee_cents<=100000), active boolean NOT NULL DEFAULT false, revision integer NOT NULL DEFAULT 1, created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT,INSERT,UPDATE ON public.matturo_delivery_zones TO authenticated; GRANT SELECT ON public.matturo_delivery_zones TO anon; GRANT ALL ON public.matturo_delivery_zones TO service_role;
+ALTER TABLE public.matturo_delivery_zones ENABLE ROW LEVEL SECURITY;
+CREATE POLICY zones_read ON public.matturo_delivery_zones FOR SELECT TO anon,authenticated USING(active OR public.matturo_has_role('admin'));
+CREATE POLICY zones_admin_insert ON public.matturo_delivery_zones FOR INSERT TO authenticated WITH CHECK(public.matturo_has_role('admin'));
+CREATE POLICY zones_admin_update ON public.matturo_delivery_zones FOR UPDATE TO authenticated USING(public.matturo_has_role('admin')) WITH CHECK(public.matturo_has_role('admin'));
+CREATE TRIGGER zones_touch BEFORE UPDATE ON public.matturo_delivery_zones FOR EACH ROW EXECUTE FUNCTION public.matturo_touch();
+ALTER PUBLICATION supabase_realtime ADD TABLE public.matturo_restaurant_settings,public.matturo_delivery_zones;

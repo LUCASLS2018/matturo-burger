@@ -140,6 +140,39 @@ export type Database = {
           },
         ]
       }
+      matturo_delivery_zones: {
+        Row: {
+          active: boolean
+          created_at: string
+          fee_cents: number
+          id: string
+          name: string
+          postal_prefixes: string[]
+          revision: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          fee_cents: number
+          id?: string
+          name: string
+          postal_prefixes: string[]
+          revision?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          fee_cents?: number
+          id?: string
+          name?: string
+          postal_prefixes?: string[]
+          revision?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       matturo_profiles: {
         Row: {
           created_at: string
@@ -160,6 +193,30 @@ export type Database = {
           id?: string
           name?: string
           photo_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      matturo_restaurant_settings: {
+        Row: {
+          created_at: string
+          id: boolean
+          orders_paused: boolean
+          revision: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: boolean
+          orders_paused?: boolean
+          revision?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: boolean
+          orders_paused?: boolean
+          revision?: number
           updated_at?: string
         }
         Relationships: []
