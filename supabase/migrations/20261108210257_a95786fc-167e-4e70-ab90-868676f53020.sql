@@ -1,0 +1,2 @@
+CREATE POLICY orders_courier_read ON public.matturo_orders FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.matturo_deliveries d WHERE d.order_id = id AND d.courier_id = auth.uid()));
+CREATE POLICY order_items_courier_read ON public.matturo_order_items FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.matturo_deliveries d JOIN public.matturo_orders o ON o.id = d.order_id WHERE d.order_id = order_id AND d.courier_id = auth.uid()));
