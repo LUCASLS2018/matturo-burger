@@ -7,6 +7,8 @@ import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChevronDown, Clock, 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
+import { groupByService, oldestFirst } from "@/lib/order-groups";
+import { ServiceGroupHeading } from "@/components/restaurant/ServiceGroupHeading";
 import { nextOrderSteps, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
 import { ManualOrder, manualMenuQuery } from "@/components/restaurant/ManualOrder";
@@ -87,7 +89,8 @@ function OrdersPage() {
     try { await move({ data: { id, from, to } }); await qc.invalidateQueries({ queryKey: ordersQuery.queryKey }); }
     catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível guardar."); }
   };
-  const cancelled = data.filter((o) => o.status === "cancelado");
+  const sorted = oldestFirst(data);
+  const cancelled = sorted.filter((o) => o.status === "cancelado");
 
   return (
     <div className="page-width py-10">
@@ -118,25 +121,31 @@ function OrdersPage() {
       </div>
       <div className="mt-4">
         {columns.filter((col) => col.key === tab).map((col) => {
-          const items = data.filter((o) => o.status === col.key);
+          const items = sorted.filter((o) => o.status === col.key);
+          const groups = groupByService(items);
           return (
             <section key={col.key} role="tabpanel">
-              <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {!items.length && <p className="col-span-full rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos</p>}
-                {items.map((o) => (
-                  <OrderCard
-                    key={o.id}
-                    order={o}
-                    board={board}
-                    courierPick={pick[o.id] ?? board.couriers[0]?.id ?? ""}
-                    onPick={(id, value) => setPick({ ...pick, [id]: value })}
-                    onSend={sendToCourier}
-                    onMove={change}
-                    nearby={nearbyOrders(o, data, board)}
-                    onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
-                  />
-                ))}
-              </div>
+              {!items.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos</p>}
+              {groups.map((group) => (
+                <div key={group.service} className="mb-8 last:mb-0">
+                  <ServiceGroupHeading service={group.service} count={group.orders.length} />
+                  <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {group.orders.map((o) => (
+                      <OrderCard
+                        key={o.id}
+                        order={o}
+                        board={board}
+                        courierPick={pick[o.id] ?? board.couriers[0]?.id ?? ""}
+                        onPick={(id, value) => setPick({ ...pick, [id]: value })}
+                        onSend={sendToCourier}
+                        onMove={change}
+                        nearby={nearbyOrders(o, sorted, board)}
+                        onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </section>
           );
         })}
@@ -145,7 +154,18 @@ function OrdersPage() {
       {cancelled.length > 0 && (
         <div className="mt-6">
           <Button variant="outline" size="sm" onClick={() => setShowCancelled(!showCancelled)}><Ban />Cancelados<span className="ml-1 rounded-full bg-secondary px-2 text-xs tabular-nums">{cancelled.length}</span></Button>
-          {showCancelled && <div className="mt-4 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">{cancelled.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}</div>}
+          {showCancelled && (
+            <div className="mt-4 space-y-8">
+              {groupByService(cancelled).map((group) => (
+                <div key={group.service}>
+                  <ServiceGroupHeading service={group.service} count={group.orders.length} />
+                  <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
       {manualOpen && <Suspense fallback={null}><ManualOrder onClose={() => setManualOpen(false)} /></Suspense>}
