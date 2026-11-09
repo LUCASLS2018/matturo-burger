@@ -16,6 +16,7 @@ import { dishTotal, selectionValid, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
 import { menuCategoriesQuery } from "@/lib/menu-query";
+import { lisbonDateTimeToDate, scheduledOrderError, OPENING_HOURS_SUMMARY } from "@/lib/opening-hours";
 
 export const manualMenuQuery = queryOptions({ queryKey: ["matturo-manual-menu"], queryFn: () => adminMenu(), staleTime: 0 });
 type Line = { key: string; dish: Dish; selected: Record<string, number>; notes: string };
@@ -39,6 +40,8 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const [postal, setPostal] = useState("");
   const [notes, setNotes] = useState("");
   const [service, setService] = useState<OrderService>("Retirada");
+  const [scheduled, setScheduled] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [dishId, setDishId] = useState("");
@@ -74,12 +77,20 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const visibleCategories = [...categories.filter((item) => categorySlugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.name })), ...categorySlugs.filter((slug) => !categories.some((item) => item.slug === slug)).map((slug) => ({ slug, name: slug }))];
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (busy || !lines.length || settings.paused || !settings.isOpen) return;
+    if (busy || !lines.length || settings.paused || (!settings.isOpen && !scheduled)) return;
+    let scheduledIso: string | undefined;
+    if (scheduled) {
+      const date = lisbonDateTimeToDate(scheduledFor);
+      if (!date) { setError("Escolha uma data e hora válidas para o pedido agendado."); return; }
+      scheduledIso = date.toISOString();
+      const scheduleError = scheduledOrderError(scheduledIso, new Date());
+      if (scheduleError) { setError(scheduleError); return; }
+    }
     setBusy(true); setError("");
     try {
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await save({ data: {
-        name, phone, service, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
+        name, phone, service, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
         expectedTotalCents: changedTotal ?? Math.round((subtotal + fee) * 100), acceptRepriced: changedTotal !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: lines.map((line) => ({ productId: line.dish.id, qty: 1, selected: line.selected, options: line.notes.trim() ? { Observações: line.notes.trim() } : {} })),
@@ -87,7 +98,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
       if (result.kind === "price_changed") { setChangedTotal(result.totalCents); return; }
       await qc.invalidateQueries({ queryKey: ["matturo-admin-orders"] });
       await qc.invalidateQueries({ queryKey: ["matturo-admin-customers"] });
-      toast.success(`Pedido #${orderNumber(result)} criado`);
+      toast.success(`Pedido #${orderNumber(result)} ${scheduledIso ? "agendado" : "criado"}`);
       onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível criar o pedido."); }
     finally { setBusy(false); }
@@ -105,6 +116,8 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
               <label className="text-sm font-medium">Telemóvel<input required type="tel" maxLength={30} value={phone} onChange={(e) => setPhone(e.target.value)} className={fieldClass} /></label>
             </div>
             <div className="flex flex-wrap gap-2">{orderServices.map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); setRadiusQuote(null); resetPrice(); }}>{value}</Button>)}</div>
+            <div className="flex flex-wrap gap-2"><Button type="button" size="sm" variant={!scheduled ? "default" : "outline"} aria-pressed={!scheduled} onClick={() => { setScheduled(false); setError(""); }}>Assim que possível</Button><Button type="button" size="sm" variant={scheduled ? "default" : "outline"} aria-pressed={scheduled} onClick={() => { setScheduled(true); setError(""); }}>Agendar pedido</Button></div>
+            {scheduled && <div><label className="block text-sm font-medium">Data e hora pretendida (hora de Portugal)<input required type="datetime-local" value={scheduledFor} onChange={(event) => { setScheduledFor(event.target.value); setError(""); }} className={fieldClass} /></label><p className="mt-2 text-xs text-muted-foreground">{OPENING_HOURS_SUMMARY}</p></div>}
             {delivery && <div className="space-y-3"><label className="block text-sm font-medium">Morada<input required maxLength={250} value={address} onChange={(e) => { setAddress(e.target.value); setRadiusQuote(null); resetPrice(); }} className={fieldClass} /></label><label className="block text-sm font-medium">Código postal<input required maxLength={8} value={postal} onChange={(e) => { setPostal(e.target.value); setRadiusQuote(null); resetPrice(); }} placeholder="2600-000" className={fieldClass} /></label>{radiusMode && <Button type="button" size="sm" variant="outline" disabled={quoting || !address.trim() || !postal.trim()} onClick={() => void verifyRadius()}>{quoting ? "A calcular…" : "Verificar distância e portes"}</Button>}<p className="text-xs text-muted-foreground">{zone ? `${radiusQuote ? `${String(radiusQuote.distanceKm).replace(".", ",")} km · ` : ""}${zone.name} · Entrega ${money(fee)}` : radiusMode ? "Calcule a distância para confirmar que a morada está dentro do raio." : "Selecione um código postal de uma zona de entrega ativa."}</p></div>}
             <label className="block text-sm font-medium">Procurar produto<input value={search} onChange={(e) => setSearch(e.target.value)} className={fieldClass} /></label>
             <div aria-label="Categorias de produtos" className="flex gap-2 overflow-x-auto pb-2"><Button type="button" size="sm" variant={!category ? "default" : "outline"} onClick={() => setCategory("")}>Todas</Button>{visibleCategories.map((item) => <Button type="button" key={item.slug} size="sm" variant={category === item.slug ? "default" : "outline"} onClick={() => setCategory(item.slug)}>{item.name}</Button>)}</div>
@@ -132,10 +145,10 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             <label className="block text-sm font-medium">Observações do pedido<textarea rows={3} maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} className={fieldClass} /></label>
             <div className="space-y-2 border-t border-border pt-4 text-sm"><div className="flex justify-between"><span>Produtos</span><span>{money(subtotal)}</span></div>{delivery && <div className="flex justify-between"><span>Entrega</span><span>{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between text-lg font-bold"><span>Total</span><span>{money(changedTotal === null ? subtotal + fee : changedTotal / 100)}</span></div></div>
             {changedTotal !== null && <p role="status" className="text-sm text-primary">O preço mudou. Confirme o total atualizado para criar o pedido.</p>}
-            {!settings.isOpen && <p role="status" className="text-sm text-destructive">O restaurante está FECHADO. Não é possível criar pedidos fora do horário.</p>}
-            {settings.isOpen && settings.paused && <p role="status" className="text-sm text-destructive">O restaurante está sem aceitar pedidos.</p>}
+            {!settings.isOpen && !settings.paused && <p role="status" className="text-sm text-destructive">{scheduled ? "O restaurante está FECHADO. O pedido agendado só poderá ser aceite com a loja aberta." : "O restaurante está FECHADO. Pode agendar para uma hora dentro do funcionamento."}</p>}
+            {settings.paused && <p role="status" className="text-sm text-destructive">O restaurante está sem aceitar pedidos.</p>}
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || !lines.length || settings.paused || !settings.isOpen || (delivery && !zone)}><Plus />{busy ? "A guardar…" : changedTotal !== null ? "Confirmar total e criar pedido" : "Criar pedido"}</Button>
+            <Button type="submit" className="w-full" disabled={busy || !lines.length || settings.paused || (!settings.isOpen && !scheduled) || (scheduled && !scheduledFor) || (delivery && !zone)}><Plus />{busy ? "A guardar…" : scheduled ? changedTotal !== null ? "Confirmar total e agendar pedido" : "Guardar pedido agendado" : changedTotal !== null ? "Confirmar total e criar pedido" : "Criar pedido"}</Button>
             <Button type="button" variant="ghost" className="w-full" disabled={busy} onClick={onClose}>Cancelar</Button>
           </div>
         </div>

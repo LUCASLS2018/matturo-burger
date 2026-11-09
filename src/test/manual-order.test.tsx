@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ save: vi.fn(), invalidate: vi.fn().mockResolvedValue(undefined) }));
+const mocks = vi.hoisted(() => ({ save: vi.fn(), invalidate: vi.fn().mockResolvedValue(undefined), isOpen: true, paused: false }));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mocks.save }));
 vi.mock("@/lib/orders.functions", () => ({ createManualOrder: {} }));
 vi.mock("@/lib/menu.functions", () => ({ adminMenu: {} }));
@@ -11,14 +11,50 @@ vi.mock("@tanstack/react-query", () => ({
   queryOptions: (options: unknown) => options,
   useQueryClient: () => ({ invalidateQueries: mocks.invalidate }),
   useSuspenseQuery: (query: { queryKey: string[] }) => ({ data: query.queryKey[0] === "settings"
-    ? { paused: false, isOpen: true, deliveryMode: "postal", zones: [{ name: "vila franca de xira", postal_prefixes: ["2600"], fee_cents: 300 }] }
+    ? { paused: mocks.paused, isOpen: mocks.isOpen, deliveryMode: "postal", zones: [{ name: "vila franca de xira", postal_prefixes: ["2600"], fee_cents: 300 }] }
     : query.queryKey[0] === "categories" ? [{ slug: "hamburguer", name: "HAMBURGUER" }]
     : [{ id: "burger", slug: "hamburguer", category: "hamburguer", name: "Hambúrguer", price: 8, available: true, visible: true, groups: [{ id: "extras", name: "Extras", required: true, min: 1, max: 1, modifiers: [{ id: "none", name: "NAO QUERO", price: 0, max: 1 }] }] }] }),
 }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
 import { ManualOrder } from "@/components/restaurant/ManualOrder";
-afterEach(() => { cleanup(); vi.clearAllMocks(); });
+afterEach(() => { cleanup(); vi.clearAllMocks(); vi.useRealTimers(); mocks.isOpen = true; mocks.paused = false; });
+function prepareScheduledOrder(time: string) {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-11-09T03:37:00Z"));
+  mocks.isOpen = false;
+  render(<ManualOrder onClose={vi.fn()} />);
+  fireEvent.change(screen.getByLabelText("Nome do cliente"), { target: { value: "Cliente" } });
+  fireEvent.change(screen.getByLabelText("Telemóvel"), { target: { value: "912345678" } });
+  fireEvent.click(screen.getByRole("button", { name: "Selecionar Hambúrguer" }));
+  fireEvent.click(screen.getByRole("radio", { name: /NAO QUERO/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Adicionar ·/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Agendar pedido" }));
+  fireEvent.change(screen.getByLabelText("Data e hora pretendida (hora de Portugal)"), { target: { value: time } });
+  fireEvent.click(screen.getByRole("button", { name: "Guardar pedido agendado" }));
+}
 describe("manual phone order form", () => {
+  it("sends a telephone order scheduled for Tuesday at 12:00 even while closed", async () => {
+    mocks.save.mockResolvedValue({ kind: "created", reference: "M123", token: "token" });
+    prepareScheduledOrder("2026-11-10T12:00");
+    await waitFor(() => expect(mocks.save).toHaveBeenCalledOnce());
+    expect(mocks.save.mock.calls[0]?.[0].data.scheduledFor).toBe("2026-11-10T12:00:00.000Z");
+  });
+  it("refuses scheduling before the Tuesday 12:00 opening", () => {
+    prepareScheduledOrder("2026-11-10T11:59");
+    expect(mocks.save).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+  });
+  it("refuses scheduling in the past", () => {
+    prepareScheduledOrder("2026-11-08T12:00");
+    expect(mocks.save).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+  });
+  it("keeps emergency closure blocking scheduled telephone orders", () => {
+    mocks.paused = true;
+    prepareScheduledOrder("2026-11-10T12:00");
+    expect(mocks.save).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Guardar pedido agendado" })).toBeDisabled();
+  });
   it("creates repeated products as separate lines with chosen options and configured delivery fee", async () => {
     mocks.save.mockResolvedValue({ kind: "created", reference: "M123", token: "token" });
     const close = vi.fn();
