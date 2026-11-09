@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { enablePush, pushConfigured, type PushStatus } from "@/lib/push";
 import { registerPushDevice } from "@/lib/push.functions";
 
-const failureCopy: Record<Exclude<PushStatus, "registered">, string> = {
+const copy: Record<PushStatus, string> = {
+  registered: "Avisos ativos. Vai receber uma notícia em cada novidade do pedido.",
   "not-configured": "Os avisos ainda não estão disponíveis neste site.",
   unsupported: "Este navegador não aceita avisos no telemóvel.",
   "open-in-new-tab": "Abra esta página no seu navegador (fora da pré-visualização) para ativar os avisos.",
@@ -23,19 +24,19 @@ export function OrderAlerts({ orderToken, path }: { orderToken: string; path: st
   async function activate() {
     setState("busy");
     const result = await enablePush();
-    if (result.status !== "registered" || !result.token) {
-      setState("error");
-      setMessage(failureCopy[result.status]);
+    if (result.status === "registered" && result.token) {
+      try {
+        await registerPushDevice({ data: { token: result.token, orderToken, path } });
+        setState("active");
+        setMessage(copy.registered);
+      } catch {
+        setState("error");
+        setMessage("Não foi possível ligar os avisos a este pedido. Tente novamente.");
+      }
       return;
     }
-    try {
-      await registerPushDevice({ data: { token: result.token, orderToken, path } });
-      setState("active");
-      setMessage("Avisos ativos. Vai receber uma notícia em cada novidade do pedido.");
-    } catch {
-      setState("error");
-      setMessage("Não foi possível ligar os avisos a este pedido. Tente novamente.");
-    }
+    setState("error");
+    setMessage(copy[result.status]);
   }
 
   if (!pushConfigured()) return null;

@@ -47,4 +47,4 @@
 - [ ] Recheck the complete GPS lifecycle with distinct accounts and a real mobile permission flow; identify any step that still requires the owner.
 - [x] Aba Clientes no painel (telemóvel, morada, últimos pedidos, total gasto) — aguarda verificação com a conta de administrador
 - [x] Som de pedidos fica ligado até o admin desligar
-- [ ] Avisos push no telemóvel do cliente (fora do site) quando o pedido muda de estado: ligação Firebase Cloud Messaging pendente de credenciais do dono; tabela isolada de dispositivos, registo pela ligação do pedido e envio ao mudar estado.
+- [ ] Avisos push no telemóvel do cliente (fora do site) quando o pedido muda de estado: código completo e verificado (botão na página do pedido, tabela isolada matturo_push_tokens só para o sistema, envio ao mudar estado do pedido ou da entrega, 6 testes novos, 64 no total, build OK). Falta apenas o dono terminar a ligação Firebase Cloud Messaging (JSON da conta de serviço + chave VAPID + app web); sem credenciais o botão fica escondido e nada é enviado.

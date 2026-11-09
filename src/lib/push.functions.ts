@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { tokenHash } from "./delivery";
 import { orderAccessValid } from "./order-pricing";
+import { orderAlertPath } from "./push";
 
 // A customer registers this device from their own order page. The order link is the
 // only proof they may receive alerts about that order, so it is verified on the server.
@@ -15,7 +16,7 @@ export const registerPushDevice = createServerFn({ method: "POST" })
   .inputValidator((input) => registerSchema.parse(input))
   .handler(async ({ data }) => {
     // Only the order page of this very order may be opened by the notification.
-    if (!/^\/pedido\/[A-Za-z0-9_-]{10,200}$/.test(data.path)) throw new Error("Ligação do pedido inválida.");
+    if (!orderAlertPath(data.path)) throw new Error("Ligação do pedido inválida.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const order = await supabaseAdmin
       .from("matturo_orders")
