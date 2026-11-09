@@ -128,6 +128,8 @@ function OrdersPage() {
                     onPick={(id, value) => setPick({ ...pick, [id]: value })}
                     onSend={sendToCourier}
                     onMove={change}
+                    nearby={nearbyOrders(o, data, board)}
+                    onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
                   />
                 ))}
               </div>
@@ -147,7 +149,18 @@ function OrdersPage() {
   );
 }
 
-function OrderCard({ order, board, courierPick, onPick, onSend, onMove }: {
+export function nearbyOrders(order: { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null }, all: typeof order[], board: { deliveries: { order_id: string | null }[] }) {
+  if (order.service !== "Delivery" || !order.postal_code) return [];
+  const prefix = order.postal_code.replace(/\D/g, "").slice(0, 4);
+  const assigned = new Set(board.deliveries.map((d) => d.order_id));
+  if (assigned.has(order.id)) return [];
+  return all.filter((o) => o.id !== order.id && o.service === "Delivery" && isActive(o.status as OrderStatus) && !assigned.has(o.id)
+    && ((o.postal_code ?? "").replace(/\D/g, "").slice(0, 4) === prefix || (!!order.zone_name && o.zone_name === order.zone_name)));
+}
+
+function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby = [], onSendNearby }: {
+  nearby?: AdminOrder[];
+  onSendNearby?: (ids: string[]) => Promise<void>;
   order: AdminOrder;
   board: Board;
   courierPick: string;
