@@ -1,3 +1,4 @@
+import { orderNumber } from "@/lib/order-number";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { lazy, Suspense } from "react";
@@ -29,7 +30,7 @@ function OrderPage() {
   const current = o.status as OrderStatus;
   return (
     <div className="page-width max-w-2xl py-12">
-      <p className="text-sm text-muted-foreground">Pedido {o.reference} · {o.service}</p>
+      <p className="text-sm text-muted-foreground">Pedido #{orderNumber(o)} · {o.service}</p>
       <h1 className="section-title mt-2">{orderStatusLabels[current]}</h1>
       {current === "cancelado" ? <p className="mt-4 border-l-4 border-destructive bg-secondary p-4">Este pedido foi cancelado pelo restaurante.</p> :
         <ol className="mt-8 grid grid-cols-5 gap-2 text-center text-xs">{steps.map((s, i) => <li key={s} className={`rounded-md p-2 ${i <= steps.indexOf(current) ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>{orderStatusLabels[s]}</li>)}</ol>}

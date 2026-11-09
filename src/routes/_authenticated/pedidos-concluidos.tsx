@@ -1,3 +1,4 @@
+import { orderNumber } from "@/lib/order-number";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -107,7 +108,7 @@ function CompletedOrderRow({ order, expanded, onToggle }: { order: AdminOrder; e
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
         <span className="min-w-0 flex-1">
           <span className="flex min-w-0 items-center gap-2">
-            <b className="shrink-0 text-sm">#{order.reference}</b>
+            <b className="shrink-0 text-sm">#{orderNumber(order)}</b>
             <span className="truncate text-sm font-semibold">{order.customer_name}</span>
           </span>
           <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{formatDate(order.created_at)} · {order.service}</span>

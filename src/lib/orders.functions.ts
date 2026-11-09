@@ -93,7 +93,9 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     const message = result.error?.message ?? "";
     throw new Error(message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : message.includes("100 pontos") ? "Ainda não tem 100 pontos disponíveis para resgatar." : message.includes("Confirme") ? "A confirmação do telemóvel expirou. Confirme novamente em Os meus pontos." : "Não foi possível registar o pedido. Tente novamente.");
   }
-  return { kind: "created" as const, reference: result.data[0].reference, token: data.accessToken };
+  const numbered = await db.from("matturo_orders").select("daily_number,order_day").eq("id", result.data[0].id).single();
+  if (numbered.error) throw new Error("Pedido guardado. Tente novamente para obter a confirmação.");
+  return { kind: "created" as const, reference: result.data[0].reference, daily_number: numbered.data.daily_number, order_day: numbered.data.order_day, token: data.accessToken };
 }
 
 export const placeOrder = createServerFn({ method: "POST" }).inputValidator((input) => orderInput.parse(input)).handler(({ data }) => createOrder(data));
@@ -109,7 +111,7 @@ export const createManualOrder = createServerFn({ method: "POST" }).middleware([
 export const orderByToken = createServerFn({ method: "GET" }).inputValidator((input) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).parse(input)).handler(async ({ data }) => {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-  const result = await db.from("matturo_orders").select("id,reference,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,access_expires_at,access_revoked_at").eq("access_token_hash", await tokenHash(data.token)).maybeSingle();
+  const result = await db.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,access_expires_at,access_revoked_at").eq("access_token_hash", await tokenHash(data.token)).maybeSingle();
   if (result.error || !result.data || !orderAccessValid(result.data.access_expires_at, result.data.access_revoked_at)) return null;
   const items = await db.from("matturo_order_items").select("name,options,qty,line_total_cents").eq("order_id", result.data.id);
   const { id, access_expires_at: _expires, access_revoked_at: _revoked, ...order } = result.data;
@@ -144,7 +146,7 @@ export const claimOrder = createServerFn({ method: "POST" }).middleware([require
 
 export const myOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
-  const result = await context.supabase.from("matturo_orders").select("id,reference,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os seus pedidos.");
   return result.data;
 });
@@ -152,7 +154,7 @@ export const myOrders = createServerFn({ method: "POST" }).middleware([requireSu
 export const adminOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
   await assertAdmin(context.supabase);
-  const result = await context.supabase.from("matturo_orders").select("id,reference,customer_name,customer_phone,service,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os pedidos.");
   return result.data;
 });
@@ -209,7 +211,7 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
 export const adminCustomers = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
   await assertAdmin(context.supabase);
-  const result = await context.supabase.from("matturo_orders").select("reference,customer_name,customer_phone,address,postal_code,service,total_cents,status,created_at").order("created_at", { ascending: false }).limit(5000);
+  const result = await context.supabase.from("matturo_orders").select("reference,order_day,daily_number,customer_name,customer_phone,address,postal_code,service,total_cents,status,created_at").order("created_at", { ascending: false }).limit(5000);
   if (result.error) throw new Error("Não foi possível carregar os clientes.");
   const { groupCustomers } = await import("./customers");
   return groupCustomers(result.data);
