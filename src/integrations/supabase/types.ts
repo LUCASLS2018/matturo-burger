@@ -215,6 +215,45 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_loyalty_redemptions: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          order_id: string
+          points: number
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          order_id: string
+          points?: number
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          order_id?: string
+          points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_loyalty_redemptions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matturo_loyalty_redemptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "matturo_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matturo_menu_categories: {
         Row: {
           active: boolean
