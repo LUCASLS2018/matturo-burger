@@ -46,6 +46,7 @@ function OrdersPage() {
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
+  const [tab, setTab] = useState<OrderStatus>("novo");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);
   const openManual = async () => {
@@ -108,17 +109,20 @@ function OrdersPage() {
         {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-medium text-muted-foreground">{s.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p></div>)}
       </div>
 
-      <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:grid lg:grid-cols-4 lg:gap-3 lg:overflow-visible xl:gap-4">
+      <div role="tablist" aria-label="Estado dos pedidos" className="mt-8 flex gap-2 overflow-x-auto border-b border-border pb-px">
         {columns.map((col) => {
+          const count = data.filter((o) => o.status === col.key).length;
+          const on = tab === col.key;
+          return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
+        })}
+      </div>
+      <div className="mt-4">
+        {columns.filter((col) => col.key === tab).map((col) => {
           const items = data.filter((o) => o.status === col.key);
           return (
-            <section key={col.key} className="w-[86vw] shrink-0 snap-start sm:w-[330px] lg:w-auto lg:min-w-0 lg:shrink">
-              <header className="sticky top-0 z-10 mb-3 flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2">
-                <span className="flex items-center gap-2 text-sm font-semibold"><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}</span>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold tabular-nums">{items.length}</span>
-              </header>
-              <div className="space-y-2">
-                {!items.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos</p>}
+            <section key={col.key} role="tabpanel">
+              <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {!items.length && <p className="col-span-full rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos</p>}
                 {items.map((o) => (
                   <OrderCard
                     key={o.id}
