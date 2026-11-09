@@ -62,6 +62,12 @@ export const createDelivery = createServerFn({ method: "POST" }).middleware([req
 
 export const changeDelivery = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => idSchema.extend({ status: z.enum(["to_restaurant", "collected", "active", "delivered"]) }).parse(input)).handler(async ({ data, context }) => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  if (data.status === "active") {
+    // Privacidade: só uma entrega com GPS em direto por estafeta; os outros clientes não veem a localização.
+    const other = await supabaseAdmin.from("matturo_deliveries").select("id").eq("courier_id", context.userId).eq("status", "active").neq("id", data.id).limit(1);
+    if (other.error) throw new Error("Não foi possível verificar as entregas.");
+    if (other.data.length) throw new Error("Finalize a entrega em curso antes de iniciar a próxima.");
+  }
   const result = await supabaseAdmin.rpc("matturo_set_delivery_state", { actor: context.userId, delivery: data.id, next_state: data.status });
   if (result.error) throw new Error("Não foi possível mudar o estado da entrega. Atualize a página.");
   return true;

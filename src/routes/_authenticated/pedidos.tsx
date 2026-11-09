@@ -128,6 +128,8 @@ function OrdersPage() {
                     onPick={(id, value) => setPick({ ...pick, [id]: value })}
                     onSend={sendToCourier}
                     onMove={change}
+                    nearby={nearbyOrders(o, data, board)}
+                    onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
                   />
                 ))}
               </div>
@@ -147,7 +149,18 @@ function OrdersPage() {
   );
 }
 
-function OrderCard({ order, board, courierPick, onPick, onSend, onMove }: {
+export function nearbyOrders<T extends { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null }>(order: T, all: T[], board: { deliveries: { order_id: string | null }[] }) {
+  if (order.service !== "Delivery" || !order.postal_code) return [];
+  const prefix = order.postal_code.replace(/\D/g, "").slice(0, 4);
+  const assigned = new Set(board.deliveries.map((d) => d.order_id));
+  if (assigned.has(order.id)) return [];
+  return all.filter((o) => o.id !== order.id && o.service === "Delivery" && isActive(o.status as OrderStatus) && !assigned.has(o.id)
+    && ((o.postal_code ?? "").replace(/\D/g, "").slice(0, 4) === prefix || (!!order.zone_name && o.zone_name === order.zone_name)));
+}
+
+function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby = [], onSendNearby }: {
+  nearby?: AdminOrder[];
+  onSendNearby?: (ids: string[]) => Promise<void>;
   order: AdminOrder;
   board: Board;
   courierPick: string;
@@ -207,7 +220,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove }: {
               ? <p className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs"><Bike className="h-3.5 w-3.5 text-primary" />Estafeta: <b>{board.couriers.find((c) => c.id === delivery.courier_id)?.name ?? "—"}</b> · {delivery.status === "active" ? "a caminho" : delivery.status === "delivered" ? "entregue" : "atribuído"}</p>
               : !board.couriers.length
                 ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
-                : <div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div>)}
+                : <>{nearby.length > 0 && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-xs"><p className="font-semibold text-primary">{nearby.length} pedido{nearby.length > 1 ? "s" : ""} perto deste cliente</p><ul className="mt-1 space-y-0.5 text-muted-foreground">{nearby.map((n) => <li key={n.id}>#{n.reference} · {n.customer_name} · {n.address}</li>)}</ul><Button size="sm" className="mt-2 h-8 w-full" onClick={() => void onSendNearby?.(nearby.map((n) => n.id))}><Bike />Enviar todos ao mesmo estafeta</Button></div>}<div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div></>)}
           </div>
           {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
         </div>
