@@ -1,5 +1,7 @@
 # Matturo Burger
 
+- [ ] Daily order numbering from 1, restarting at Lisbon midnight; awaiting approval of isolated numbering fields and atomic counter.
+
 - [x] Show original product photographs grouped by categories in the manual admin order form.
 
 - [ ] Guest loyalty redemption: awaiting approval of telephone-ownership confirmation and isolated transactional debit changes; telephone alone cannot authorize spending another customer's points.
