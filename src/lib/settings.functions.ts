@@ -20,13 +20,6 @@ function publicDb(url: string, key: string) {
   });
 }
 
-function publicEnvironment() {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!url || !key) throw new Error("Não foi possível consultar o atendimento.");
-  return { url, key };
-}
-
 export const publicSettings = createServerFn({ method: "GET" }).handler(async () => {
   setResponseHeader("Cache-Control", "no-store");
   const { url, key } = publicEnvironment();

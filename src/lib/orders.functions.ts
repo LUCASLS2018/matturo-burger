@@ -12,6 +12,7 @@ import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 import { CLOSED_ORDER_MESSAGE, isRestaurantOpen } from "./opening-hours";
+import { distanceKm, findRadiusZone, radiusZoneLabel } from "./delivery-radius";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
 const orderInput = z.object({
