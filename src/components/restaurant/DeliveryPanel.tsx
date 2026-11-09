@@ -11,6 +11,7 @@ import { summarizeCourierDeliveries } from "@/lib/courier-delivery-stats";
 import { money } from "@/lib/restaurant";
 import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { CourierAlerts } from "./CourierAlerts";
 
 const Map = lazy(() => import("./DeliveryMap"));
 type Data = Awaited<ReturnType<typeof deliveryDashboard>>;
@@ -115,6 +116,8 @@ export default function DeliveryPanel({ data }: { data: Data }) {
         {availability === "busy" && <Button size="sm" variant="outline" disabled={busy} onClick={() => run(() => setCourierAvailability({ data: { state: "inactive" } }))}>Inativo após as ativas</Button>}
       </div>
     </div>}
+
+    {data.courier && <CourierAlerts />}
 
     {showProfile && <section className="mt-4 rounded-xl border border-border bg-card p-4"><h2 className="text-sm font-semibold">O meu perfil</h2>
       <div className="mt-3 flex flex-wrap items-center gap-3">{photo && <img src={photo} alt="Foto do estafeta" className="h-14 w-14 rounded-full object-cover" />}<input aria-label="Nome" value={name} onChange={(event) => setName(event.target.value)} maxLength={100} className="h-10 rounded-md border border-input bg-background px-3 text-sm" /><Button size="sm" variant="outline" disabled={busy} onClick={() => run(async () => { const result = await supabase.from("matturo_profiles").update({ name: name.trim() }).eq("id", data.userId); if (result.error) throw result.error; toast.success("Perfil guardado"); })}>Guardar</Button><label className="inline-flex cursor-pointer items-center gap-2 text-sm"><Camera className="h-4 w-4" />Mudar foto<input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; void run(async () => { if (file.size > 2 * 1024 * 1024) throw new Error("A foto deve ter até 2 MB."); const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg"; const path = `${data.userId}/${crypto.randomUUID()}.${extension}`; const uploaded = await supabase.storage.from("matturo-courier-photos").upload(path, file); if (uploaded.error) throw uploaded.error; const updated = await supabase.from("matturo_profiles").update({ photo_path: path }).eq("id", data.userId); if (updated.error) throw updated.error; }); }} /></label></div>

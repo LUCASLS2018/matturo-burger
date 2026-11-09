@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { tokenHash } from "./delivery";
 import { orderAccessValid } from "./order-pricing";
@@ -33,6 +34,20 @@ export const registerPushDevice = createServerFn({ method: "POST" })
         { token: data.token, order_id: order.data.id, path: data.path, updated_at: new Date().toISOString() },
         { onConflict: "token,order_id" },
       );
+    if (saved.error) throw new Error("Não foi possível ativar os avisos.");
+    return { ok: true };
+  });
+
+// A signed-in courier registers this device to be told when a delivery is sent to them.
+export const registerCourierDevice = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ token: z.string().trim().min(20).max(512) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const roles = await context.supabase.from("matturo_user_roles").select("role").eq("user_id", context.userId);
+    if (roles.error || !roles.data.some((r) => r.role === "courier")) throw new Error("Só estafetas podem ativar estes avisos.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const saved = await supabaseAdmin.from("matturo_courier_push_tokens")
+      .upsert({ token: data.token, user_id: context.userId, updated_at: new Date().toISOString() }, { onConflict: "token" });
     if (saved.error) throw new Error("Não foi possível ativar os avisos.");
     return { ok: true };
   });
