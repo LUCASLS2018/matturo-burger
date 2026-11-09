@@ -82,6 +82,7 @@ function Checkout() {
     try {
       const latest = await checkSettings();
       if (latest.paused) { setError("O Matturo está temporariamente sem aceitar pedidos."); return; }
+      if (!latest.isOpen) { setError(CLOSED_ORDER_MESSAGE); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
         name, phone: normalizedPhone, service, source: detectOrderSource(), address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,

@@ -59,7 +59,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const visibleCategories = [...categories.filter((item) => categorySlugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.name })), ...categorySlugs.filter((slug) => !categories.some((item) => item.slug === slug)).map((slug) => ({ slug, name: slug }))];
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (busy || !lines.length) return;
+    if (busy || !lines.length || settings.paused || !settings.isOpen) return;
     setBusy(true); setError("");
     try {
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
