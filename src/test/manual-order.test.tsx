@@ -22,7 +22,7 @@ describe("manual phone order form", () => {
     render(<ManualOrder onClose={close} />);
     fireEvent.change(screen.getByLabelText("Nome do cliente"), { target: { value: "Cliente" } });
     fireEvent.change(screen.getByLabelText("Telemóvel"), { target: { value: "912345678" } });
-    fireEvent.click(screen.getByRole("button", { name: "Delivery", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: /^Delivery$/ }));
     fireEvent.change(screen.getByLabelText("Morada"), { target: { value: "Rua do cliente 10" } });
     fireEvent.change(screen.getByLabelText("Código postal"), { target: { value: "2600-162" } });
     fireEvent.change(screen.getByLabelText("Produto"), { target: { value: "burger" } });
@@ -30,7 +30,7 @@ describe("manual phone order form", () => {
     fireEvent.click(screen.getByRole("radio", { name: /NAO QUERO/ }));
     fireEvent.click(screen.getByRole("button", { name: /Adicionar ·/ }));
     fireEvent.click(screen.getByRole("button", { name: /Adicionar ·/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Criar pedido", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: /^Criar pedido$/ }));
     await waitFor(() => expect(close).toHaveBeenCalledOnce());
     const data = mocks.save.mock.calls[0]?.[0].data;
     expect(data.expectedTotalCents).toBe(1900);
