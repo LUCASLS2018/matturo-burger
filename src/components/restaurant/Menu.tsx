@@ -7,6 +7,7 @@ import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { menuCategoriesQuery, menuQuery } from "@/lib/menu-query";
+import { publicSettingsQuery } from "@/lib/settings-query";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const cutout = dishCutout(dish.slug);

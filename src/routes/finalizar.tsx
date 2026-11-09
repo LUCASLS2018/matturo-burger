@@ -15,6 +15,7 @@ import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { canonicalPhone, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";
 import { detectOrderSource } from "@/lib/order-source";
+import { CLOSED_ORDER_MESSAGE } from "@/lib/opening-hours";
 
 export const Route = createFileRoute("/finalizar")({
   head: () => restaurantHead("Finalizar pedido", "Confirme e envie o seu pedido diretamente ao Matturo Burger."),

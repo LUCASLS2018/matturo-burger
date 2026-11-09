@@ -112,6 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(publicSettingsQuery),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

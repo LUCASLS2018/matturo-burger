@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart";
 import { money, restaurantHead } from "@/lib/restaurant";
 import { menuQuery } from "@/lib/menu-query";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { publicSettingsQuery } from "@/lib/settings-query";
 export const Route = createFileRoute("/produto/$slug")({validateSearch:(s:Record<string,unknown>):{editar?:string | undefined;quantidade?:number | undefined;recompensa?:boolean | undefined}=>({recompensa:s["recompensa"]===true||s["recompensa"]==="1"||s["recompensa"]===1?true:undefined,editar:typeof s["editar"] === "string"?s["editar"]:undefined,quantidade:Number.isInteger(Number(s["quantidade"]))&&Number(s["quantidade"])>0?Number(s["quantidade"]):undefined}),loader:async({params,context})=>{const menu=await context.queryClient.ensureQueryData(menuQuery);const p=menu.find(p=>p.slug===params.slug);if(!p)throw notFound();return p;},head:({loaderData})=>restaurantHead(loaderData?.name??"Prato indisponível",loaderData?.description||"Consulte os pratos Matturo Burger."),component:ProductPage,notFoundComponent:()=> <div className="page-width py-20"><h1 className="section-title">Prato não encontrado</h1><Button asChild className="mt-6"><Link to="/cardapio">Ver cardápio</Link></Button></div>});
 function ProductPage(){const initial=Route.useLoaderData();const {data:menu}=useSuspenseQuery(menuQuery);const p=menu.find(dish=>dish.id===initial.id)??initial;return <DishDetail key={p.id} dish={p}/>;}
 function DishDetail({dish:p}:{dish:Dish}){
