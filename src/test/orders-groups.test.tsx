@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => {
     total_cents: 1200,
     delivery_fee_cents: service === "Delivery" ? 300 : 0,
     notes: null,
+    scheduled_for: null as string | null,
     matturo_order_items: [{ name: "Hambúrguer", qty: 1, line_total_cents: 1200, options: {} }],
   });
   return {
