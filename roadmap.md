@@ -1,6 +1,7 @@
 # Matturo Burger
 
 - [ ] Switch loyalty accumulation and redemption to customer telephone without requiring an account; present isolated data changes and secure redemption for approval first.
+- [ ] Automatically associate every customer's eligible order points to the checkout telephone; no registration or manual enrollment.
 
 - [x] Present and obtain approval for the complete Matturo management architecture: onsite orders, live order administration, autosaved catalogue/categories, courier assignment, customer access and restaurant pause controls.
 - [x] Create isolated restaurant settings and zone resources and administration page with revision-checked persistence; preserve existing catalogue and ordering channel until the order stage.
