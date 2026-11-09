@@ -133,7 +133,14 @@ export const saveDeliveryZone = createServerFn({ method: "POST" }).middleware([r
   .handler(async ({ data, context }) => {
     const role = await context.supabase.rpc("matturo_has_role", { wanted: "admin" });
     if (role.error || !role.data) throw new Error("Acesso reservado ao administrador.");
-    const { id, revision, ...values } = data;
+    const { id, revision } = data;
+    const values: Database["public"]["Tables"]["matturo_delivery_zones"]["Insert"] = {
+      name: data.name,
+      postal_prefixes: data.postal_prefixes,
+      fee_cents: data.fee_cents,
+      active: data.active,
+      max_distance_km: data.max_distance_km ?? null,
+    };
     if (id && !revision) throw new Error("Atualize a zona antes de editar.");
     const result = id && revision
       ? await context.supabase.from("matturo_delivery_zones").update({ ...values, revision: revision + 1 }).eq("id", id).eq("revision", revision).select().maybeSingle()
