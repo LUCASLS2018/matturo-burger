@@ -40,3 +40,4 @@ use the editor.
 - Restaurant settings and delivery zones use isolated Matturo tables, revision-checked admin writes and public allowlisted reads; checkout rechecks pause immediately before submission to prevent stale-page ordering.
 - Matturo menu edits live in isolated matturo_menu_items rows with revision-checked autosave and private admin-only photo uploads; public pages read current rows, while the verified snapshot supplies preserved option groups.
 - Matturo orders are created only by a server function that reprices every line from current menu rows and rechecks pause/zones; customers read their order via an unguessable hashed token, admins via RLS — never trust browser prices.
+- Admin loyalty aggregates persisted orders and redemption snapshots by normalized telephone, including guests; phone-only input must never authorize private balance lookup or redemption.
