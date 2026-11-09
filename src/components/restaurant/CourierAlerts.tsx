@@ -5,6 +5,7 @@ import { enablePush, type PushConfig } from "@/lib/push";
 import { getPushConfig } from "@/lib/push-config.functions";
 import { registerCourierDevice } from "@/lib/push.functions";
 
+const FAILED = "Não foi possível ativar os avisos. Tente novamente.";
 const copy: Record<string, string> = {
   "not-configured": "Os avisos ainda não estão disponíveis.",
   unsupported: "Este navegador não aceita avisos.",
@@ -25,8 +26,8 @@ export function CourierAlerts() {
     const result = await enablePush(config);
     if (result.status === "registered" && result.token) {
       try { await registerCourierDevice({ data: { token: result.token } }); setState("active"); return; }
-      catch (cause) { setError(cause instanceof Error ? cause.message : copy.failed); }
-    } else setError(copy[result.status] ?? copy.failed);
+      catch (cause) { setError(cause instanceof Error ? cause.message : FAILED); }
+    } else setError(copy[result.status] ?? FAILED);
     setState("idle");
   }
 
