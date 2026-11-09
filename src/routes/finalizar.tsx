@@ -43,6 +43,8 @@ function Checkout() {
   const total = subtotal + fee;
   const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
 
+  const [payment, setPayment] = useState<"" | "Multibanco" | "Dinheiro">("");
+  const [cash, setCash] = useState("");
   const [locating, setLocating] = useState(false);
   const lookup = useServerFn(reverseGeocode);
   const useLocation = () => {
@@ -69,13 +71,18 @@ function Checkout() {
       setError(delivery && !zone ? "Indique o seu nome, a morada e um código postal de uma zona de entrega." : "Indique o seu nome, um telemóvel válido e, para delivery, a morada de entrega.");
       return;
     }
+    if (!payment) { setError("Escolha a forma de pagamento."); return; }
+    const cashValue = Number(cash.replace(",", "."));
+    if (payment === "Dinheiro" && (!Number.isFinite(cashValue) || cashValue < (priceChange === null ? total : priceChange / 100))) { setError("Indique com quanto vai pagar (igual ou superior ao total)."); return; }
+    const paymentNote = payment === "Dinheiro" ? `Pagamento: Dinheiro — paga com ${money(cashValue)} (troco ${money(cashValue - (priceChange === null ? total : priceChange / 100))})` : "Pagamento: Multibanco";
+    const fullNotes = [paymentNote, notes.trim()].filter(Boolean).join("\n").slice(0, 500);
     setSending(true); setError("");
     try {
       const latest = await checkSettings();
       if (latest.paused) { setError("O Matturo está temporariamente sem aceitar pedidos."); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
-        name, phone: normalizedPhone, service, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
+        name, phone: normalizedPhone, service, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
         expectedTotalCents: Math.round((priceChange ?? total) * 100), acceptRepriced: priceChange !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, reward: item.reward })),
@@ -105,7 +112,11 @@ function Checkout() {
           <label className="block text-sm font-medium">Morada de entrega<textarea required value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="street-address" maxLength={250} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
           <label className="block text-sm font-medium">Código postal<input required value={postal} onChange={(event) => { setPostal(event.target.value); setPriceChange(null); }} autoComplete="postal-code" inputMode="numeric" placeholder="0000-000" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">{settings.zones.length ? "Entregamos em " + settings.zones.map((item) => `${item.name} (${item.postal_prefixes.join(", ")})`).join(" e ") + "." : "Ainda não há zonas de entrega ativadas."}</span></label>
         </div>}
-        <label className="block text-sm font-medium">Observações (opcional)<textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={500} rows={3} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
+        <fieldset className="space-y-3"><legend className="text-sm font-medium">Forma de pagamento</legend>
+          <div className="flex flex-wrap gap-3">{(["Multibanco", "Dinheiro"] as const).map((item) => <Button key={item} type="button" aria-pressed={payment === item} variant={payment === item ? "default" : "outline"} onClick={() => setPayment(item)}>{item}</Button>)}</div>
+          {payment === "Dinheiro" && <label className="block text-sm font-medium">Com quanto vai pagar? (€)<input required value={cash} onChange={(event) => setCash(event.target.value)} inputMode="decimal" placeholder="Ex.: 20" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>}
+        </fieldset>
+        <label className="block text-sm font-medium">Observações (opcional)<textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={400} rows={3} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
         <ul className="divide-y divide-border border-y border-border">{items.map((item) => <li key={item.key} className="flex justify-between gap-3 py-4 text-sm"><span>{item.qty}× {item.name}</span><span className="shrink-0 font-semibold">{money(item.price * item.qty)}</span></li>)}</ul>
         <div className="space-y-2 text-sm"><div className="flex justify-between"><span>Subtotal dos produtos</span><span className="font-semibold">{money(subtotal)}</span></div>{delivery && <div className="flex justify-between"><span>Entrega{zone ? ` — ${zone.name}` : ""}{zone ? ` (${postal.trim()})` : ""}</span><span className="font-semibold">{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between border-t border-border pt-3 text-lg font-semibold"><span>Total</span><span>{money(priceChange === null ? total : priceChange / 100)}</span></div></div>
         {priceChange !== null && <p role="status" className="border-l-4 border-primary bg-secondary p-4 text-sm">O preço ou os portes mudaram. O total atualizado é <strong>{money(priceChange / 100)}</strong>; confirme esse valor para continuar.</p>}
