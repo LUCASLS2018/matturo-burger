@@ -1,7 +1,9 @@
 import { orderNumber } from "@/lib/order-number";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { BellRing } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ClientOnly } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 const DeliveryMap = lazy(() => import("@/components/restaurant/DeliveryMap"));
@@ -25,11 +27,28 @@ function Missing() {
 function OrderPage() {
   const { token } = Route.useParams();
   const { data: o } = useSuspenseQuery(q(token));
+  const stage = o ? `${o.status}|${o.tracking?.status ?? ""}` : "";
+  const last = useRef(stage);
+  const [notice, setNotice] = useState<string | null>(null);
+  useEffect(() => {
+    if (!o || last.current === stage) return;
+    last.current = stage;
+    const t = o.tracking;
+    const msg = t?.status === "active" ? `${t.courier} está a caminho com o seu pedido!` : t?.status === "delivered" ? "O seu pedido foi entregue. Bom apetite!" : `O seu pedido está agora: ${orderStatusLabels[o.status as OrderStatus]}`;
+    setNotice(msg);
+    try { navigator.vibrate?.(200); } catch { /* sem vibração */ }
+  }, [stage, o]);
   if (!o) return <Missing />;
   const steps = orderStatuses.filter((s) => s !== "cancelado");
   const current = o.status as OrderStatus;
   return (
     <div className="page-width max-w-2xl py-12">
+      <Dialog open={notice !== null} onOpenChange={(open) => { if (!open) setNotice(null); }}>
+        <DialogContent className="max-w-sm text-center">
+          <DialogHeader><DialogTitle className="flex items-center justify-center gap-2"><BellRing className="h-5 w-5 text-primary" />Atualização do pedido #{orderNumber(o)}</DialogTitle><DialogDescription className="text-base text-foreground">{notice}</DialogDescription></DialogHeader>
+          <Button onClick={() => setNotice(null)}>OK</Button>
+        </DialogContent>
+      </Dialog>
       <p className="text-sm text-muted-foreground">Pedido #{orderNumber(o)} · {o.service}</p>
       <h1 className="section-title mt-2">{orderStatusLabels[current]}</h1>
       {current === "cancelado" ? <p className="mt-4 border-l-4 border-destructive bg-secondary p-4">Este pedido foi cancelado pelo restaurante.</p> :
