@@ -30,6 +30,7 @@ const mocks = vi.hoisted(() => {
       order("R1", "Retirada", 40),
     ],
     board: { couriers: [{ id: "c1", name: "Ana" }], deliveries: [] },
+    settings: { isOpen: true, paused: false },
   };
 });
 
