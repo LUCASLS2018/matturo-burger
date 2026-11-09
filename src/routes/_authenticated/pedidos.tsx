@@ -16,6 +16,8 @@ import { ManualOrder, manualMenuQuery } from "@/components/restaurant/ManualOrde
 import { publicSettingsQuery } from "@/lib/settings-query";
 import { printTicket } from "@/lib/print-ticket";
 import { LiveCouriers } from "@/components/restaurant/LiveCouriers";
+import { OrderSourceBadge, OrderSourceFilter } from "@/components/restaurant/OrderSourceFilter";
+import { filterByOrderSource, type OrderSourceFilter as SourceFilter } from "@/lib/order-source";
 
 const ordersQuery = queryOptions({ queryKey: ["matturo-admin-orders"], queryFn: () => adminOrders() });
 const boardQuery = queryOptions({ queryKey: ["matturo-order-couriers"], queryFn: () => orderCourierBoard() });
@@ -52,6 +54,7 @@ function OrdersPage() {
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
   const [tab, setTab] = useState<OrderStatus | "mapa">("novo");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("todos");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);
   const openManual = async () => {
@@ -93,7 +96,8 @@ function OrdersPage() {
     try { await move({ data: { id, from, to } }); await qc.invalidateQueries({ queryKey: ordersQuery.queryKey }); }
     catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível guardar."); }
   };
-  const sorted = oldestFirst(data);
+  const visible = filterByOrderSource(data, sourceFilter);
+  const sorted = oldestFirst(visible);
   const cancelled = sorted.filter((o) => o.status === "cancelado");
 
   return (
@@ -116,9 +120,11 @@ function OrdersPage() {
         {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-medium text-muted-foreground">{s.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p></div>)}
       </div>
 
+      <div className="mt-4"><OrderSourceFilter value={sourceFilter} onChange={setSourceFilter} orders={data} /></div>
+
       <div role="tablist" aria-label="Estado dos pedidos" className="mt-8 flex gap-2 overflow-x-auto border-b border-border pb-px">
         {columns.map((col) => {
-          const count = data.filter((o) => o.status === col.key).length;
+          const count = visible.filter((o) => o.status === col.key).length;
           const on = tab === col.key;
           return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
         })}
@@ -219,6 +225,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
             <span className="flex min-w-0 items-center gap-2">
               <b className="shrink-0 text-sm">#{orderNumber(order)}</b>
               <span className="truncate text-xs font-semibold">{order.customer_name}</span>
+              <OrderSourceBadge source={order.source} />
             </span>
             <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
           </span>

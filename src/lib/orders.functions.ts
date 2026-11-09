@@ -9,6 +9,7 @@ import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./orde
 import { tokenHash } from "./delivery";
 import { REWARD_SLUG } from "./loyalty";
 import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
+import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
@@ -16,6 +17,7 @@ const orderInput = z.object({
   name: z.string().trim().min(1).max(100),
   phone: loyaltyPhoneSchema,
   service: z.enum(orderServices),
+  source: z.enum(orderSources).default("web"),
   address: z.string().trim().max(250).optional(),
   postal: z.string().trim().max(8).optional(),
   notes: z.string().trim().max(500).optional(),
@@ -80,7 +82,7 @@ async function createOrder(data: z.infer<typeof orderInput>) {
   const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
   const result = await db.rpc("matturo_place_loyalty_order", {
     p_order: {
-      reference, customer_name: data.name, customer_phone: data.phone, service: data.service,
+      reference, customer_name: data.name, customer_phone: data.phone, service: data.service, source: data.source,
       address: delivery ? data.address ?? "" : "", postal_code: delivery ? data.postal ?? "" : "", zone_name: zone?.name ?? "",
       delivery_fee_cents: fee, subtotal_cents: subtotal, total_cents: total, notes: data.notes || "",
       access_token_hash: await tokenHash(data.accessToken), idempotency_key: data.submissionId,
@@ -106,7 +108,7 @@ export const createManualOrder = createServerFn({ method: "POST" }).middleware([
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase);
     if (data.items.some((item) => item.reward)) throw new Error("As ofertas devem ser resgatadas pela conta do cliente.");
-    return createOrder(data);
+    return createOrder({ ...data, source: "telefone" satisfies OrderSource });
   });
 
 export const orderByToken = createServerFn({ method: "GET" }).inputValidator((input) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).parse(input)).handler(async ({ data }) => {
@@ -155,7 +157,7 @@ export const myOrders = createServerFn({ method: "POST" }).middleware([requireSu
 export const adminOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
   await assertAdmin(context.supabase);
-  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,source,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os pedidos.");
   return result.data;
 });

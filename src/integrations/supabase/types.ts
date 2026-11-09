@@ -731,6 +731,7 @@ export type Database = {
           reference: string
           request_fingerprint: string | null
           service: string
+          source: string
           status: string
           subtotal_cents: number
           total_cents: number
@@ -756,6 +757,7 @@ export type Database = {
           reference: string
           request_fingerprint?: string | null
           service: string
+          source?: string
           status?: string
           subtotal_cents: number
           total_cents: number
@@ -781,6 +783,7 @@ export type Database = {
           reference?: string
           request_fingerprint?: string | null
           service?: string
+          source?: string
           status?: string
           subtotal_cents?: number
           total_cents?: number
