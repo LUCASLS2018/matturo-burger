@@ -1,0 +1,4 @@
+CREATE TABLE public.matturo_loyalty_accounts(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),wallet_id uuid NOT NULL UNIQUE REFERENCES public.matturo_loyalty_wallets(id),password_hash text NOT NULL,failed_attempts integer NOT NULL DEFAULT 0,locked_until timestamptz,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.matturo_loyalty_accounts TO service_role;
+ALTER TABLE public.matturo_loyalty_accounts ENABLE ROW LEVEL SECURITY;
+CREATE TRIGGER touch_matturo_loyalty_accounts BEFORE UPDATE ON public.matturo_loyalty_accounts FOR EACH ROW EXECUTE FUNCTION public.matturo_touch();
