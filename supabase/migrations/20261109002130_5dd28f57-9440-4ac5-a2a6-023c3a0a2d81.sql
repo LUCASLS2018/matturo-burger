@@ -1,0 +1,1 @@
+CREATE POLICY "Server manages loyalty sessions" ON public.matturo_loyalty_sessions FOR ALL TO service_role USING(true) WITH CHECK(true);
