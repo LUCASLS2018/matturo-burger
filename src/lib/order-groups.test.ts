@@ -17,8 +17,9 @@ describe("groupByService", () => {
   it("keeps delivery and retirada apart", () => {
     const groups = groupByService(oldestFirst(orders));
     expect(groups.map((g) => g.service)).toEqual(["Delivery", "Retirada"]);
-    expect(groups[0].orders.map((o) => o.id)).toEqual(["b", "c"]);
-    expect(groups[1].orders.map((o) => o.id)).toEqual(["a"]);
+    const [delivery, retirada] = groups;
+    expect(delivery?.orders.map((o) => o.id)).toEqual(["b", "c"]);
+    expect(retirada?.orders.map((o) => o.id)).toEqual(["a"]);
   });
 
   it("drops service groups with no orders", () => {
