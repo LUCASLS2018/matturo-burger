@@ -58,7 +58,7 @@ export function RadiusDeliverySettings({ settings, zones, busy, run }: Props) {
         });
       }}>
         <label className="text-sm font-medium">Nome da faixa<input required value={name} onChange={(event) => setName(event.target.value)} placeholder="Ex.: Até 3 km" maxLength={100} className={field} /></label>
-        <label className="text-sm font-medium">Raio máximo (km)<input required value={distance} onChange={(event) => setDistance(event.target.value)} inputMode="decimal" placeholder="3" className={field} /></label>
+        <label className="text-sm font-medium">Raio máximo (km)<input required type="number" min="0.1" max="100" step="0.1" value={distance} onChange={(event) => setDistance(event.target.value)} inputMode="decimal" placeholder="3" className={field} /></label>
         <label className="text-sm font-medium">Entrega (€)<input required value={fee} onChange={(event) => setFee(event.target.value)} inputMode="decimal" placeholder="0,00" className={field} /></label>
         <div className="flex gap-3 md:col-span-3"><Button type="submit" disabled={busy}><Plus />{editing ? "Guardar faixa" : "Adicionar faixa"}</Button>{editing && <Button type="button" variant="ghost" onClick={reset}>Cancelar edição</Button>}</div>
       </form>

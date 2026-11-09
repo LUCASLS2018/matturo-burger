@@ -61,6 +61,7 @@ function Checkout() {
         const result = await lookup({ data: { lat: position.coords.latitude, lng: position.coords.longitude } });
         setAddress(result.address);
         if (result.postal) setPostal(result.postal);
+        setRadiusQuote(null);
         setPriceChange(null);
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Não foi possível obter a morada.");
