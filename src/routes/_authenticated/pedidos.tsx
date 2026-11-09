@@ -138,7 +138,7 @@ function OrdersPage() {
       <div className="mt-4">
         {tab === "mapa" && <LiveCouriers />}
         {columns.filter((col) => col.key === tab).map((col) => {
-          const items = sorted.filter((o) => o.status === col.key);
+          const items = sorted.filter((o) => o.status === col.key && (col.key !== "novo" || !o.scheduled_for));
           const groups = groupByService(items);
           return (
             <section key={col.key} role="tabpanel">
