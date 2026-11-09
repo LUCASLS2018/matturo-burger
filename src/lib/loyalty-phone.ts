@@ -13,3 +13,10 @@ export const loyaltySessionSchema = z.string().regex(/^[a-f0-9]{64}$/);
 export function rewardUnitPrice(unitCents: number, baseCents: number) {
   return Math.max(0, unitCents - baseCents);
 }
+
+export const REWARD_MINIMUM_CENTS = 700;
+export const REWARD_MINIMUM_MESSAGE = "Para resgatar a oferta, precisa de pelo menos 7 € em produtos pagos, sem contar os portes nem o Hamburguinho grátis.";
+
+export function meetsRewardMinimum(hasReward: boolean, paidProductsCents: number) {
+  return !hasReward || paidProductsCents >= REWARD_MINIMUM_CENTS;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canonicalPhone, rewardUnitPrice } from "./loyalty-phone";
+import { canonicalPhone, rewardUnitPrice, meetsRewardMinimum } from "./loyalty-phone";
 
 describe("secure telephone loyalty rules", () => {
   it("unifies the Portuguese number with international format", () => {
@@ -15,5 +15,13 @@ describe("secure telephone loyalty rules", () => {
   it("makes the Hamburguinho base free while keeping extra prices", () => {
     expect(rewardUnitPrice(650, 500)).toBe(150);
     expect(rewardUnitPrice(500, 500)).toBe(0);
+  });
+  it("requires at least 7 euros in paid products for any reward order", () => {
+    expect(meetsRewardMinimum(true, 699)).toBe(false);
+    expect(meetsRewardMinimum(true, 700)).toBe(true);
+    expect(meetsRewardMinimum(true, 701)).toBe(true);
+  });
+  it("does not impose the reward minimum on ordinary orders", () => {
+    expect(meetsRewardMinimum(false, 500)).toBe(true);
   });
 });
