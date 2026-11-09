@@ -47,3 +47,4 @@
 - [ ] Recheck the complete GPS lifecycle with distinct accounts and a real mobile permission flow; identify any step that still requires the owner.
 - [x] Aba Clientes no painel (telemóvel, morada, últimos pedidos, total gasto) — aguarda verificação com a conta de administrador
 - [x] Som de pedidos fica ligado até o admin desligar
+- [ ] Avisos push no telemóvel do cliente (fora do site) quando o pedido muda de estado: ligação Firebase Cloud Messaging pendente de credenciais do dono; tabela isolada de dispositivos, registo pela ligação do pedido e envio ao mudar estado.
