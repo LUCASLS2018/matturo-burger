@@ -182,7 +182,7 @@ export const myOrders = createServerFn({ method: "POST" }).middleware([requireSu
 export const adminOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
   await assertAdmin(context.supabase);
-  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,source,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,source,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,scheduled_for,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os pedidos.");
   return result.data;
 });

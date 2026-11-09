@@ -112,7 +112,7 @@ function Checkout() {
       if (!latest.isOpen && !scheduledIso) { setError(CLOSED_ORDER_MESSAGE); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
-        name, phone: normalizedPhone, service, source: detectOrderSource(), address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
+        name, phone: normalizedPhone, service, source: detectOrderSource(), scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
         expectedTotalCents: Math.round((priceChange ?? total) * 100), acceptRepriced: priceChange !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, reward: item.reward })),
