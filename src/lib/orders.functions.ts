@@ -139,7 +139,7 @@ export const createManualOrder = createServerFn({ method: "POST" }).middleware([
 export const orderByToken = createServerFn({ method: "GET" }).inputValidator((input) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).parse(input)).handler(async ({ data }) => {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-  const result = await db.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,access_expires_at,access_revoked_at").eq("access_token_hash", await tokenHash(data.token)).maybeSingle();
+  const result = await db.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,scheduled_for,access_expires_at,access_revoked_at").eq("access_token_hash", await tokenHash(data.token)).maybeSingle();
   if (result.error || !result.data || !orderAccessValid(result.data.access_expires_at, result.data.access_revoked_at)) return null;
   const items = await db.from("matturo_order_items").select("name,options,qty,line_total_cents").eq("order_id", result.data.id);
   const { id, access_expires_at: _expires, access_revoked_at: _revoked, ...order } = result.data;

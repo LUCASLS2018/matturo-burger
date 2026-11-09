@@ -125,7 +125,7 @@ function OrdersPage() {
 
       <div role="tablist" aria-label="Estado dos pedidos" className="mt-8 flex gap-2 overflow-x-auto border-b border-border pb-px">
         {columns.map((col) => {
-          const count = visible.filter((o) => o.status === col.key).length;
+          const count = visible.filter((o) => o.status === col.key && (col.key !== "novo" || !o.scheduled_for)).length;
           const on = tab === col.key;
           return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
         })}

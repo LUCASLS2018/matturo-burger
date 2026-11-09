@@ -53,7 +53,8 @@ function OrderPage() {
         </DialogContent>
       </Dialog>
       <p className="text-sm text-muted-foreground">Pedido #{orderNumber(o)} · {o.service}</p>
-      <h1 className="section-title mt-2">{orderStatusLabels[current]}</h1>
+      <h1 className="section-title mt-2">{scheduled ? "Agendado" : orderStatusLabels[current]}</h1>
+      {scheduled && o.scheduled_for && <p className="mt-4 border-l-4 border-primary bg-secondary p-4">Pedido agendado para <strong>{formatLisbonDateTime(o.scheduled_for)}</strong> (hora de Portugal). Será analisado e aceite pela equipa durante o horário de abertura.</p>}
       {current === "cancelado" ? <p className="mt-4 border-l-4 border-destructive bg-secondary p-4">Este pedido foi cancelado pelo restaurante.</p> :
         <ol className="mt-8 grid grid-cols-5 gap-2 text-center text-xs">{steps.map((s, i) => <li key={s} className={`rounded-md p-2 ${i <= steps.indexOf(current) ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>{orderStatusLabels[s]}</li>)}</ol>}
       {o.tracking && <section className="mt-8 rounded-lg border border-border bg-card p-4">
