@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Send, ArrowLeft } from "lucide-react";
+import { Send, ArrowLeft, LocateFixed } from "lucide-react";
+import { reverseGeocode } from "@/lib/reverse-geocode.functions";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { claimOrder, placeOrder } from "@/lib/orders.functions";
@@ -41,6 +42,23 @@ function Checkout() {
   const fee = zone ? zone.fee_cents / 100 : 0;
   const total = subtotal + fee;
   const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
+
+  const [locating, setLocating] = useState(false);
+  const lookup = useServerFn(reverseGeocode);
+  const useLocation = () => {
+    if (!navigator.geolocation) { setError("Localização indisponível neste dispositivo."); return; }
+    setLocating(true); setError("");
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const result = await lookup({ data: { lat: position.coords.latitude, lng: position.coords.longitude } });
+        setAddress(result.address);
+        if (result.postal) setPostal(result.postal);
+        setPriceChange(null);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Não foi possível obter a morada.");
+      } finally { setLocating(false); }
+    }, () => { setLocating(false); setError("Não foi possível aceder à localização. Autorize a localização ou escreva a morada."); }, { enableHighAccuracy: true, timeout: 15000 });
+  };
 
   const send = async () => {
     if (sending) return;
@@ -83,6 +101,7 @@ function Checkout() {
         <label className="block text-sm font-medium">Telemóvel<input required type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" maxLength={30} placeholder="912 345 678" className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
         <Button asChild variant="link" className="px-0"><Link to="/pontos">Os meus pontos · Confirmar telemóvel</Link></Button>
         {delivery && <div className="space-y-4">
+          <Button type="button" variant="outline" disabled={locating} onClick={useLocation} className="h-11 w-full sm:w-auto"><LocateFixed />{locating ? "A obter localização…" : "Usar a minha localização atual"}</Button>
           <label className="block text-sm font-medium">Morada de entrega<textarea required value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="street-address" maxLength={250} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
           <label className="block text-sm font-medium">Código postal<input required value={postal} onChange={(event) => { setPostal(event.target.value); setPriceChange(null); }} autoComplete="postal-code" inputMode="numeric" placeholder="0000-000" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">{settings.zones.length ? "Entregamos em " + settings.zones.map((item) => `${item.name} (${item.postal_prefixes.join(", ")})`).join(" e ") + "." : "Ainda não há zonas de entrega ativadas."}</span></label>
         </div>}
