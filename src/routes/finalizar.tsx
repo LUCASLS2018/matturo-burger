@@ -55,7 +55,7 @@ function Checkout() {
         name, phone, service, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
         expectedTotalCents: Math.round((priceChange ?? total) * 100), acceptRepriced: priceChange !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
-        items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected })),
+        items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, reward: item.reward })),
       } });
       if (result.kind === "price_changed") { setPriceChange(result.totalCents); return; }
       const { data: session } = await supabase.auth.getSession();
