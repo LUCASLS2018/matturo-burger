@@ -82,7 +82,7 @@ describe("orders board", () => {
   });
 
   it("keeps scheduled orders in their own tab and disables acceptance while closed", () => {
-    mocks.orders.push({ ...mocks.orders[0], id: "scheduled", reference: "A1", scheduled_for: "2026-11-10T12:00:00Z" });
+    mocks.orders.push({ ...mocks.orders[0], id: "scheduled", reference: "A1", customer_name: "Cliente A1", scheduled_for: "2026-11-10T12:00:00Z" });
     mocks.settings.isOpen = false;
     try {
       render(<OrdersPage />);
