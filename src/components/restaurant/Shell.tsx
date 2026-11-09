@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart";
 import { restaurant } from "@/lib/restaurant";
 import logo from "@/assets/matturo/logo-black.png";
 import {CustomerAccountAccess} from "./CustomerAccountAccess";
+import {OpeningStatus} from "./OpeningStatus";
 
 export function RestaurantHeader() {
   const { count } = useCart();

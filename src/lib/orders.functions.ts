@@ -11,6 +11,7 @@ import { REWARD_SLUG } from "./loyalty";
 import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
+import { CLOSED_ORDER_MESSAGE, isRestaurantOpen } from "./opening-hours";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
 const orderInput = z.object({
