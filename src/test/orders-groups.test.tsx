@@ -79,4 +79,20 @@ describe("orders board", () => {
     const cards = screen.getAllByRole("article");
     expect(cards.map((card) => card.querySelector("b")?.textContent)).toEqual(["#D1", "#D2", "#R1", "#R2"]);
   });
+
+  it("keeps scheduled orders in their own tab and disables acceptance while closed", () => {
+    mocks.orders.push({ ...mocks.orders[0], id: "scheduled", reference: "A1", scheduled_for: "2026-11-10T12:00:00Z" });
+    mocks.settings.isOpen = false;
+    try {
+      render(<OrdersPage />);
+      expect(screen.queryByText("Cliente A1")).toBeNull();
+      fireEvent.click(screen.getByRole("tab", { name: /Agendados/ }));
+      expect(screen.getByText("Cliente A1")).toBeTruthy();
+      fireEvent.click(screen.getByRole("article").querySelector("button") as HTMLButtonElement);
+      expect((screen.getByRole("button", { name: "Aceite" }) as HTMLButtonElement).disabled).toBe(true);
+    } finally {
+      mocks.orders.pop();
+      mocks.settings.isOpen = true;
+    }
+  });
 });
