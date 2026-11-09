@@ -215,6 +215,51 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_loyalty_movements: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          order_id: string
+          points: number
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          order_id: string
+          points: number
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          order_id?: string
+          points?: number
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_loyalty_movements_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matturo_loyalty_movements_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_loyalty_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matturo_loyalty_redemptions: {
         Row: {
           created_at: string
@@ -253,6 +298,68 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      matturo_loyalty_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          revoked_at: string | null
+          token_hash: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          revoked_at?: string | null
+          token_hash: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          token_hash?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_loyalty_sessions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_loyalty_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matturo_loyalty_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       matturo_menu_categories: {
         Row: {
@@ -1238,6 +1345,19 @@ export type Database = {
         Returns: string
       }
       matturo_has_role: { Args: { wanted: string }; Returns: boolean }
+      matturo_loyalty_phone: { Args: { raw_phone: string }; Returns: string }
+      matturo_place_loyalty_order: {
+        Args: {
+          p_items: Json
+          p_order: Json
+          p_reward?: boolean
+          p_session_hash?: string
+        }
+        Returns: {
+          id: string
+          reference: string
+        }[]
+      }
       matturo_place_order: {
         Args: { p_items: Json; p_order: Json }
         Returns: {
