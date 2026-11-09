@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ArrowLeft, Bike, CheckCircle2, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminOrders } from "@/lib/orders.functions";
+import { groupByService, oldestFirst } from "@/lib/order-groups";
+import { ServiceGroupHeading } from "@/components/restaurant/ServiceGroupHeading";
 import { money, restaurantHead } from "@/lib/restaurant";
 
 const completedOrdersQuery = queryOptions({
@@ -36,7 +38,7 @@ const formatDate = (iso: string) => new Date(iso).toLocaleString("pt-PT", {
 function CompletedOrdersPage() {
   const { data } = useSuspenseQuery(completedOrdersQuery);
   const [openId, setOpenId] = useState<string | null>(null);
-  const completed = data.filter((order) => order.status === "concluido");
+  const completed = oldestFirst(data.filter((order) => order.status === "concluido"));
   const totalCents = completed.reduce((sum, order) => sum + order.total_cents, 0);
 
   return (
@@ -66,14 +68,21 @@ function CompletedOrdersPage() {
         {!completed.length ? (
           <p className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">Ainda não há pedidos concluídos.</p>
         ) : (
-          <div className="space-y-2">
-            {completed.map((order) => (
-              <CompletedOrderRow
-                key={order.id}
-                order={order}
-                expanded={openId === order.id}
-                onToggle={() => setOpenId((current) => current === order.id ? null : order.id)}
-              />
+          <div className="space-y-8">
+            {groupByService(completed).map((group) => (
+              <div key={group.service}>
+                <ServiceGroupHeading service={group.service} count={group.orders.length} />
+                <div className="space-y-2">
+                  {group.orders.map((order) => (
+                    <CompletedOrderRow
+                      key={order.id}
+                      order={order}
+                      expanded={openId === order.id}
+                      onToggle={() => setOpenId((current) => current === order.id ? null : order.id)}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
