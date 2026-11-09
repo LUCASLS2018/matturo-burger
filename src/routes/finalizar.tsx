@@ -127,7 +127,7 @@ function Checkout() {
         <p className="text-sm leading-relaxed text-muted-foreground">O pedido chega diretamente ao Matturo. Pagamento no levantamento, na entrega ou à mesa. Vai poder acompanhar o estado numa página privada.</p>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {!rewardMinimumMet && <p role="status" className="text-sm text-destructive">{REWARD_MINIMUM_MESSAGE}</p>}
-        <Button type="submit" disabled={settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
+        <Button type="submit" disabled={!settings.isOpen || settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{!settings.isOpen ? "FECHADO" : sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
       </form>
     </>}
   </div>;
