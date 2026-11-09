@@ -236,6 +236,7 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
     if (order.error) throw new Error("Pedido não encontrado.");
     if (order.data.service !== "Delivery" || !order.data.address) throw new Error("Só pedidos de delivery têm estafeta.");
     if (["concluido", "cancelado"].includes(order.data.status)) throw new Error("Pedido já fechado.");
+    if (order.data.status === "novo" && order.data.scheduled_for) throw new Error("O pedido agendado ainda não foi aceite pela equipa.");
     const { geocodePt } = await import("./geocode.server");
     const point = await geocodePt(order.data.address, order.data.postal_code ?? "");
     if (!point) throw new Error("Não consegui localizar este código postal. Confirme o código postal do cliente.");
