@@ -797,6 +797,41 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          path: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          path: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          path?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_push_tokens_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "matturo_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matturo_restaurant_settings: {
         Row: {
           created_at: string
