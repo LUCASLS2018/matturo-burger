@@ -8,14 +8,16 @@ import { authorizeCourier, changeDelivery, deliveryDashboard, issueTrackingLink,
 import { paymentFromNotes, paymentMethods } from "@/lib/payment-note";
 import { deliveryLabels, nextDeliveryState } from "@/lib/delivery";
 import { summarizeCourierDeliveries } from "@/lib/courier-delivery-stats";
+import { summarizeDailyResults } from "@/lib/delivery-daily-results";
 import { money } from "@/lib/restaurant";
-import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown } from "lucide-react";
+import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { CourierAlerts } from "./CourierAlerts";
 
 const Map = lazy(() => import("./DeliveryMap"));
 type Data = Awaited<ReturnType<typeof deliveryDashboard>>;
 const openStates = ["confirmed", "to_restaurant", "collected", "active"];
+const formatLisbonDay = (day: string) => new Intl.DateTimeFormat("pt-PT", { timeZone: "Europe/Lisbon", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${day}T12:00:00Z`));
 
 export default function DeliveryPanel({ data }: { data: Data }) {
   const query = useQueryClient();
@@ -74,13 +76,14 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const ownOpen = data.deliveries.filter((delivery) => delivery.courier_id === data.userId && openStates.includes(delivery.status)).length;
   const availability = ownOpen ? "busy" : ownAvailability?.state ?? "available";
 
-  const [tab, setTab] = useState<"open" | "done" | "couriers">("open");
+  const [tab, setTab] = useState<"open" | "done" | "couriers" | "days">("open");
   const [openId, setOpenId] = useState<string | null>(null);
   const [showProfile, setShowProfile] = useState(false);
   const active = data.deliveries.filter((d) => !["delivered", "cancelled"].includes(d.status));
   const done = data.deliveries.filter((d) => ["delivered", "cancelled"].includes(d.status));
   const list = tab === "done" ? done : active;
   const courierStats = summarizeCourierDeliveries(data.courierIds, data.profiles, data.deliveryTotals);
+  const dailyResults = summarizeDailyResults(data.dailyResults, data.profiles);
   const today = new Date().toDateString();
   const doneToday = done.filter((d) => d.status === "delivered" && data.events.some((e) => e.delivery_id === d.id && e.status === "delivered" && new Date(e.created_at).toDateString() === today)).length;
   const onRoad = active.filter((d) => d.status === "active").length;
@@ -129,7 +132,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     {link && <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3"><LinkIcon className="h-4 w-4 text-primary" /><span className="text-xs text-muted-foreground">Link do cliente (24 h):</span><a href={link} className="min-w-0 flex-1 truncate text-sm text-primary">{link}</a><Button size="sm" onClick={copy}><Copy />Copiar</Button></div>}
 
     <div className="mt-6 flex gap-2 overflow-x-auto border-b border-border">
-      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length], ...(data.admin ? [["couriers", "Estafetas", courierStats.length] as const] : [])] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
+      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length], ...(data.admin ? [["couriers", "Estafetas", courierStats.length], ["days", "Por dia", dailyResults.length]] : [])] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
     </div>
 
     {tab === "couriers" && <section aria-label="Entregas por estafeta" className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -150,8 +153,27 @@ export default function DeliveryPanel({ data }: { data: Data }) {
       {!courierStats.length && <p className="col-span-full rounded-xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">Ainda não há estafetas autorizados.</p>}
     </section>}
 
-    {tab !== "couriers" && !list.length && <p className="py-12 text-center text-sm text-muted-foreground">{tab === "open" ? "Sem entregas ativas." : "Sem entregas concluídas."}</p>}
-    {tab !== "couriers" && <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">{list.map((delivery) => {
+    {tab === "days" && <section aria-label="Resultado das entregas por dia" className="mt-4 space-y-3">
+      {dailyResults.map((day) => <article key={day.day} className="rounded-xl border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><CalendarDays className="h-5 w-5" /></span>
+            <div><h2 className="font-semibold capitalize">{formatLisbonDay(day.day)}</h2><p className="mt-0.5 text-xs text-muted-foreground">{day.deliveries} entrega{day.deliveries === 1 ? "" : "s"} · {day.couriers.length} estafeta{day.couriers.length === 1 ? "" : "s"}</p></div>
+          </div>
+          <span className="text-lg font-bold tabular-nums">{money(day.valueCents / 100)}</span>
+        </div>
+        <ul className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
+          {day.couriers.map((courier) => <li key={courier.id} className="flex items-center justify-between gap-3">
+            <span className="truncate">{courier.name}</span>
+            <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{courier.deliveries} entrega{courier.deliveries === 1 ? "" : "s"} · {money(courier.valueCents / 100)}</span>
+          </li>)}
+        </ul>
+      </article>)}
+      {!dailyResults.length && <p className="rounded-xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">Ainda não há entregas concluídas para mostrar.</p>}
+    </section>}
+
+    {tab !== "couriers" && tab !== "days" && !list.length && <p className="py-12 text-center text-sm text-muted-foreground">{tab === "open" ? "Sem entregas ativas." : "Sem entregas concluídas."}</p>}
+    {tab !== "couriers" && tab !== "days" && <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">{list.map((delivery) => {
       const position = delivery.status === "active" ? data.positions.find((item) => item.delivery_id === delivery.id) ?? null : null;
       const order = data.orders.find((item) => item.id === delivery.order_id);
       const next = nextDeliveryState[delivery.status];

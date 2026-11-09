@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { adminOrders } from "@/lib/orders.functions";
 import { groupByService, oldestFirst } from "@/lib/order-groups";
 import { ServiceGroupHeading } from "@/components/restaurant/ServiceGroupHeading";
+import { OrderSourceBadge, OrderSourceFilter } from "@/components/restaurant/OrderSourceFilter";
+import { filterByOrderSource, type OrderSourceFilter as SourceFilter } from "@/lib/order-source";
 import { money, restaurantHead } from "@/lib/restaurant";
 
 const completedOrdersQuery = queryOptions({
@@ -39,7 +41,8 @@ const formatDate = (iso: string) => new Date(iso).toLocaleString("pt-PT", {
 function CompletedOrdersPage() {
   const { data } = useSuspenseQuery(completedOrdersQuery);
   const [openId, setOpenId] = useState<string | null>(null);
-  const completed = oldestFirst(data.filter((order) => order.status === "concluido"));
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("todos");
+  const completed = oldestFirst(filterByOrderSource(data.filter((order) => order.status === "concluido"), sourceFilter));
   const totalCents = completed.reduce((sum, order) => sum + order.total_cents, 0);
 
   return (
@@ -53,6 +56,8 @@ function CompletedOrdersPage() {
         </div>
         <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground"><CheckCircle2 className="h-4 w-4" />Arquivo de concluídos</span>
       </div>
+
+      <div className="mt-6"><OrderSourceFilter value={sourceFilter} onChange={setSourceFilter} orders={data.filter((order) => order.status === "concluido")} /></div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:max-w-xl">
         <div className="rounded-xl border border-border bg-card p-4">
@@ -110,6 +115,7 @@ function CompletedOrderRow({ order, expanded, onToggle }: { order: AdminOrder; e
           <span className="flex min-w-0 items-center gap-2">
             <b className="shrink-0 text-sm">#{orderNumber(order)}</b>
             <span className="truncate text-sm font-semibold">{order.customer_name}</span>
+            <OrderSourceBadge source={order.source} />
           </span>
           <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{formatDate(order.created_at)} · {order.service}</span>
         </span>
