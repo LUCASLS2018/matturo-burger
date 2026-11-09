@@ -4,7 +4,8 @@ import { ClientOnly, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { authorizeCourier, changeDelivery, deliveryDashboard, issueTrackingLink, recordPosition, setCourierAvailability } from "@/lib/delivery.functions";
+import { authorizeCourier, changeDelivery, deliveryDashboard, issueTrackingLink, recordPosition, setCourierAvailability, setDeliveryPayment } from "@/lib/delivery.functions";
+import { paymentFromNotes, paymentMethods } from "@/lib/payment-note";
 import { deliveryLabels, nextDeliveryState } from "@/lib/delivery";
 import { summarizeCourierDeliveries } from "@/lib/courier-delivery-stats";
 import { money } from "@/lib/restaurant";
@@ -170,7 +171,8 @@ export default function DeliveryPanel({ data }: { data: Data }) {
             <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-semibold">{order.customer_name}</p><a className="inline-flex items-center gap-1 text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3.5 w-3.5" />{order.customer_phone}</a></div>
             <p className="mt-1 text-xs text-muted-foreground">{order.address} · {order.postal_code}</p>
             <ul className="mt-3 space-y-2 border-t border-border pt-3">{order.matturo_order_items.flatMap((item) => Array.from({ length: Math.max(1, item.qty) }, () => item)).map((item, index) => <li key={index}><div className="flex justify-between gap-3"><span>1× {item.name}</span><span>{money(item.line_total_cents / Math.max(1, item.qty) / 100)}</span></div>{Object.entries(item.options as Record<string, string>).map(([key, value]) => <p key={key} className="text-xs text-muted-foreground">{key}: {value}</p>)}</li>)}</ul>
-            {order.notes && <p className="mt-3 italic">“{order.notes}”</p>}
+            {order.notes && <p className="mt-3 whitespace-pre-line italic">“{order.notes}”</p>}
+            {(mine || data.admin) && <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3"><span className="text-xs font-medium">Cliente pagou com:</span>{paymentMethods.map((method) => <Button key={method} size="sm" variant={paymentFromNotes(order.notes) === method ? "default" : "outline"} disabled={busy || paymentFromNotes(order.notes) === method} onClick={() => run(async () => { await setDeliveryPayment({ data: { id: delivery.id, method } }); toast.success(`Pagamento alterado para ${method}`); })}>{method}</Button>)}</div>}
           </div>}
           {delivery.status === "active" && <div><ClientOnly><Suspense fallback={<div className="h-72 rounded-lg bg-muted" />}><Map lat={delivery.destination_lat} lng={delivery.destination_lng} position={position} /></Suspense></ClientOnly><p className="mt-2 text-xs text-muted-foreground">{position ? `Última atualização: ${new Date(position.recorded_at).toLocaleTimeString("pt-PT")}` : "A aguardar GPS"}</p></div>}
           <div className="flex flex-wrap gap-2">

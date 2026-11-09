@@ -88,6 +88,20 @@ export const changeDelivery = createServerFn({ method: "POST" }).middleware([req
   return true;
 });
 
+export const setDeliveryPayment = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => idSchema.extend({ method: z.enum(["Multibanco", "Dinheiro"]) }).parse(input)).handler(async ({ data, context }) => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const delivery = await supabaseAdmin.from("matturo_deliveries").select("order_id,courier_id").eq("id", data.id).single();
+  if (delivery.error || !delivery.data.order_id) throw new Error("Entrega sem pedido associado.");
+  const admin = await context.supabase.rpc("matturo_has_role", { wanted: "admin" });
+  if (delivery.data.courier_id !== context.userId && !admin.data) throw new Error("Sem acesso a esta entrega.");
+  const order = await supabaseAdmin.from("matturo_orders").select("notes").eq("id", delivery.data.order_id).single();
+  if (order.error) throw new Error("Não foi possível carregar o pedido.");
+  const { replacePaymentNote } = await import("./payment-note");
+  const saved = await supabaseAdmin.from("matturo_orders").update({ notes: replacePaymentNote(order.data.notes, data.method, admin.data ? "restaurante" : "estafeta") }).eq("id", delivery.data.order_id);
+  if (saved.error) throw new Error("Não foi possível guardar a forma de pagamento.");
+  return true;
+});
+
 export const recordPosition = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => idSchema.extend({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180), accuracy: z.number().nonnegative().finite() }).parse(input)).handler(async ({ data, context }) => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const result = await supabaseAdmin.rpc("matturo_record_position", { actor: context.userId, delivery: data.id, lat: data.lat, lng: data.lng, precision_m: data.accuracy });
