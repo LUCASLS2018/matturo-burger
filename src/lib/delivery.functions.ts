@@ -29,7 +29,7 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
     db.from("matturo_courier_availability").select("*"),
     orderIds.length ? db.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,address,postal_code,notes,service,status,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
     // A separate full-history count keeps courier totals correct while the detailed list stays limited to 100 rows.
-    db.from("matturo_deliveries").select("courier_id,status"),
+    db.from("matturo_deliveries").select("courier_id,status,completed_at"),
   ]);
   if (positions.error || events.error || availability.error || orders.error || deliveryTotals.error) throw new Error("Não foi possível carregar as entregas.");
   return {
