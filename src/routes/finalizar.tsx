@@ -12,6 +12,7 @@ import { publicSettingsQuery } from "@/lib/settings-query";
 import { publicSettings } from "@/lib/settings.functions";
 import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
+import { canonicalPhone } from "@/lib/loyalty-phone";
 
 export const Route = createFileRoute("/finalizar")({
   head: () => restaurantHead("Finalizar pedido", "Confirme e envie o seu pedido diretamente ao Matturo Burger."),
@@ -42,7 +43,9 @@ function Checkout() {
 
   const send = async () => {
     if (sending) return;
-    if (!name.trim() || !/^\+?[\d\s]{9,16}$/.test(phone.trim()) || (delivery && (!address.trim() || !zone))) {
+    let normalizedPhone: string;
+    try { normalizedPhone = canonicalPhone(phone); } catch { setError("Indique um telemóvel válido."); return; }
+    if (!name.trim() || (delivery && (!address.trim() || !zone))) {
       setError(delivery && !zone ? "Indique o seu nome, a morada e um código postal de uma zona de entrega." : "Indique o seu nome, um telemóvel válido e, para delivery, a morada de entrega.");
       return;
     }
@@ -52,7 +55,7 @@ function Checkout() {
       if (latest.paused) { setError("O Matturo está temporariamente sem aceitar pedidos."); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
-        name, phone, service, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
+        name, phone: normalizedPhone, service, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
         expectedTotalCents: Math.round((priceChange ?? total) * 100), acceptRepriced: priceChange !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, reward: item.reward })),
@@ -75,7 +78,8 @@ function Checkout() {
       <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); }}>{item}</Button>)}</div>
       <form onSubmit={(event) => { event.preventDefault(); void send(); }} className="mt-8 space-y-6">
         <label className="block text-sm font-medium">O seu nome<input required value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" maxLength={100} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
-        <label className="block text-sm font-medium">Telemóvel<input required type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" maxLength={16} placeholder="912 345 678" className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
+        <label className="block text-sm font-medium">Telemóvel<input required type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" maxLength={30} placeholder="912 345 678" className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
+        <Button asChild variant="link" className="px-0"><Link to="/pontos">Os meus pontos · Confirmar telemóvel</Link></Button>
         {delivery && <div className="space-y-4">
           <label className="block text-sm font-medium">Morada de entrega<textarea required value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="street-address" maxLength={250} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
           <label className="block text-sm font-medium">Código postal<input required value={postal} onChange={(event) => { setPostal(event.target.value); setPriceChange(null); }} autoComplete="postal-code" inputMode="numeric" placeholder="0000-000" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">{settings.zones.length ? "Entregamos em " + settings.zones.map((item) => `${item.name} (${item.postal_prefixes.join(", ")})`).join(" e ") + "." : "Ainda não há zonas de entrega ativadas."}</span></label>

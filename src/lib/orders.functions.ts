@@ -1,29 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader, getRequestIP, setResponseHeader } from "@tanstack/react-start/server";
+import { getRequestIP, setResponseHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { orderServices, needsDeliveryAddress } from "./order-service";
 import { findZone } from "./restaurant-settings";
 import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./order-pricing";
 import { tokenHash } from "./delivery";
-import { groupPhoneLoyalty, loyaltyBalance, REWARD_POINTS, REWARD_SLUG } from "./loyalty";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function customerBalance(db: SupabaseClient<any>, customerId: string) {
-  const [orders, redemptions] = await Promise.all([
-    db.from("matturo_orders").select("subtotal_cents,status").eq("customer_id", customerId),
-    db.from("matturo_loyalty_redemptions").select("points,matturo_orders(status)").eq("customer_id", customerId),
-  ]);
-  if (orders.error || redemptions.error) throw new Error("Não foi possível consultar os pontos.");
-  return loyaltyBalance(orders.data, (redemptions.data as unknown as { points: number; matturo_orders: { status: string } | null }[]).map((r) => ({ points: r.points, order_status: r.matturo_orders?.status ?? "novo" })));
-}
+import { REWARD_SLUG } from "./loyalty";
+import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice } from "./loyalty-phone";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
 const orderInput = z.object({
   name: z.string().trim().min(1).max(100),
-  phone: z.string().trim().regex(/^\+?[\d\s]{9,16}$/),
+  phone: loyaltyPhoneSchema,
   service: z.enum(orderServices),
   address: z.string().trim().max(250).optional(),
   postal: z.string().trim().max(8).optional(),
@@ -62,19 +52,19 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
   )));
   const lines = data.items.map((line) => priceLine(line, currentMenu));
   const rewardIndex = data.items.findIndex((line) => line.reward);
-  let rewardCustomer: string | null = null;
+  let rewardSessionHash: string | null = null;
   if (rewardIndex >= 0) {
     if (data.items.filter((line) => line.reward).length > 1) throw new Error("Só pode resgatar um Hamburguinho por pedido.");
-    const dish = currentMenu.find((item) => item.id === data.items[rewardIndex]!.productId);
-    if (!dish || dish.slug !== REWARD_SLUG || data.items[rewardIndex]!.qty !== 1) throw new Error("Recompensa inválida.");
-    const token = (getRequestHeader("authorization") ?? "").replace(/^Bearer /, "");
-    const user = token ? await db.auth.getUser(token) : null;
-    if (!user?.data.user) throw new Error("Inicie sessão na sua conta para resgatar o Hamburguinho.");
-    rewardCustomer = user.data.user.id;
-    const balance = await customerBalance(db, rewardCustomer);
-    if (balance.available < REWARD_POINTS) throw new Error("Ainda não tem 100 pontos para resgatar.");
-    const line = lines[rewardIndex]!;
-    const unit = Math.max(0, line.unit_price_cents - Math.round(dish.price * 100));
+    const inputLine = data.items[rewardIndex];
+    const line = lines[rewardIndex];
+    const dish = currentMenu.find((item) => item.id === inputLine?.productId);
+    if (!line || !dish || dish.slug !== REWARD_SLUG || inputLine?.qty !== 1) throw new Error("Recompensa inválida.");
+    const { verifiedLoyalty } = await import("./loyalty-session.server");
+    const session = await verifiedLoyalty();
+    if (!session || session.phone !== data.phone) throw new Error("Confirme o telemóvel deste pedido em Os meus pontos para resgatar.");
+    rewardSessionHash = session.hash;
+    // The transaction below checks balance under a lock, including idempotent retries.
+    const unit = rewardUnitPrice(line.unit_price_cents, Math.round(dish.price * 100));
     lines[rewardIndex] = { ...line, name: `${line.name} (GRÁTIS · fidelização)`, unit_price_cents: unit, line_total_cents: unit };
   }
   const delivery = needsDeliveryAddress(data.service);
@@ -86,7 +76,7 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
   if (total !== data.expectedTotalCents && !data.acceptRepriced) return { kind: "price_changed" as const, totalCents: total };
   const reference = "M" + Date.now().toString(36).toUpperCase().slice(-6) + crypto.randomUUID().slice(0, 2).toUpperCase();
   const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
-  const result = await db.rpc("matturo_place_order", {
+  const result = await db.rpc("matturo_place_loyalty_order", {
     p_order: {
       reference, customer_name: data.name, customer_phone: data.phone, service: data.service,
       address: delivery ? data.address ?? "" : "", postal_code: delivery ? data.postal ?? "" : "", zone_name: zone?.name ?? "",
@@ -95,15 +85,12 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
       request_fingerprint: await tokenHash(ip), access_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
     },
     p_items: lines,
+    p_session_hash: rewardSessionHash ?? undefined,
+    p_reward: rewardIndex >= 0,
   });
   if (result.error || !result.data?.[0]) {
-    console.error(result.error);
-    throw new Error(result.error?.message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : "Não foi possível registar o pedido. Tente novamente.");
-  }
-  if (rewardCustomer) {
-    await db.from("matturo_orders").update({ customer_id: rewardCustomer }).eq("id", result.data[0].id).is("customer_id", null);
-    const saved = await db.from("matturo_loyalty_redemptions").insert({ customer_id: rewardCustomer, order_id: result.data[0].id, points: REWARD_POINTS });
-    if (saved.error && saved.error.code !== "23505") console.error(saved.error);
+    const message = result.error?.message ?? "";
+    throw new Error(message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : message.includes("100 pontos") ? "Ainda não tem 100 pontos disponíveis para resgatar." : message.includes("Confirme") ? "A confirmação do telemóvel expirou. Confirme novamente em Os meus pontos." : "Não foi possível registar o pedido. Tente novamente.");
   }
   return { kind: "created" as const, reference: result.data[0].reference, token: data.accessToken };
 });
@@ -219,8 +206,10 @@ export const adminCustomers = createServerFn({ method: "POST" }).middleware([req
 
 export const myLoyalty = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
-  const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-  return customerBalance(db, context.userId);
+  // An optional customer account is not evidence of telephone ownership.
+  const { verifiedLoyalty } = await import("./loyalty-session.server");
+  const session = await verifiedLoyalty();
+  return { available: session?.available ?? 0, verified: Boolean(session) };
 });
 
 export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
@@ -228,21 +217,36 @@ export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requi
   await assertAdmin(context.supabase);
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   // Read every page: PostgREST caps each response even when a larger limit is requested.
-  const orders: { customer_name: string; customer_phone: string; subtotal_cents: number; status: string }[] = [];
-  const redemptions: { phone: string; points: number; order_status: string; at: string; reference: string }[] = [];
+  const orders: { customer_name: string; customer_phone: string }[] = [];
+  const wallets: { id: string; phone: string; balance: number }[] = [];
+  const movements: { wallet_id: string; points: number; kind: string; created_at: string; matturo_orders: { reference: string; status: string } | null }[] = [];
   for (let offset = 0; ; offset += 500) {
-    const page = await db.from("matturo_orders").select("customer_name,customer_phone,subtotal_cents,status").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+    const page = await db.from("matturo_orders").select("customer_name,customer_phone").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
     if (page.error) throw new Error("Não foi possível carregar a fidelização.");
     orders.push(...page.data);
     if (page.data.length < 500) break;
   }
   for (let offset = 0; ; offset += 500) {
-    const page = await db.from("matturo_loyalty_redemptions").select("points,created_at,matturo_orders(customer_phone,status,reference)").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+    const page = await db.from("matturo_loyalty_wallets").select("id,phone,balance").order("id").range(offset, offset + 499);
     if (page.error) throw new Error("Não foi possível carregar a fidelização.");
-    for (const row of page.data) {
-      if (row.matturo_orders) redemptions.push({ phone: row.matturo_orders.customer_phone, points: row.points, order_status: row.matturo_orders.status, at: row.created_at, reference: row.matturo_orders.reference });
-    }
+    wallets.push(...page.data);
     if (page.data.length < 500) break;
   }
-  return groupPhoneLoyalty(orders, redemptions);
+  for (let offset = 0; ; offset += 500) {
+    const page = await db.from("matturo_loyalty_movements").select("wallet_id,points,kind,created_at,matturo_orders(reference,status)").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+    if (page.error) throw new Error("Não foi possível carregar a fidelização.");
+    movements.push(...page.data);
+    if (page.data.length < 500) break;
+  }
+  const names = new Map<string, string>();
+  for (const order of orders) {
+    try { const phone = canonicalPhone(order.customer_phone); if (!names.has(phone)) names.set(phone, order.customer_name); } catch { /* Invalid historical numbers remain isolated. */ }
+  }
+  return wallets.map((wallet) => {
+    const own = movements.filter((movement) => movement.wallet_id === wallet.id);
+    const earned = own.filter((movement) => movement.kind === "earn").reduce((sum, movement) => sum + movement.points, 0);
+    const spent = -own.filter((movement) => movement.kind !== "earn").reduce((sum, movement) => sum + movement.points, 0);
+    return { id: wallet.id, name: names.get(wallet.phone) ?? "Cliente", phone: wallet.phone, available: wallet.balance, earned, spent,
+      redemptions: own.filter((movement) => movement.kind === "redeem").map((movement) => ({ at: movement.created_at, reference: movement.matturo_orders?.reference ?? "", cancelled: movement.matturo_orders?.status === "cancelado" })) };
+  }).sort((a, b) => b.available - a.available);
 });

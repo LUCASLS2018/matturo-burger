@@ -19,6 +19,7 @@ import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as FinalizarRouteImport } from './routes/finalizar'
+import { Route as PontosRouteImport } from './routes/pontos'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedCategoriasRouteImport } from './routes/_authenticated/categorias'
@@ -85,6 +86,11 @@ const ContactosRoute = ContactosRouteImport.update({
 const FinalizarRoute = FinalizarRouteImport.update({
   id: '/finalizar',
   path: '/finalizar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PontosRoute = PontosRouteImport.update({
+  id: '/pontos',
+  path: '/pontos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProdutosRoute = ProdutosRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof ContaRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
+  '/pontos': typeof PontosRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
   '/categorias': typeof AuthenticatedCategoriasRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/conta': typeof ContaRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
+  '/pontos': typeof PontosRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
   '/categorias': typeof AuthenticatedCategoriasRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/conta': typeof ContaRoute
   '/contactos': typeof ContactosRoute
   '/finalizar': typeof FinalizarRoute
+  '/pontos': typeof PontosRoute
   '/produtos': typeof ProdutosRoute
   '/sobre': typeof SobreRoute
   '/_authenticated/categorias': typeof AuthenticatedCategoriasRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/contactos'
     | '/finalizar'
+    | '/pontos'
     | '/produtos'
     | '/sobre'
     | '/categorias'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/contactos'
     | '/finalizar'
+    | '/pontos'
     | '/produtos'
     | '/sobre'
     | '/categorias'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/contactos'
     | '/finalizar'
+    | '/pontos'
     | '/produtos'
     | '/sobre'
     | '/_authenticated/categorias'
@@ -372,6 +384,7 @@ export interface RootRouteChildren {
   ContaRoute: typeof ContaRoute
   ContactosRoute: typeof ContactosRoute
   FinalizarRoute: typeof FinalizarRoute
+  PontosRoute: typeof PontosRoute
   ProdutosRoute: typeof ProdutosRoute
   SobreRoute: typeof SobreRoute
   AcompanharTokenRoute: typeof AcompanharTokenRoute
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       path: '/finalizar'
       fullPath: '/finalizar'
       preLoaderRoute: typeof FinalizarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pontos': {
+      id: '/pontos'
+      path: '/pontos'
+      fullPath: '/pontos'
+      preLoaderRoute: typeof PontosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produtos': {
@@ -623,6 +643,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContaRoute: ContaRoute,
   ContactosRoute: ContactosRoute,
   FinalizarRoute: FinalizarRoute,
+  PontosRoute: PontosRoute,
   ProdutosRoute: ProdutosRoute,
   SobreRoute: SobreRoute,
   AcompanharTokenRoute: AcompanharTokenRoute,

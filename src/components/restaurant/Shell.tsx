@@ -19,6 +19,7 @@ export function RestaurantHeader() {
         <Link to="/sobre" activeProps={{ className: "text-primary" }}>O Matturo</Link>
         <Link to="/atendimento" activeProps={{ className: "text-primary" }}>Atendimento</Link>
         <Link to="/contactos" activeProps={{ className: "text-primary" }}>Contactos</Link>
+        <Link to="/pontos" activeProps={{ className: "text-primary" }}>Os meus pontos</Link>
       </nav>
       <div className="flex items-center gap-3">
         <CustomerAccountAccess/>
@@ -27,7 +28,7 @@ export function RestaurantHeader() {
         <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Fechar menu" : "Abrir menu"} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
       </div>
     </div>
-    {open && <nav aria-label="Menu móvel" className="flex flex-col gap-5 border-t border-border px-6 py-6 lg:hidden" onClick={() => setOpen(false)}><Link to="/">Início</Link><Link to="/cardapio">Cardápio</Link><Link to="/sobre">O Matturo</Link><Link to="/atendimento">Atendimento</Link><Link to="/contactos">Contactos</Link></nav>}
+    {open && <nav aria-label="Menu móvel" className="flex flex-col gap-5 border-t border-border px-6 py-6 lg:hidden" onClick={() => setOpen(false)}><Link to="/">Início</Link><Link to="/cardapio">Cardápio</Link><Link to="/sobre">O Matturo</Link><Link to="/atendimento">Atendimento</Link><Link to="/contactos">Contactos</Link><Link to="/pontos">Os meus pontos</Link></nav>}
   </header>;
 }
 
