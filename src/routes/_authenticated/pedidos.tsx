@@ -67,6 +67,8 @@ function OrdersPage() {
   };
   const [sound, setSound] = useState(false);
   const soundRef = useRef(sound); soundRef.current = sound;
+  useEffect(() => { if (window.localStorage.getItem("matturo-order-sound") === "on") setSound(true); }, []);
+  const toggleSound = () => { const next = !sound; setSound(next); window.localStorage.setItem("matturo-order-sound", next ? "on" : "off"); };
   useEffect(() => {
     const ch = supabase.channel("matturo-orders").on("postgres_changes", { event: "*", schema: "public", table: "matturo_orders" }, (p) => {
       void qc.invalidateQueries({ queryKey: ordersQuery.queryKey });
@@ -105,7 +107,7 @@ function OrdersPage() {
           <Button size="sm" disabled={loadingManual} onClick={() => void openManual()}><Plus />{loadingManual ? "A carregar…" : "Criar pedido manual"}</Button>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 animate-pulse rounded-full bg-primary" />Em direto</span>
           <Button asChild variant="outline" size="sm"><Link to="/pedidos-concluidos"><CheckCircle2 />Concluídos</Link></Button>
-          <Button variant={sound ? "default" : "outline"} size="sm" onClick={() => setSound(!sound)}>{sound ? <Bell /> : <BellOff />}{sound ? "Som ligado" : "Som desligado"}</Button>
+          <Button variant={sound ? "default" : "outline"} size="sm" onClick={toggleSound}>{sound ? <Bell /> : <BellOff />}{sound ? "Som ligado" : "Som desligado"}</Button>
         </div>
       </div>
 
