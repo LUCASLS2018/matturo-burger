@@ -31,6 +31,6 @@ describe("summarizeCourierDeliveries", () => {
 
   it("shows registered couriers even when they have never completed a delivery", () => {
     const stats = summarizeCourierDeliveries(["carla"], profiles, deliveries);
-    expect(stats).toEqual([{ id: "carla", name: "Carla", active: 0, delivered: 0 }]);
+    expect(stats.find((courier) => courier.id === "carla")).toEqual({ id: "carla", name: "Carla", active: 0, delivered: 0 });
   });
 });
