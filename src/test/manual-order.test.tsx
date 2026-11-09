@@ -25,7 +25,7 @@ describe("manual phone order form", () => {
     fireEvent.click(screen.getByRole("button", { name: /^Delivery$/ }));
     fireEvent.change(screen.getByLabelText("Morada"), { target: { value: "Rua do cliente 10" } });
     fireEvent.change(screen.getByLabelText("Código postal"), { target: { value: "2600-162" } });
-    fireEvent.change(screen.getByLabelText("Produto"), { target: { value: "burger" } });
+    fireEvent.click(screen.getByRole("button", { name: "Selecionar Hambúrguer" }));
     expect(screen.getByRole("button", { name: /Adicionar ·/ })).toBeDisabled();
     fireEvent.click(screen.getByRole("radio", { name: /NAO QUERO/ }));
     fireEvent.click(screen.getByRole("button", { name: /Adicionar ·/ }));

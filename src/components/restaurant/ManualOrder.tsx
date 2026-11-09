@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Minus, Trash2, Phone, ShoppingBag } from "lucide-react";
+import { Plus, Minus, Trash2, Phone, ShoppingBag, Utensils } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -12,10 +12,16 @@ import { findZone } from "@/lib/restaurant-settings";
 import { orderServices, needsDeliveryAddress, type OrderService } from "@/lib/order-service";
 import { dishTotal, selectionValid, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
+import { dishCutout } from "@/lib/dish-images";
 
 export const manualMenuQuery = queryOptions({ queryKey: ["matturo-manual-menu"], queryFn: () => adminMenu(), staleTime: 0 });
 type Line = { key: string; dish: Dish; selected: Record<string, number>; notes: string };
 const fieldClass = "mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-sm";
+
+function ProductPhoto({ dish, className }: { dish: Dish; className: string }) {
+  const photo = (dish.image?.startsWith("https://") ? dish.image : null) || dishCutout(dish.slug) || dish.image;
+  return <span className={`flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-secondary ${className}`}>{photo ? <img src={photo} alt={dish.name} loading="lazy" className="h-full w-full object-contain" /> : <Utensils className="h-6 w-6 text-muted-foreground" />}</span>;
+}
 
 export function ManualOrder({ onClose }: { onClose: () => void }) {
   const { data: menu } = useSuspenseQuery(manualMenuQuery);
@@ -78,10 +84,11 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             <div className="flex flex-wrap gap-2">{orderServices.map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); resetPrice(); }}>{value}</Button>)}</div>
             {delivery && <div className="space-y-3"><label className="block text-sm font-medium">Morada<input required maxLength={250} value={address} onChange={(e) => setAddress(e.target.value)} className={fieldClass} /></label><label className="block text-sm font-medium">Código postal<input required maxLength={8} value={postal} onChange={(e) => { setPostal(e.target.value); resetPrice(); }} placeholder="2600-000" className={fieldClass} /></label><p className="text-xs text-muted-foreground">{zone ? `${zone.name} · Entrega ${money(fee)}` : "Selecione um código postal de uma zona de entrega ativa."}</p></div>}
             <label className="block text-sm font-medium">Procurar produto<input value={search} onChange={(e) => setSearch(e.target.value)} className={fieldClass} /></label>
-            <select aria-label="Produto" value={dishId} onChange={(e) => { setDishId(e.target.value); setSelected({}); setDishNotes(""); }} className={fieldClass}>
-              <option value="">Selecionar produto</option>{menu.filter((item) => item.visible && item.available && item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map((item) => <option key={item.id} value={item.id}>{item.name} · {money(item.price)}</option>)}
-            </select>
+            <div aria-label="Produtos" className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto pr-1">
+              {menu.filter((item) => item.visible && item.available && item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map((item) => <Button type="button" key={item.id} aria-label={`Selecionar ${item.name}`} aria-pressed={dishId === item.id} variant="outline" className={`h-auto min-w-0 flex-col items-stretch gap-2 whitespace-normal p-2 text-left ${dishId === item.id ? "border-primary bg-primary/5" : ""}`} onClick={() => { setDishId(item.id); setSelected({}); setDishNotes(""); }}><ProductPhoto dish={item} className="h-24 w-full" /><span className="text-xs font-semibold leading-snug">{item.name}</span><span className="text-xs text-primary">{money(item.price)}</span></Button>)}
+            </div>
             {dish && <div className="space-y-4 border-t border-border pt-4">
+              <div className="flex items-center gap-3"><ProductPhoto dish={dish} className="h-16 w-16" /><h3 className="min-w-0 text-sm font-semibold">{dish.name}</h3></div>
               {dish.groups.map((group) => <fieldset key={group.id}><legend className="text-sm font-semibold">{group.name}{group.required && <span className="ml-2 text-xs text-primary">Obrigatório</span>}</legend><div className="mt-2 space-y-2">{group.modifiers.map((modifier) => {
                 const count = selected[modifier.id] ?? 0;
                 return group.max === 1 ? <label key={modifier.id} className="flex min-h-10 items-center justify-between gap-2 text-sm"><span className="flex items-center gap-2"><input type="radio" name={group.id} checked={count === 1} onChange={() => setSelected((previous) => ({ ...previous, ...Object.fromEntries(group.modifiers.map((option) => [option.id, option.id === modifier.id ? 1 : 0])) }))} />{modifier.name}</span><span className="shrink-0 text-xs text-muted-foreground">{modifier.price ? `+ ${money(modifier.price)}` : "Sem custo"}</span></label> : <div key={modifier.id} className="flex items-center justify-between gap-2 text-sm"><span>{modifier.name}<span className="ml-2 text-xs text-muted-foreground">{money(modifier.price)}</span></span><div className="flex shrink-0 items-center"><Button type="button" variant="ghost" size="icon" aria-label={`Retirar ${modifier.name}`} disabled={!count} onClick={() => setSelected((previous) => ({ ...previous, [modifier.id]: count - 1 }))}><Minus /></Button><span className="w-5 text-center">{count}</span><Button type="button" variant="ghost" size="icon" aria-label={`Adicionar ${modifier.name}`} disabled={count >= modifier.max || group.modifiers.reduce((sum, option) => sum + (selected[option.id] ?? 0), 0) >= group.max} onClick={() => setSelected((previous) => ({ ...previous, [modifier.id]: count + 1 }))}><Plus /></Button></div></div>;
