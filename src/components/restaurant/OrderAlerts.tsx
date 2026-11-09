@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { enablePush, pushConfigured, type PushStatus } from "@/lib/push";
+import { enablePush, pushConfigured, type PushConfig, type PushStatus } from "@/lib/push";
+import { getPushConfig } from "@/lib/push-config.functions";
 import { registerPushDevice } from "@/lib/push.functions";
 
 const copy: Record<PushStatus, string> = {
@@ -20,10 +21,15 @@ const copy: Record<PushStatus, string> = {
 export function OrderAlerts({ orderToken, path }: { orderToken: string; path: string }) {
   const [state, setState] = useState<"idle" | "busy" | "active" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [config, setConfig] = useState<PushConfig | null>(null);
+
+  useEffect(() => {
+    getPushConfig().then(setConfig).catch(() => setConfig(null));
+  }, []);
 
   async function activate() {
     setState("busy");
-    const result = await enablePush();
+    const result = await enablePush(config);
     if (result.status === "registered" && result.token) {
       try {
         await registerPushDevice({ data: { token: result.token, orderToken, path } });
@@ -39,7 +45,7 @@ export function OrderAlerts({ orderToken, path }: { orderToken: string; path: st
     setMessage(copy[result.status]);
   }
 
-  if (!pushConfigured()) return null;
+  if (!pushConfigured(config)) return null;
 
   return (
     <section className="mt-8 rounded-lg border border-border bg-card p-4">
