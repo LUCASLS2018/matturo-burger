@@ -52,7 +52,10 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const productsRef = useRef<HTMLDivElement>(null);
   const dish = menu.find((item) => item.id === dishId);
   const delivery = needsDeliveryAddress(service);
-  const zone = delivery ? findZone(postal, settings.zones) : null;
+  const radiusMode = delivery && settings.deliveryMode === "radius";
+  const [radiusQuote, setRadiusQuote] = useState<{ zone: { name: string; fee_cents: number; max_distance_km: number | null } | null; distanceKm: number } | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const zone = delivery ? radiusMode ? radiusQuote?.zone ?? null : findZone(postal, settings.zones) : null;
   const subtotal = lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0);
   const fee = zone ? zone.fee_cents / 100 : 0;
   const resetPrice = () => { setChangedTotal(null); };

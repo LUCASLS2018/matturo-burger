@@ -41,7 +41,10 @@ function Checkout() {
   const [priceChange, setPriceChange] = useState<number | null>(null);
   const submission = useRef<{ id: string; token: string } | null>(null);
   const delivery = needsDeliveryAddress(service);
-  const zone = delivery ? findZone(postal, settings.zones) : null;
+  const radiusMode = delivery && settings.deliveryMode === "radius";
+  const [radiusQuote, setRadiusQuote] = useState<{ zone: { name: string; fee_cents: number; max_distance_km: number | null } | null; distanceKm: number } | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const zone = delivery ? radiusMode ? radiusQuote?.zone ?? null : findZone(postal, settings.zones) : null;
   const fee = zone ? zone.fee_cents / 100 : 0;
   const total = subtotal + fee;
   const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
