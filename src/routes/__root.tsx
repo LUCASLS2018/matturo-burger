@@ -14,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import { CartProvider } from "@/lib/cart";
 import { RestaurantHeader, RestaurantFooter } from "@/components/restaurant/Shell";
 import { Button } from "@/components/ui/button";
+import { LoyaltyBanner } from "@/components/restaurant/LoyaltyBanner";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -142,6 +143,7 @@ function RootComponent() {
       <CartProvider>
         <div className="flex min-h-screen flex-col">
           {!isAdmin && !isAdminLogin && <RestaurantHeader />}
+          {!isAdmin && !isAdminLogin && <LoyaltyBanner />}
           <main className="flex-1">
             <Outlet />
           </main>
