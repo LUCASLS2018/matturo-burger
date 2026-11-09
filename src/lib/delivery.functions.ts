@@ -62,9 +62,9 @@ export const createDelivery = createServerFn({ method: "POST" }).middleware([req
 
 export const changeDelivery = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => idSchema.extend({ status: z.enum(["to_restaurant", "collected", "active", "delivered"]) }).parse(input)).handler(async ({ data, context }) => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const delivery = await supabaseAdmin.from("matturo_deliveries").select("order_id,courier_id").eq("id", data.id).single();
+  if (delivery.error) throw new Error("Não foi possível verificar a entrega.");
   if (data.status === "collected") {
-    const delivery = await supabaseAdmin.from("matturo_deliveries").select("order_id").eq("id", data.id).single();
-    if (delivery.error) throw new Error("Não foi possível verificar a entrega.");
     if (delivery.data.order_id) {
       const order = await supabaseAdmin.from("matturo_orders").select("status").eq("id", delivery.data.order_id).single();
       if (order.error || order.data.status !== "pronto") throw new Error("O restaurante ainda não colocou este pedido em entrega.");
@@ -78,6 +78,10 @@ export const changeDelivery = createServerFn({ method: "POST" }).middleware([req
   }
   const result = await supabaseAdmin.rpc("matturo_set_delivery_state", { actor: context.userId, delivery: data.id, next_state: data.status });
   if (result.error) throw new Error("Não foi possível mudar o estado da entrega. Atualize a página.");
+  if (delivery.data.order_id) {
+    const { notifyOrder } = await import("./push.server");
+    await notifyOrder(delivery.data.order_id).catch(() => 0);
+  }
   return true;
 });
 
