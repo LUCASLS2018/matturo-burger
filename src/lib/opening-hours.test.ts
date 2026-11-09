@@ -61,6 +61,15 @@ describe("Matturo opening hours in Europe/Lisbon", () => {
     expect(scheduledOrderError("2026-11-10T19:30:00Z", now)).toBeNull();
   });
 
+  it("allows scheduled acceptance only while the store is open and not emergency-closed", () => {
+    const open = new Date("2026-11-10T12:00:00Z");
+    const closed = new Date("2026-11-10T16:00:00Z");
+    expect(canAcceptScheduledOrder("2026-11-10T19:00:00Z", false, closed)).toBe(false);
+    expect(canAcceptScheduledOrder("2026-11-10T19:00:00Z", true, open)).toBe(false);
+    expect(canAcceptScheduledOrder("2026-11-10T19:00:00Z", false, open)).toBe(true);
+    expect(canAcceptScheduledOrder(null, true, closed)).toBe(true);
+  });
+
   it("rejects a nonexistent Portugal local time at the DST change", () => {
     expect(lisbonDateTimeToDate("2026-03-29T01:30")).toBeNull();
   });

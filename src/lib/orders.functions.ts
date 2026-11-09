@@ -174,7 +174,7 @@ export const claimOrder = createServerFn({ method: "POST" }).middleware([require
 
 export const myOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
-  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,scheduled_for,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os seus pedidos.");
   return result.data;
 });
@@ -190,6 +190,14 @@ export const adminOrders = createServerFn({ method: "POST" }).middleware([requir
 export const setOrderStatus = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => z.object({ id: z.string().uuid(), from: z.enum(orderStatuses), to: z.enum(orderStatuses) }).parse(input)).handler(async ({ data, context }) => {
   await assertAdmin(context.supabase);
   if (!canMoveOrder(data.from, data.to)) throw new Error("Mudança de estado inválida.");
+  if (data.from === "novo" && data.to === "aceite") {
+    const [current, settings] = await Promise.all([
+      context.supabase.from("matturo_orders").select("scheduled_for").eq("id", data.id).single(),
+      context.supabase.from("matturo_restaurant_settings").select("orders_paused").eq("id", true).single(),
+    ]);
+    if (current.error || settings.error) throw new Error("Não foi possível validar o horário do pedido.");
+    if (!canAcceptScheduledOrder(current.data.scheduled_for, settings.data.orders_paused, new Date())) throw new Error("Este pedido agendado só pode ser aceite com a loja aberta.");
+  }
   const result = await context.supabase.from("matturo_orders").update({ status: data.to }).eq("id", data.id).eq("status", data.from).select("id").maybeSingle();
   if (result.error) throw new Error("Não foi possível guardar. Tente novamente.");
   if (!result.data) throw new Error("Este pedido foi alterado noutra janela. Atualize a lista.");
