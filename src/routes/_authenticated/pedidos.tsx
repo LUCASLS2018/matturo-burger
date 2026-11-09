@@ -27,7 +27,7 @@ type Board = Awaited<ReturnType<typeof orderCourierBoard>>;
 
 export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => restaurantHead("Pedidos", "Central privada de pedidos Matturo Burger."),
-  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(ordersQuery), context.queryClient.ensureQueryData(boardQuery)]),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(ordersQuery), context.queryClient.ensureQueryData(boardQuery), context.queryClient.ensureQueryData(publicSettingsQuery)]),
   errorComponent: () => <div className="page-width py-16"><h1 className="section-title">Acesso indisponível</h1><p className="mt-4">Esta área exige acesso de administrador.</p><Button asChild className="mt-6"><Link to="/entregas">Voltar à equipa</Link></Button></div>,
   component: OrdersPage,
 });

@@ -20,6 +20,7 @@ const orderInput = z.object({
   phone: loyaltyPhoneSchema,
   service: z.enum(orderServices),
   source: z.enum(orderSources).default("web"),
+  scheduledFor: z.string().datetime({ offset: true }).optional(),
   address: z.string().trim().max(250).optional(),
   postal: z.string().trim().max(8).optional(),
   notes: z.string().trim().max(500).optional(),
