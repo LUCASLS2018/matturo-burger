@@ -156,6 +156,7 @@ function OrdersPage() {
                         onPick={(id, value) => setPick({ ...pick, [id]: value })}
                         onSend={sendToCourier}
                         onMove={change}
+                        orderingOpen={orderingOpen}
                         nearby={nearbyOrders(o, sorted, board)}
                         onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
                       />
@@ -177,7 +178,7 @@ function OrdersPage() {
                 <div key={group.service}>
                   <ServiceGroupHeading service={group.service} count={group.orders.length} />
                   <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}
+                    {group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} orderingOpen={orderingOpen} />)}
                   </div>
                 </div>
               ))}
@@ -199,7 +200,7 @@ export function nearbyOrders<T extends { id: string; service: string; status: st
     && ((o.postal_code ?? "").replace(/\D/g, "").slice(0, 4) === prefix || (!!order.zone_name && o.zone_name === order.zone_name)));
 }
 
-function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby = [], onSendNearby }: {
+function OrderCard({ order, board, courierPick, onPick, onSend, onMove, orderingOpen, nearby = [], onSendNearby }: {
   nearby?: AdminOrder[];
   onSendNearby?: (ids: string[]) => Promise<void>;
   order: AdminOrder;
@@ -208,6 +209,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
   onPick: (orderId: string, courierId: string) => void;
   onSend: (orderId: string) => Promise<void>;
   onMove: (id: string, from: OrderStatus, to: OrderStatus) => Promise<void>;
+  orderingOpen: boolean;
 }) {
   const Icon = serviceIcon(order.service);
   const delivery = board.deliveries.find((d) => d.order_id === order.id);
@@ -237,7 +239,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
           <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
         </span>
         <span className="mt-2 flex items-center justify-between gap-2 pl-10">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusTone(order.status)}`}>{order.status === "novo" && order.scheduled_for ? "Agendado" : boardLabels[order.status] ?? order.status}</span>
           <b className="text-sm tabular-nums">{money(order.total_cents / 100)}</b>
         </span>
       </button>
