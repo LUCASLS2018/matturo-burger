@@ -30,7 +30,7 @@ const orderInput = z.object({
   })).min(1).max(60),
 });
 
-export const placeOrder = createServerFn({ method: "POST" }).inputValidator((input) => orderInput.parse(input)).handler(async ({ data }) => {
+async function createOrder(data: z.infer<typeof orderInput>) {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [settings, zones, menu] = await Promise.all([
@@ -94,7 +94,17 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
     throw new Error(message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : message.includes("100 pontos") ? "Ainda não tem 100 pontos disponíveis para resgatar." : message.includes("Confirme") ? "A confirmação do telemóvel expirou. Confirme novamente em Os meus pontos." : "Não foi possível registar o pedido. Tente novamente.");
   }
   return { kind: "created" as const, reference: result.data[0].reference, token: data.accessToken };
-});
+}
+
+export const placeOrder = createServerFn({ method: "POST" }).inputValidator((input) => orderInput.parse(input)).handler(({ data }) => createOrder(data));
+
+export const createManualOrder = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((input) => orderInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    if (data.items.some((item) => item.reward)) throw new Error("As ofertas devem ser resgatadas pela conta do cliente.");
+    return createOrder(data);
+  });
 
 export const orderByToken = createServerFn({ method: "GET" }).inputValidator((input) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).parse(input)).handler(async ({ data }) => {
   setResponseHeader("Cache-Control", "no-store");
