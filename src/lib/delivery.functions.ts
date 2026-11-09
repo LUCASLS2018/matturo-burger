@@ -27,7 +27,7 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
     admin ? db.from("matturo_profiles").select("*") : Promise.resolve(profile),
     admin ? db.from("matturo_user_roles").select("user_id").eq("role", "courier") : Promise.resolve(null),
     db.from("matturo_courier_availability").select("*"),
-    orderIds.length ? db.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,address,postal_code,notes,service,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
+    orderIds.length ? db.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,address,postal_code,notes,service,status,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
   ]);
   if (positions.error || events.error || availability.error || orders.error) throw new Error("Não foi possível carregar as entregas.");
   return {
@@ -62,6 +62,14 @@ export const createDelivery = createServerFn({ method: "POST" }).middleware([req
 
 export const changeDelivery = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => idSchema.extend({ status: z.enum(["to_restaurant", "collected", "active", "delivered"]) }).parse(input)).handler(async ({ data, context }) => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  if (data.status === "collected") {
+    const delivery = await supabaseAdmin.from("matturo_deliveries").select("order_id").eq("id", data.id).single();
+    if (delivery.error) throw new Error("Não foi possível verificar a entrega.");
+    if (delivery.data.order_id) {
+      const order = await supabaseAdmin.from("matturo_orders").select("status").eq("id", delivery.data.order_id).single();
+      if (order.error || order.data.status !== "pronto") throw new Error("O restaurante ainda não colocou este pedido em entrega.");
+    }
+  }
   if (data.status === "active") {
     // Privacidade: só uma entrega com GPS em direto por estafeta; os outros clientes não veem a localização.
     const other = await supabaseAdmin.from("matturo_deliveries").select("id").eq("courier_id", context.userId).eq("status", "active").neq("id", data.id).limit(1);
