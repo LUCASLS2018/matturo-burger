@@ -1,9 +1,10 @@
-const apiKey = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY"] ?? "";
-const projectId = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID"] ?? "";
-const appId = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID"] ?? "";
-const vapidKey = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY"] ?? "";
-// The web app id carries the sender id as its second segment: 1:<senderId>:web:<hash>.
-const messagingSenderId = appId.split(":")[1] ?? "";
+export type PushConfig = {
+  apiKey: string;
+  projectId: string;
+  appId: string;
+  vapidKey: string;
+  messagingSenderId: string;
+};
 
 export type PushStatus =
   | "registered"
@@ -13,9 +14,9 @@ export type PushStatus =
   | "denied"
   | "failed";
 
-/** True when the Firebase web-push credentials are present in the app. */
-export function pushConfigured() {
-  return Boolean(apiKey && projectId && appId && vapidKey && messagingSenderId);
+/** True when every Firebase web-push value is present. */
+export function pushConfigured(c: PushConfig | null | undefined): c is PushConfig {
+  return Boolean(c && c.apiKey && c.projectId && c.appId && c.vapidKey && c.messagingSenderId);
 }
 
 /** Only this order's own page may be opened by an alert — never an address typed by a browser. */
@@ -25,11 +26,10 @@ export function orderAlertPath(path: string) {
 
 /**
  * Asks the browser for notification permission and returns this device's push token.
- * Must be called from a click handler: browsers ignore permission requests without a user gesture.
- * Firebase is loaded here only, after hydration, so server rendering never touches it.
+ * Must be called from a click handler. Firebase loads only here, after hydration.
  */
-export async function enablePush(): Promise<{ status: PushStatus; token?: string }> {
-  if (!pushConfigured()) return { status: "not-configured" };
+export async function enablePush(config: PushConfig | null): Promise<{ status: PushStatus; token?: string }> {
+  if (!pushConfigured(config)) return { status: "not-configured" };
   if (typeof window === "undefined" || !("Notification" in window)) return { status: "unsupported" };
 
   let supported = false;
@@ -40,14 +40,14 @@ export async function enablePush(): Promise<{ status: PushStatus; token?: string
   }
   if (!supported) return { status: "unsupported" };
 
-  // The Lovable preview runs inside a cross-origin iframe, where browsers reject the
-  // permission prompt without ever showing it.
+  // The preview runs inside a cross-origin iframe, where the permission prompt is rejected silently.
   if (window.top !== window.self) return { status: "open-in-new-tab" };
 
   const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
   if (permission !== "granted") return { status: "denied" };
 
   try {
+    const { apiKey, projectId, appId, messagingSenderId, vapidKey } = config;
     const [{ getApp, getApps, initializeApp }, { getMessaging, getToken }] = await Promise.all([
       import("firebase/app"),
       import("firebase/messaging"),
@@ -57,7 +57,8 @@ export async function enablePush(): Promise<{ status: PushStatus; token?: string
     const registration = await navigator.serviceWorker.register(`/firebase-messaging-sw.js?${query}`);
     const token = await getToken(getMessaging(app), { vapidKey, serviceWorkerRegistration: registration });
     return token ? { status: "registered", token } : { status: "denied" };
-  } catch {
+  } catch (error) {
+    console.error("Push registration failed", error);
     return { status: "failed" };
   }
 }
