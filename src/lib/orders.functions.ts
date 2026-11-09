@@ -85,7 +85,7 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
       request_fingerprint: await tokenHash(ip), access_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
     },
     p_items: lines,
-    p_session_hash: rewardSessionHash ?? undefined,
+    ...(rewardSessionHash ? { p_session_hash: rewardSessionHash } : {}),
     p_reward: rewardIndex >= 0,
   });
   if (result.error || !result.data?.[0]) {

@@ -215,6 +215,44 @@ export type Database = {
         }
         Relationships: []
       }
+      matturo_loyalty_accounts: {
+        Row: {
+          created_at: string
+          failed_attempts: number
+          id: string
+          locked_until: string | null
+          password_hash: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          created_at?: string
+          failed_attempts?: number
+          id?: string
+          locked_until?: string | null
+          password_hash: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          created_at?: string
+          failed_attempts?: number
+          id?: string
+          locked_until?: string | null
+          password_hash?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matturo_loyalty_accounts_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: true
+            referencedRelation: "matturo_loyalty_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matturo_loyalty_movements: {
         Row: {
           created_at: string

@@ -6,6 +6,7 @@ import { Gift, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { guestLoyalty, leaveGuestLoyalty } from "@/lib/loyalty.functions";
 import { restaurantHead } from "@/lib/restaurant";
+import { PhoneAccountForm } from "@/components/restaurant/PhoneAccountForm";
 
 const pointsQuery = queryOptions({ queryKey: ["matturo-guest-loyalty"], queryFn: () => guestLoyalty(), staleTime: 0 });
 export const Route = createFileRoute("/pontos")({
@@ -28,10 +29,10 @@ function PointsPage() {
       <progress max={100} value={Math.min(100, data.available)} aria-label="Progresso para Hamburguinho grátis" className="mt-4 h-3 w-full accent-primary" />
       <p className="mt-4 text-sm text-muted-foreground">100 pontos = 1 Hamburguinho grátis</p>
       {data.available >= 100 && <Button asChild className="mt-6 w-full"><Link to="/produto/$slug" params={{ slug: "hamburguinho" }} search={{ recompensa: true }}>Resgatar Hamburguinho grátis</Link></Button>}
-      <Button variant="outline" className="mt-4 w-full" onClick={async () => { try { await leave(); await cache.invalidateQueries({ queryKey: ["matturo-guest-loyalty"] }); } catch { setError("Não foi possível sair. Tente novamente."); } }}>Terminar confirmação</Button>
-    </> : <div className="mt-6 border-y border-border py-6">
-      <p role="status" className="text-sm leading-relaxed">A confirmação por SMS ainda não está disponível. Os seus pontos continuam a acumular automaticamente no telemóvel de cada pedido concluído.</p>
-      <p className="mt-3 text-sm text-muted-foreground">A consulta e o resgate ficam disponíveis depois de ativar a confirmação segura do telemóvel.</p>
+      <Button variant="outline" className="mt-4 w-full" onClick={async () => { try { await leave(); await cache.invalidateQueries({ queryKey: ["matturo-guest-loyalty"] }); } catch { setError("Não foi possível sair. Tente novamente."); } }}>Sair</Button>
+    </> : <div className="mt-6">
+      <p className="text-sm leading-relaxed text-muted-foreground">Os pontos acumulam no telemóvel de cada pedido concluído (1 € = 1 ponto). Entre ou crie conta com o mesmo número para os ver e resgatar.</p>
+      <PhoneAccountForm />
     </div>}
     {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
   </div>;

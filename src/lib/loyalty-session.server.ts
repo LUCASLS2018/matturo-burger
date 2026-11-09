@@ -13,5 +13,5 @@ export async function verifiedLoyalty() {
   return { hash, sessionId: result.data.id, walletId: result.data.wallet_id, phone: result.data.matturo_loyalty_wallets.phone, available: result.data.matturo_loyalty_wallets.balance };
 }
 export function setLoyaltyCookie(token: string, maxAge = 86400) {
-  setCookie(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge });
+  setCookie(COOKIE, token, { httpOnly: true, secure: process.env['NODE_ENV'] === "production", sameSite: "strict", path: "/", maxAge });
 }

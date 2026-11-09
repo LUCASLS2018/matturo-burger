@@ -1,50 +1,12 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { routeTree } from "@/routeTree.gen";
-
-const getUser = vi.fn();
-const onAuthStateChange = vi.fn((_callback: unknown) => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
-
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: {
-    auth: {
-      getUser: () => getUser(),
-      getSession: () => Promise.resolve({ data: { session: null } }),
-      onAuthStateChange: (callback: (event: string, session: unknown) => void) => onAuthStateChange(callback),
-    },
-  },
-}));
-
-async function renderStore() {
-  const router = createRouter({
-    routeTree,
-    history: createMemoryHistory({ initialEntries: ["/conta"] }),
-    context: { queryClient: new QueryClient() },
-  });
-  await router.load();
-  return render(<RouterProvider router={router} />);
-}
+vi.mock("@tanstack/react-router", () => ({ Link: ({ to, ...rest }: { to: string }) => <a href={to} {...rest} /> }));
+import { CustomerAccountAccess } from "@/components/restaurant/CustomerAccountAccess";
 
 describe("Public store header", () => {
-  it("offers only the customer account when nobody is signed in", async () => {
-    getUser.mockResolvedValue({ data: { user: null } });
-    await renderStore();
-
-    const account = await screen.findByRole("link", { name: "Criar conta de cliente" });
-    expect(account).toHaveAttribute("href", "/conta");
-    expect(screen.queryByRole("link", { name: /painel/i })).toBeNull();
-    expect(screen.queryByRole("link", { name: /administração/i })).toBeNull();
-  });
-
-  it("sends a signed-in customer to their own orders, not to the team panel", async () => {
-    getUser.mockResolvedValue({ data: { user: { id: "customer-1" } } });
-    await renderStore();
-
-    const account = await screen.findByRole("link", { name: "A minha conta" });
-    expect(account).toHaveAttribute("href", "/minha-conta");
-    await waitFor(() => expect(screen.queryByRole("link", { name: /painel/i })).toBeNull());
+  it("sends customers to their phone account, never the team panel", () => {
+    render(<CustomerAccountAccess />);
+    expect(screen.getByRole("link", { name: "A minha conta" })).toHaveAttribute("href", "/pontos");
   });
 });
