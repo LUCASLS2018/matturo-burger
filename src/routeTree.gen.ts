@@ -25,6 +25,7 @@ import { Route as AuthenticatedCategoriasRouteImport } from './routes/_authentic
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEntregasRouteImport } from './routes/_authenticated/entregas'
+import { Route as AuthenticatedFidelizacaoRouteImport } from './routes/_authenticated/fidelizacao'
 import { Route as AuthenticatedGerirMenuRouteImport } from './routes/_authenticated/gerir-menu'
 import { Route as AuthenticatedMinhaContaRouteImport } from './routes/_authenticated/minha-conta'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
@@ -117,6 +118,12 @@ const AuthenticatedEntregasRoute = AuthenticatedEntregasRouteImport.update({
   path: '/entregas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFidelizacaoRoute =
+  AuthenticatedFidelizacaoRouteImport.update({
+    id: '/fidelizacao',
+    path: '/fidelizacao',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGerirMenuRoute = AuthenticatedGerirMenuRouteImport.update({
   id: '/gerir-menu',
   path: '/gerir-menu',
@@ -190,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof AuthenticatedClientesRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/fidelizacao': typeof AuthenticatedFidelizacaoRoute
   '/gerir-menu': typeof AuthenticatedGerirMenuRoute
   '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -218,6 +226,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof AuthenticatedClientesRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/entregas': typeof AuthenticatedEntregasRoute
+  '/fidelizacao': typeof AuthenticatedFidelizacaoRoute
   '/gerir-menu': typeof AuthenticatedGerirMenuRoute
   '/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/painel': typeof AuthenticatedPainelRoute
@@ -248,6 +257,7 @@ export interface FileRoutesById {
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/entregas': typeof AuthenticatedEntregasRoute
+  '/_authenticated/fidelizacao': typeof AuthenticatedFidelizacaoRoute
   '/_authenticated/gerir-menu': typeof AuthenticatedGerirMenuRoute
   '/_authenticated/minha-conta': typeof AuthenticatedMinhaContaRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/configuracoes'
     | '/entregas'
+    | '/fidelizacao'
     | '/gerir-menu'
     | '/minha-conta'
     | '/painel'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/configuracoes'
     | '/entregas'
+    | '/fidelizacao'
     | '/gerir-menu'
     | '/minha-conta'
     | '/painel'
@@ -335,6 +347,7 @@ export interface FileRouteTypes {
     | '/_authenticated/clientes'
     | '/_authenticated/configuracoes'
     | '/_authenticated/entregas'
+    | '/_authenticated/fidelizacao'
     | '/_authenticated/gerir-menu'
     | '/_authenticated/minha-conta'
     | '/_authenticated/painel'
@@ -483,6 +496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEntregasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fidelizacao': {
+      id: '/_authenticated/fidelizacao'
+      path: '/fidelizacao'
+      fullPath: '/fidelizacao'
+      preLoaderRoute: typeof AuthenticatedFidelizacaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/gerir-menu': {
       id: '/_authenticated/gerir-menu'
       path: '/gerir-menu'
@@ -568,6 +588,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEntregasRoute: typeof AuthenticatedEntregasRoute
+  AuthenticatedFidelizacaoRoute: typeof AuthenticatedFidelizacaoRoute
   AuthenticatedGerirMenuRoute: typeof AuthenticatedGerirMenuRoute
   AuthenticatedMinhaContaRoute: typeof AuthenticatedMinhaContaRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
@@ -580,6 +601,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEntregasRoute: AuthenticatedEntregasRoute,
+  AuthenticatedFidelizacaoRoute: AuthenticatedFidelizacaoRoute,
   AuthenticatedGerirMenuRoute: AuthenticatedGerirMenuRoute,
   AuthenticatedMinhaContaRoute: AuthenticatedMinhaContaRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
