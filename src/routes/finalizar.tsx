@@ -85,6 +85,14 @@ function Checkout() {
 
   const send = async () => {
     if (sending) return;
+    let scheduledIso: string | undefined;
+    if (scheduled) {
+      const selectedDate = lisbonDateTimeToDate(scheduledFor);
+      if (!selectedDate) { setError("Escolha uma data e hora válidas em Portugal."); return; }
+      scheduledIso = selectedDate.toISOString();
+      const scheduleError = scheduledOrderError(scheduledIso, new Date());
+      if (scheduleError) { setError(scheduleError); return; }
+    }
     if (!rewardMinimumMet) { setError(REWARD_MINIMUM_MESSAGE); return; }
     let normalizedPhone: string;
     try { normalizedPhone = canonicalPhone(phone); } catch { setError("Indique um telemóvel válido."); return; }

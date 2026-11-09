@@ -79,7 +79,7 @@ function OrdersPage() {
     const ch = supabase.channel("matturo-orders").on("postgres_changes", { event: "*", schema: "public", table: "matturo_orders" }, (p) => {
       void qc.invalidateQueries({ queryKey: ordersQuery.queryKey });
       if (p.eventType === "INSERT") {
-        toast.success("Novo pedido recebido");
+        toast.success((p.new as { scheduled_for?: string | null }).scheduled_for ? "Pedido agendado recebido" : "Novo pedido recebido");
       }
     }).subscribe();
     return () => { void supabase.removeChannel(ch); };

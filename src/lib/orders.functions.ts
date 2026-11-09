@@ -111,6 +111,7 @@ async function createOrder(data: z.infer<typeof orderInput>) {
       delivery_fee_cents: fee, subtotal_cents: subtotal, total_cents: total, notes: data.notes || "",
       access_token_hash: await tokenHash(data.accessToken), idempotency_key: data.submissionId,
       request_fingerprint: await tokenHash(ip), access_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
+      scheduled_for: data.scheduledFor ?? null,
     },
     p_items: lines,
     ...(rewardSessionHash ? { p_session_hash: rewardSessionHash } : {}),

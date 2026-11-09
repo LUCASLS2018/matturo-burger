@@ -43,6 +43,7 @@ function OrderPage() {
   if (!o) return <Missing />;
   const steps = orderStatuses.filter((s) => s !== "cancelado");
   const current = o.status as OrderStatus;
+  const scheduled = current === "novo" && Boolean(o.scheduled_for);
   return (
     <div className="page-width max-w-2xl py-12">
       <Dialog open={notice !== null} onOpenChange={(open) => { if (!open) setNotice(null); }}>
