@@ -13,9 +13,11 @@ export function LoyaltyBanner() {
   useEffect(() => {
     let alive = true;
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) { if (alive) setPoints(0); return; }
-      try { const b = await myLoyalty(); if (alive) setPoints(b.available); } catch { /* ignore */ }
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) { if (alive) setPoints(0); return; }
+        const b = await myLoyalty(); if (alive) setPoints(b.available);
+      } catch { /* banner is optional */ }
     };
     void load();
     const { data } = supabase.auth.onAuthStateChange((event) => { if (event === "SIGNED_IN" || event === "SIGNED_OUT") void load(); });
