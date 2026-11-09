@@ -15,7 +15,7 @@ import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { canonicalPhone, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";
 import { detectOrderSource } from "@/lib/order-source";
-import { CLOSED_ORDER_MESSAGE } from "@/lib/opening-hours";
+import { CLOSED_ORDER_MESSAGE, lisbonDateTimeToDate, scheduledOrderError } from "@/lib/opening-hours";
 
 export const Route = createFileRoute("/finalizar")({
   head: () => restaurantHead("Finalizar pedido", "Confirme e envie o seu pedido diretamente ao Matturo Burger."),
@@ -49,6 +49,8 @@ function Checkout() {
   const total = subtotal + fee;
   const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
 
+  const [scheduled, setScheduled] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState("");
   const [payment, setPayment] = useState<"" | "Multibanco" | "Dinheiro">("");
   const [cash, setCash] = useState("");
   const [locating, setLocating] = useState(false);
@@ -83,6 +85,14 @@ function Checkout() {
 
   const send = async () => {
     if (sending) return;
+    let scheduledIso: string | undefined;
+    if (scheduled) {
+      const selectedDate = lisbonDateTimeToDate(scheduledFor);
+      if (!selectedDate) { setError("Escolha uma data e hora válidas em Portugal."); return; }
+      scheduledIso = selectedDate.toISOString();
+      const scheduleError = scheduledOrderError(scheduledIso, new Date());
+      if (scheduleError) { setError(scheduleError); return; }
+    }
     if (!rewardMinimumMet) { setError(REWARD_MINIMUM_MESSAGE); return; }
     let normalizedPhone: string;
     try { normalizedPhone = canonicalPhone(phone); } catch { setError("Indique um telemóvel válido."); return; }
@@ -99,10 +109,10 @@ function Checkout() {
     try {
       const latest = await checkSettings();
       if (latest.paused) { setError("O Matturo está FECHADO temporariamente e não está a aceitar pedidos."); return; }
-      if (!latest.isOpen) { setError(CLOSED_ORDER_MESSAGE); return; }
+      if (!latest.isOpen && !scheduledIso) { setError(CLOSED_ORDER_MESSAGE); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
-        name, phone: normalizedPhone, service, source: detectOrderSource(), address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
+        name, phone: normalizedPhone, service, source: detectOrderSource(), scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
         expectedTotalCents: Math.round((priceChange ?? total) * 100), acceptRepriced: priceChange !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, reward: item.reward })),
@@ -120,7 +130,7 @@ function Checkout() {
   return <div className="page-width max-w-3xl py-12">
     <Button asChild variant="link" className="mb-6 px-0"><Link to="/carrinho"><ArrowLeft />Voltar ao pedido</Link></Button>
     <h1 className="section-title">Quase à mesa.</h1>
-    {!settings.isOpen && <p role="status" className="mt-6 border-l-4 border-destructive bg-destructive/10 p-4 font-semibold text-destructive">{CLOSED_ORDER_MESSAGE}</p>}
+    {!settings.isOpen && <p role="status" className="mt-6 border-l-4 border-destructive bg-destructive/10 p-4 font-semibold text-destructive">{CLOSED_ORDER_MESSAGE} Pode escolher «Agendar pedido» para uma hora futura dentro do funcionamento.</p>}
     {settings.isOpen && settings.paused && <p role="status" className="mt-6 border-l-4 border-primary bg-secondary p-4">O Matturo está FECHADO temporariamente e não está a aceitar pedidos.</p>}
     {!items.length ? <div className="py-12"><p>O seu pedido está vazio.</p><Button asChild className="mt-5"><Link to="/cardapio">Ver cardápio</Link></Button></div> : <>
       <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); setRadiusQuote(null); }}>{item}</Button>)}</div>
@@ -134,6 +144,10 @@ function Checkout() {
           <label className="block text-sm font-medium">Código postal<input required value={postal} onChange={(event) => { setPostal(event.target.value); setRadiusQuote(null); setPriceChange(null); }} autoComplete="postal-code" inputMode="numeric" placeholder="0000-000" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">{radiusMode ? "Usamos a morada e o código postal completo para calcular a distância desde a loja." : settings.zones.some((item) => item.max_distance_km === null) ? "Entregamos em " + settings.zones.filter((item) => item.max_distance_km === null).map((item) => `${item.name} (${item.postal_prefixes.join(", ")})`).join(" e ") + "." : "Ainda não há zonas de entrega ativadas."}</span></label>
           {radiusMode && <div className="rounded-md border border-border p-4"><Button type="button" variant="outline" disabled={quoting || !address.trim() || !postal.trim()} onClick={() => void verifyRadius()}>{quoting ? "A calcular distância…" : "Verificar distância e portes"}</Button>{radiusQuote && <p className="mt-3 text-sm text-muted-foreground">Distância da loja: <strong className="text-foreground">{String(radiusQuote.distanceKm).replace(".", ",")} km</strong>{zone ? ` · ${zone.name} · ${money(fee)}` : " · fora do raio de entrega"}</p>}</div>}
         </div>}
+        <fieldset className="space-y-3 rounded-md border border-border p-4"><legend className="px-1 text-sm font-medium">Quando pretende o pedido?</legend>
+          <div className="flex flex-wrap gap-3"><Button type="button" variant={!scheduled ? "default" : "outline"} aria-pressed={!scheduled} onClick={() => { setScheduled(false); setError(""); }}>Assim que possível</Button><Button type="button" variant={scheduled ? "default" : "outline"} aria-pressed={scheduled} onClick={() => { setScheduled(true); setError(""); }}>Agendar pedido</Button></div>
+          {scheduled && <label className="block text-sm font-medium">Data e hora pretendida (hora de Portugal)<input required type="datetime-local" value={scheduledFor} onChange={(event) => { setScheduledFor(event.target.value); setError(""); }} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">Escolha uma hora futura dentro do funcionamento: terça a domingo, 12:00–15:00 ou 19:00–21:45. O pedido só será aceite pela equipa com a loja aberta.</span></label>}
+        </fieldset>
         <fieldset className="space-y-3"><legend className="text-sm font-medium">Forma de pagamento</legend>
           <div className="flex flex-wrap gap-3">{(["Multibanco", "Dinheiro"] as const).map((item) => <Button key={item} type="button" aria-pressed={payment === item} variant={payment === item ? "default" : "outline"} onClick={() => setPayment(item)}>{item}</Button>)}</div>
           {payment === "Dinheiro" && <label className="block text-sm font-medium">Com quanto vai pagar? (€)<input required value={cash} onChange={(event) => setCash(event.target.value)} inputMode="decimal" placeholder="Ex.: 20" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>}
@@ -145,7 +159,7 @@ function Checkout() {
         <p className="text-sm leading-relaxed text-muted-foreground">O pedido chega diretamente ao Matturo. Pagamento no levantamento, na entrega ou à mesa. Vai poder acompanhar o estado numa página privada.</p>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {!rewardMinimumMet && <p role="status" className="text-sm text-destructive">{REWARD_MINIMUM_MESSAGE}</p>}
-        <Button type="submit" disabled={!settings.isOpen || settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{!settings.isOpen || settings.paused ? "FECHADO" : sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
+        <Button type="submit" disabled={settings.paused || (!settings.isOpen && !scheduled) || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{settings.paused || (!settings.isOpen && !scheduled) ? "FECHADO" : sending ? "A enviar…" : scheduled ? priceChange !== null ? "Confirmar novo total e agendar" : "Agendar pedido" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
       </form>
     </>}
   </div>;

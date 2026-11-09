@@ -733,6 +733,7 @@ export type Database = {
           postal_code: string | null
           reference: string
           request_fingerprint: string | null
+          scheduled_for: string | null
           service: string
           source: string
           status: string
@@ -759,6 +760,7 @@ export type Database = {
           postal_code?: string | null
           reference: string
           request_fingerprint?: string | null
+          scheduled_for?: string | null
           service: string
           source?: string
           status?: string
@@ -785,6 +787,7 @@ export type Database = {
           postal_code?: string | null
           reference?: string
           request_fingerprint?: string | null
+          scheduled_for?: string | null
           service?: string
           source?: string
           status?: string

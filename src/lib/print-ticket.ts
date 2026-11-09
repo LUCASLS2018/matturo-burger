@@ -4,7 +4,7 @@ type TicketOrder = {
   reference: string; daily_number?: number | null; order_day?: string | null;
   customer_name: string; customer_phone: string; service: string;
   address?: string | null; postal_code?: string | null; notes?: string | null;
-  created_at: string; delivery_fee_cents: number; total_cents: number;
+  created_at: string; scheduled_for?: string | null; delivery_fee_cents: number; total_cents: number;
   matturo_order_items: { name: string; options: unknown; qty: number; line_total_cents: number }[];
 };
 
@@ -22,7 +22,7 @@ h1{font-size:16px;text-align:center;margin:0}.big{font-size:22px;text-align:cent
 .c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.row{display:flex;justify-content:space-between;gap:6px}
 .opt{padding-left:10px;font-size:11px}.tot{font-size:15px;font-weight:bold}</style></head><body>
 <h1>MATTURO BURGER</h1><div class="big">#${orderNumber(order)}</div>
-<div class="c">${esc(order.service)} · ${new Date(order.created_at).toLocaleString("pt-PT")}</div><hr>
+<div class="c">${esc(order.service)} · ${new Date(order.created_at).toLocaleString("pt-PT")}</div>${order.scheduled_for ? `<div class="c"><b>AGENDADO: ${new Date(order.scheduled_for).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" })}</b></div>` : ""}<hr>
 <div><b>${esc(order.customer_name)}</b></div><div>${esc(order.customer_phone)}</div>
 ${order.address ? `<div>${esc(order.address)}</div><div>${esc(order.postal_code ?? "")}</div>` : ""}<hr>
 ${items}<hr>

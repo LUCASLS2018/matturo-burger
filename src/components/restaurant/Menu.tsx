@@ -11,7 +11,7 @@ import { publicSettingsQuery } from "@/lib/settings-query";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const { data: settings } = useSuspenseQuery(publicSettingsQuery);
-  const acceptingOrders = settings.isOpen && !settings.paused;
+  const acceptingOrders = !settings.paused;
   const cutout = dishCutout(dish.slug);
   const customPhoto = dish.image?.startsWith("https://") ? dish.image : null;
   const photo = customPhoto || cutout || dish.image;
@@ -22,8 +22,8 @@ export function DishCard({ dish }: { dish: Dish }) {
       <div className="mb-4 flex items-center justify-end gap-2">
         <Button size="icon" variant="outline" className="h-7 w-7 rounded-md border-0 bg-primary/15 text-primary" title={`Diminuir quantidade de ${dish.name}`} aria-label={`Diminuir quantidade de ${dish.name}`} disabled><Minus className="h-3 w-3" /></Button>
         <span className="w-4 text-center text-xs font-semibold" aria-label={`Quantidade de ${dish.name}`}>0</span>
-        {acceptingOrders && dish.available ? <Button asChild size="icon" className="h-7 w-7 rounded-md" title={`Adicionar ${dish.name}`}><Link to="/produto/$slug" params={{ slug: dish.slug }} search={{ quantidade: 1 }} aria-label={`Adicionar ${dish.name}`}><Plus className="h-3 w-3" /></Link></Button> : <Button size="icon" className="h-7 w-7 rounded-md" disabled title={settings.isOpen ? "Pedidos pausados" : "Restaurante fechado"} aria-label={`Adicionar ${dish.name}`}><Plus className="h-3 w-3" /></Button>}
-        {acceptingOrders && dish.available ? <Button asChild size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" title={`Selecionar ${dish.name}`}><Link to="/produto/$slug" params={{ slug: dish.slug }} search={{ quantidade: 1 }} aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Link></Button> : <Button size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" disabled title={settings.isOpen ? "Pedidos pausados" : "Restaurante fechado"} aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Button>}
+        {acceptingOrders && dish.available ? <Button asChild size="icon" className="h-7 w-7 rounded-md" title={`Adicionar ${dish.name}`}><Link to="/produto/$slug" params={{ slug: dish.slug }} search={{ quantidade: 1 }} aria-label={`Adicionar ${dish.name}`}><Plus className="h-3 w-3" /></Link></Button> : <Button size="icon" className="h-7 w-7 rounded-md" disabled title="Pedidos pausados" aria-label={`Adicionar ${dish.name}`}><Plus className="h-3 w-3" /></Button>}
+        {acceptingOrders && dish.available ? <Button asChild size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" title={`Selecionar ${dish.name}`}><Link to="/produto/$slug" params={{ slug: dish.slug }} search={{ quantidade: 1 }} aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Link></Button> : <Button size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" disabled title="Pedidos pausados" aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Button>}
       </div>
       <Link to="/produto/$slug" params={{ slug: dish.slug }}><h3 className="min-h-10 break-words text-sm font-semibold leading-5">{dish.name}</h3></Link>
       <p className="mt-2 text-base font-semibold text-primary">{dish.available ? money(dish.price) : "Indisponível"}</p>

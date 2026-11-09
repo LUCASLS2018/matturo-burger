@@ -11,7 +11,7 @@ import { REWARD_SLUG } from "./loyalty";
 import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
-import { CLOSED_ORDER_MESSAGE, isRestaurantOpen } from "./opening-hours";
+import { CLOSED_ORDER_MESSAGE, canAcceptScheduledOrder, isRestaurantOpen, scheduledOrderError } from "./opening-hours";
 import { distanceKm, findRadiusZone, radiusZoneLabel } from "./delivery-radius";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
@@ -20,6 +20,7 @@ const orderInput = z.object({
   phone: loyaltyPhoneSchema,
   service: z.enum(orderServices),
   source: z.enum(orderSources).default("web"),
+  scheduledFor: z.string().datetime({ offset: true }).optional(),
   address: z.string().trim().max(250).optional(),
   postal: z.string().trim().max(8).optional(),
   notes: z.string().trim().max(500).optional(),
@@ -44,8 +45,11 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     db.from("matturo_menu_items").select(menuFields).eq("visible", true),
   ]);
   if (settings.error || zones.error || menu.error) throw new Error("Não foi possível registar o pedido. Tente novamente.");
-  if (settings.data.orders_paused) throw new Error("O Matturo está temporariamente sem aceitar pedidos.");
-  if (!isRestaurantOpen(new Date())) throw new Error(CLOSED_ORDER_MESSAGE);
+  if (settings.data.orders_paused) throw new Error("O Matturo está FECHADO temporariamente e não está a aceitar pedidos.");
+  const now = new Date();
+  const scheduleError = scheduledOrderError(data.scheduledFor, now);
+  if (scheduleError) throw new Error(scheduleError);
+  if (!isRestaurantOpen(now) && !data.scheduledFor) throw new Error(CLOSED_ORDER_MESSAGE);
   const itemIds = menu.data.map((item) => item.id);
   const [groups, modifiers] = await Promise.all([
     db.from("matturo_modifier_groups").select("item_id,id,name,required,min,max,position,revision").in("item_id", itemIds),
@@ -107,6 +111,7 @@ async function createOrder(data: z.infer<typeof orderInput>) {
       delivery_fee_cents: fee, subtotal_cents: subtotal, total_cents: total, notes: data.notes || "",
       access_token_hash: await tokenHash(data.accessToken), idempotency_key: data.submissionId,
       request_fingerprint: await tokenHash(ip), access_expires_at: new Date(Date.now() + 30 * 86400000).toISOString(),
+      scheduled_for: data.scheduledFor ?? null,
     },
     p_items: lines,
     ...(rewardSessionHash ? { p_session_hash: rewardSessionHash } : {}),
@@ -134,7 +139,7 @@ export const createManualOrder = createServerFn({ method: "POST" }).middleware([
 export const orderByToken = createServerFn({ method: "GET" }).inputValidator((input) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).parse(input)).handler(async ({ data }) => {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-  const result = await db.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,access_expires_at,access_revoked_at").eq("access_token_hash", await tokenHash(data.token)).maybeSingle();
+  const result = await db.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,scheduled_for,access_expires_at,access_revoked_at").eq("access_token_hash", await tokenHash(data.token)).maybeSingle();
   if (result.error || !result.data || !orderAccessValid(result.data.access_expires_at, result.data.access_revoked_at)) return null;
   const items = await db.from("matturo_order_items").select("name,options,qty,line_total_cents").eq("order_id", result.data.id);
   const { id, access_expires_at: _expires, access_revoked_at: _revoked, ...order } = result.data;
@@ -169,7 +174,7 @@ export const claimOrder = createServerFn({ method: "POST" }).middleware([require
 
 export const myOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
-  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,service,zone_name,delivery_fee_cents,subtotal_cents,total_cents,status,created_at,scheduled_for,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os seus pedidos.");
   return result.data;
 });
@@ -177,7 +182,7 @@ export const myOrders = createServerFn({ method: "POST" }).middleware([requireSu
 export const adminOrders = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
   await assertAdmin(context.supabase);
-  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,source,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
+  const result = await context.supabase.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,service,source,address,postal_code,zone_name,delivery_fee_cents,subtotal_cents,total_cents,notes,status,created_at,scheduled_for,matturo_order_items(name,options,qty,line_total_cents),matturo_order_events(status,actor_id,created_at)").order("created_at", { ascending: false }).limit(100);
   if (result.error) throw new Error("Não foi possível carregar os pedidos.");
   return result.data;
 });
@@ -185,6 +190,14 @@ export const adminOrders = createServerFn({ method: "POST" }).middleware([requir
 export const setOrderStatus = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => z.object({ id: z.string().uuid(), from: z.enum(orderStatuses), to: z.enum(orderStatuses) }).parse(input)).handler(async ({ data, context }) => {
   await assertAdmin(context.supabase);
   if (!canMoveOrder(data.from, data.to)) throw new Error("Mudança de estado inválida.");
+  if (data.from === "novo" && data.to === "aceite") {
+    const [current, settings] = await Promise.all([
+      context.supabase.from("matturo_orders").select("scheduled_for").eq("id", data.id).single(),
+      context.supabase.from("matturo_restaurant_settings").select("orders_paused").eq("id", true).single(),
+    ]);
+    if (current.error || settings.error) throw new Error("Não foi possível validar o horário do pedido.");
+    if (!canAcceptScheduledOrder(current.data.scheduled_for, settings.data.orders_paused, new Date())) throw new Error("Este pedido agendado só pode ser aceite com a loja aberta.");
+  }
   const result = await context.supabase.from("matturo_orders").update({ status: data.to }).eq("id", data.id).eq("status", data.from).select("id").maybeSingle();
   if (result.error) throw new Error("Não foi possível guardar. Tente novamente.");
   if (!result.data) throw new Error("Este pedido foi alterado noutra janela. Atualize a lista.");
@@ -219,10 +232,11 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
   .handler(async ({ data, context }) => {
     const db = context.supabase;
     await assertAdmin(db);
-    const order = await db.from("matturo_orders").select("reference,service,address,postal_code,customer_name,customer_phone,status").eq("id", data.orderId).single();
+    const order = await db.from("matturo_orders").select("reference,service,address,postal_code,customer_name,customer_phone,status,scheduled_for").eq("id", data.orderId).single();
     if (order.error) throw new Error("Pedido não encontrado.");
     if (order.data.service !== "Delivery" || !order.data.address) throw new Error("Só pedidos de delivery têm estafeta.");
     if (["concluido", "cancelado"].includes(order.data.status)) throw new Error("Pedido já fechado.");
+    if (order.data.status === "novo" && order.data.scheduled_for) throw new Error("O pedido agendado ainda não foi aceite pela equipa.");
     const { geocodePt } = await import("./geocode.server");
     const point = await geocodePt(order.data.address, order.data.postal_code ?? "");
     if (!point) throw new Error("Não consegui localizar este código postal. Confirme o código postal do cliente.");

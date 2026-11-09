@@ -27,7 +27,7 @@ type Board = Awaited<ReturnType<typeof orderCourierBoard>>;
 
 export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => restaurantHead("Pedidos", "Central privada de pedidos Matturo Burger."),
-  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(ordersQuery), context.queryClient.ensureQueryData(boardQuery)]),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(ordersQuery), context.queryClient.ensureQueryData(boardQuery), context.queryClient.ensureQueryData(publicSettingsQuery)]),
   errorComponent: () => <div className="page-width py-16"><h1 className="section-title">Acesso indisponível</h1><p className="mt-4">Esta área exige acesso de administrador.</p><Button asChild className="mt-6"><Link to="/entregas">Voltar à equipa</Link></Button></div>,
   component: OrdersPage,
 });
@@ -50,10 +50,11 @@ function OrdersPage() {
   const qc = useQueryClient();
   const move = useServerFn(setOrderStatus);
   const { data: board } = useSuspenseQuery(boardQuery);
+  const { data: settings } = useSuspenseQuery(publicSettingsQuery);
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
-  const [tab, setTab] = useState<OrderStatus | "mapa">("novo");
+  const [tab, setTab] = useState<OrderStatus | "mapa" | "agendados">("novo");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("todos");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);
@@ -78,7 +79,7 @@ function OrdersPage() {
     const ch = supabase.channel("matturo-orders").on("postgres_changes", { event: "*", schema: "public", table: "matturo_orders" }, (p) => {
       void qc.invalidateQueries({ queryKey: ordersQuery.queryKey });
       if (p.eventType === "INSERT") {
-        toast.success("Novo pedido recebido");
+        toast.success((p.new as { scheduled_for?: string | null }).scheduled_for ? "Pedido agendado recebido" : "Novo pedido recebido");
       }
     }).subscribe();
     return () => { void supabase.removeChannel(ch); };
@@ -99,6 +100,9 @@ function OrdersPage() {
   const visible = filterByOrderSource(data, sourceFilter);
   const sorted = oldestFirst(visible);
   const cancelled = sorted.filter((o) => o.status === "cancelado");
+  const scheduled = sorted.filter((o) => o.status === "novo" && o.scheduled_for);
+  const scheduledGroups = groupByService(scheduled);
+  const orderingOpen = settings.isOpen && !settings.paused;
 
   return (
     <div className="page-width py-10">
@@ -124,16 +128,17 @@ function OrdersPage() {
 
       <div role="tablist" aria-label="Estado dos pedidos" className="mt-8 flex gap-2 overflow-x-auto border-b border-border pb-px">
         {columns.map((col) => {
-          const count = visible.filter((o) => o.status === col.key).length;
+          const count = visible.filter((o) => o.status === col.key && (col.key !== "novo" || !o.scheduled_for)).length;
           const on = tab === col.key;
           return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
         })}
+        <button role="tab" aria-selected={tab === "agendados"} onClick={() => setTab("agendados")} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${tab === "agendados" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><Clock className="h-4 w-4" />Agendados<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${tab === "agendados" ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{scheduled.length}</span></button>
         <button role="tab" aria-selected={tab === "mapa"} onClick={() => setTab("mapa")} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${tab === "mapa" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><MapPin className="h-4 w-4" />Estafetas no mapa</button>
       </div>
       <div className="mt-4">
         {tab === "mapa" && <LiveCouriers />}
         {columns.filter((col) => col.key === tab).map((col) => {
-          const items = sorted.filter((o) => o.status === col.key);
+          const items = sorted.filter((o) => o.status === col.key && (col.key !== "novo" || !o.scheduled_for));
           const groups = groupByService(items);
           return (
             <section key={col.key} role="tabpanel">
@@ -151,6 +156,7 @@ function OrdersPage() {
                         onPick={(id, value) => setPick({ ...pick, [id]: value })}
                         onSend={sendToCourier}
                         onMove={change}
+                        orderingOpen={orderingOpen}
                         nearby={nearbyOrders(o, sorted, board)}
                         onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
                       />
@@ -161,6 +167,14 @@ function OrdersPage() {
             </section>
           );
         })}
+        {tab === "agendados" && <section role="tabpanel" aria-label="Pedidos agendados">
+          {!orderingOpen && scheduled.length > 0 && <p className="mb-4 rounded-xl border border-border bg-card p-3 text-sm">A loja está fechada: estes pedidos só podem ser aceites durante o horário de funcionamento.</p>}
+          {!scheduled.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos agendados</p>}
+          {scheduledGroups.map((group) => <div key={group.service} className="mb-8 last:mb-0">
+            <ServiceGroupHeading service={group.service} count={group.orders.length} />
+            <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={sendToCourier} onMove={change} orderingOpen={orderingOpen} />)}</div>
+          </div>)}
+        </section>}
       </div>
 
       {cancelled.length > 0 && (
@@ -172,7 +186,7 @@ function OrdersPage() {
                 <div key={group.service}>
                   <ServiceGroupHeading service={group.service} count={group.orders.length} />
                   <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}
+                    {group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} orderingOpen={orderingOpen} />)}
                   </div>
                 </div>
               ))}
@@ -185,16 +199,16 @@ function OrdersPage() {
   );
 }
 
-export function nearbyOrders<T extends { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null }>(order: T, all: T[], board: { deliveries: { order_id: string | null }[] }) {
+export function nearbyOrders<T extends { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null; scheduled_for?: string | null }>(order: T, all: T[], board: { deliveries: { order_id: string | null }[] }) {
   if (order.service !== "Delivery" || !order.postal_code) return [];
   const prefix = order.postal_code.replace(/\D/g, "").slice(0, 4);
   const assigned = new Set(board.deliveries.map((d) => d.order_id));
   if (assigned.has(order.id)) return [];
-  return all.filter((o) => o.id !== order.id && o.service === "Delivery" && isActive(o.status as OrderStatus) && !assigned.has(o.id)
+  return all.filter((o) => o.id !== order.id && o.service === "Delivery" && isActive(o.status as OrderStatus) && !(o.status === "novo" && o.scheduled_for) && !assigned.has(o.id)
     && ((o.postal_code ?? "").replace(/\D/g, "").slice(0, 4) === prefix || (!!order.zone_name && o.zone_name === order.zone_name)));
 }
 
-function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby = [], onSendNearby }: {
+function OrderCard({ order, board, courierPick, onPick, onSend, onMove, orderingOpen, nearby = [], onSendNearby }: {
   nearby?: AdminOrder[];
   onSendNearby?: (ids: string[]) => Promise<void>;
   order: AdminOrder;
@@ -203,6 +217,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
   onPick: (orderId: string, courierId: string) => void;
   onSend: (orderId: string) => Promise<void>;
   onMove: (id: string, from: OrderStatus, to: OrderStatus) => Promise<void>;
+  orderingOpen: boolean;
 }) {
   const Icon = serviceIcon(order.service);
   const delivery = board.deliveries.find((d) => d.order_id === order.id);
@@ -232,7 +247,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
           <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
         </span>
         <span className="mt-2 flex items-center justify-between gap-2 pl-10">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusTone(order.status)}`}>{boardLabels[order.status] ?? order.status}</span>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusTone(order.status)}`}>{order.status === "novo" && order.scheduled_for ? "Agendado" : boardLabels[order.status] ?? order.status}</span>
           <b className="text-sm tabular-nums">{money(order.total_cents / 100)}</b>
         </span>
       </button>
@@ -245,6 +260,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
               <p className="font-semibold">{order.customer_name}</p>
               <a className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3 w-3" />{order.customer_phone}</a>
               {order.address && <p className="flex items-start gap-1.5 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3 shrink-0" />{order.address} · {order.postal_code} ({order.zone_name})</p>}
+              {order.scheduled_for && <p className="font-semibold text-primary">Agendado: {new Date(order.scheduled_for).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" })}</p>}
             </div>
             <ul className="space-y-1.5 rounded-lg bg-secondary/40 p-3 text-xs">
               {order.matturo_order_items.flatMap((i) => Array.from({ length: Math.max(1, i.qty) }, () => ({ ...i, qty: 1, line_total_cents: Math.round(i.line_total_cents / Math.max(1, i.qty)) }))).map((i, n) => <li key={n}><div className="flex justify-between gap-2"><span><b>{i.qty}×</b> {i.name}</span><span className="shrink-0 tabular-nums">{money(i.line_total_cents / 100)}</span></div>{Object.entries(i.options as Record<string, string>).map(([k, v]) => <p key={k} className="pl-4 text-[11px] text-muted-foreground">{k}: {v}</p>)}</li>)}
@@ -254,13 +270,13 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
               <span className="text-[11px] text-muted-foreground">{order.delivery_fee_cents ? `Inclui entrega ${money(order.delivery_fee_cents / 100)}` : "Total"}</span>
               <span className="text-lg font-bold tabular-nums">{money(order.total_cents / 100)}</span>
             </div>
-            {order.service === "Delivery" && isActive(order.status) && (delivery
+            {order.service === "Delivery" && isActive(order.status) && !(order.status === "novo" && order.scheduled_for) && (delivery
               ? <p className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs"><Bike className="h-3.5 w-3.5 text-primary" />Estafeta: <b>{board.couriers.find((c) => c.id === delivery.courier_id)?.name ?? "—"}</b> · {delivery.status === "active" ? "a caminho" : delivery.status === "delivered" ? "entregue" : "atribuído"}</p>
               : !board.couriers.length
                 ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
                 : <>{nearby.length > 0 && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-xs"><p className="font-semibold text-primary">{nearby.length} pedido{nearby.length > 1 ? "s" : ""} perto deste cliente</p><ul className="mt-1 space-y-0.5 text-muted-foreground">{nearby.map((n) => <li key={n.id}>#{orderNumber(n)} · {n.customer_name} · {n.address}</li>)}</ul><Button size="sm" className="mt-2 h-8 w-full" onClick={() => void onSendNearby?.(nearby.map((n) => n.id))}><Bike />Enviar todos ao mesmo estafeta</Button></div>}<div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div></>)}
           </div>
-          {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
+          {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} disabled={s === "aceite" && order.status === "novo" && !!order.scheduled_for && !orderingOpen} title={s === "aceite" && order.scheduled_for && !orderingOpen ? "Só pode aceitar com a loja aberta" : undefined} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
         </div>
       )}
     </article>

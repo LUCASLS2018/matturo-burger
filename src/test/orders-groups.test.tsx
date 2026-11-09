@@ -1,4 +1,4 @@
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => {
     total_cents: 1200,
     delivery_fee_cents: service === "Delivery" ? 300 : 0,
     notes: null,
+    scheduled_for: null as string | null,
     matturo_order_items: [{ name: "Hambúrguer", qty: 1, line_total_cents: 1200, options: {} }],
   });
   return {
@@ -30,6 +31,7 @@ const mocks = vi.hoisted(() => {
       order("R1", "Retirada", 40),
     ],
     board: { couriers: [{ id: "c1", name: "Ana" }], deliveries: [] },
+    settings: { isOpen: true, paused: false },
   };
 });
 
@@ -61,7 +63,7 @@ vi.mock("@tanstack/react-query", () => ({
   queryOptions: (options: unknown) => options,
   useQueryClient: () => ({ invalidateQueries: mocks.invalidate, fetchQuery: vi.fn() }),
   useSuspenseQuery: (query: { queryKey: string[] }) => ({
-    data: query.queryKey[0] === "matturo-order-couriers" ? mocks.board : mocks.orders,
+    data: query.queryKey[0] === "matturo-order-couriers" ? mocks.board : query.queryKey[0] === "settings" ? mocks.settings : mocks.orders,
   }),
 }));
 
@@ -77,5 +79,21 @@ describe("orders board", () => {
     expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual(["Delivery", "Retirada"]);
     const cards = screen.getAllByRole("article");
     expect(cards.map((card) => card.querySelector("b")?.textContent)).toEqual(["#D1", "#D2", "#R1", "#R2"]);
+  });
+
+  it("keeps scheduled orders in their own tab and disables acceptance while closed", () => {
+    mocks.orders.push({ ...mocks.orders[0]!, id: "scheduled", reference: "A1", customer_name: "Cliente A1", scheduled_for: "2026-11-10T12:00:00Z" });
+    mocks.settings.isOpen = false;
+    try {
+      render(<OrdersPage />);
+      expect(screen.queryByText("Cliente A1")).toBeNull();
+      fireEvent.click(screen.getByRole("tab", { name: /Agendados/ }));
+      expect(screen.getByText("Cliente A1")).toBeTruthy();
+      fireEvent.click(screen.getByRole("article").querySelector("button") as HTMLButtonElement);
+      expect((screen.getByRole("button", { name: "Aceite" }) as HTMLButtonElement).disabled).toBe(true);
+    } finally {
+      mocks.orders.pop();
+      mocks.settings.isOpen = true;
+    }
   });
 });
