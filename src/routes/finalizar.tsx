@@ -87,7 +87,7 @@ function Checkout() {
     let normalizedPhone: string;
     try { normalizedPhone = canonicalPhone(phone); } catch { setError("Indique um telemóvel válido."); return; }
     if (!name.trim() || (delivery && (!address.trim() || !zone))) {
-      setError(delivery && !zone ? "Indique o seu nome, a morada e um código postal de uma zona de entrega." : "Indique o seu nome, um telemóvel válido e, para delivery, a morada de entrega.");
+      setError(delivery && !zone ? radiusMode ? radiusQuote ? "Esta morada está fora do raio de entrega." : "Verifique a distância e os portes antes de enviar o pedido." : "Indique o seu nome, a morada e um código postal de uma zona de entrega." : "Indique o seu nome, um telemóvel válido e, para delivery, a morada de entrega.");
       return;
     }
     if (!payment) { setError("Escolha a forma de pagamento."); return; }
