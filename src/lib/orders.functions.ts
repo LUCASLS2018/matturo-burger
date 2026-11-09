@@ -210,6 +210,8 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
     if (result.error) throw new Error(result.error.message.includes("inativo") ? "Este estafeta está inativo." : result.error.message.includes("duplicate") ? "Este pedido já tem estafeta." : "Não foi possível atribuir o estafeta.");
     const { notifyOrder } = await import("./push.server");
     await notifyOrder(data.orderId).catch(() => 0);
+    const { notifyCourier } = await import("./push.server");
+    await notifyCourier(data.orderId).catch(() => 0);
     return { id: result.data };
   });
 

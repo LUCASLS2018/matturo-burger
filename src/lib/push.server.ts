@@ -102,3 +102,21 @@ export async function notifyOrder(orderId: string): Promise<number> {
   if (stale.length) await supabaseAdmin.from("matturo_push_tokens").delete().in("id", stale);
   return results.filter((result) => result.outcome === "sent").length;
 }
+
+/** Alerts the assigned courier's devices that a new delivery was sent to them. Never throws. */
+export async function notifyCourier(orderId: string): Promise<number> {
+  if (!pushReady()) return 0;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const [order, delivery] = await Promise.all([
+    supabaseAdmin.from("matturo_orders").select("reference,daily_number,order_day,address,postal_code").eq("id", orderId).maybeSingle(),
+    supabaseAdmin.from("matturo_deliveries").select("courier_id").eq("order_id", orderId).maybeSingle(),
+  ]);
+  if (!order.data || !delivery.data?.courier_id) return 0;
+  const devices = await supabaseAdmin.from("matturo_courier_push_tokens").select("id,token").eq("user_id", delivery.data.courier_id);
+  if (devices.error || !devices.data?.length) return 0;
+  const message = { title: "Nova entrega", body: `Recebeu o pedido #${orderNumber(order.data)} · ${order.data.address ?? ""} ${order.data.postal_code ?? ""}`.trim() };
+  const results = await Promise.all(devices.data.map(async (d) => ({ id: d.id, outcome: await sendToToken(d.token, message, "/entregas") })));
+  const stale = results.filter((r) => r.outcome === "stale").map((r) => r.id);
+  if (stale.length) await supabaseAdmin.from("matturo_courier_push_tokens").delete().in("id", stale);
+  return results.filter((r) => r.outcome === "sent").length;
+}
