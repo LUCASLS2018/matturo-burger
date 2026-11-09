@@ -577,6 +577,27 @@ export type Database = {
           },
         ]
       }
+      matturo_order_daily_counters: {
+        Row: {
+          created_at: string
+          last_number: number
+          order_day: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          last_number: number
+          order_day: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          last_number?: number
+          order_day?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       matturo_order_events: {
         Row: {
           actor_id: string | null
@@ -676,10 +697,12 @@ export type Database = {
           customer_id: string | null
           customer_name: string
           customer_phone: string
+          daily_number: number
           delivery_fee_cents: number
           id: string
           idempotency_key: string | null
           notes: string | null
+          order_day: string
           postal_code: string | null
           reference: string
           request_fingerprint: string | null
@@ -699,10 +722,12 @@ export type Database = {
           customer_id?: string | null
           customer_name: string
           customer_phone: string
+          daily_number: number
           delivery_fee_cents?: number
           id?: string
           idempotency_key?: string | null
           notes?: string | null
+          order_day: string
           postal_code?: string | null
           reference: string
           request_fingerprint?: string | null
@@ -722,10 +747,12 @@ export type Database = {
           customer_id?: string | null
           customer_name?: string
           customer_phone?: string
+          daily_number?: number
           delivery_fee_cents?: number
           id?: string
           idempotency_key?: string | null
           notes?: string | null
+          order_day?: string
           postal_code?: string | null
           reference?: string
           request_fingerprint?: string | null
@@ -1384,6 +1411,10 @@ export type Database = {
       }
       matturo_has_role: { Args: { wanted: string }; Returns: boolean }
       matturo_loyalty_phone: { Args: { raw_phone: string }; Returns: string }
+      matturo_next_daily_order_number: {
+        Args: { p_day: string }
+        Returns: number
+      }
       matturo_place_loyalty_order: {
         Args: {
           p_items: Json
