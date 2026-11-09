@@ -11,7 +11,7 @@ import { publicSettingsQuery } from "@/lib/settings-query";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const { data: settings } = useSuspenseQuery(publicSettingsQuery);
-  const acceptingOrders = settings.isOpen && !settings.paused;
+  const acceptingOrders = !settings.paused;
   const cutout = dishCutout(dish.slug);
   const customPhoto = dish.image?.startsWith("https://") ? dish.image : null;
   const photo = customPhoto || cutout || dish.image;
