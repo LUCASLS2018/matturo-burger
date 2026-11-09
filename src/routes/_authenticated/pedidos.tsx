@@ -14,6 +14,7 @@ import { nextOrderSteps, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
 import { ManualOrder, manualMenuQuery } from "@/components/restaurant/ManualOrder";
 import { publicSettingsQuery } from "@/lib/settings-query";
+import { LiveCouriers } from "@/components/restaurant/LiveCouriers";
 
 const ordersQuery = queryOptions({ queryKey: ["matturo-admin-orders"], queryFn: () => adminOrders() });
 const boardQuery = queryOptions({ queryKey: ["matturo-order-couriers"], queryFn: () => orderCourierBoard() });
@@ -49,7 +50,7 @@ function OrdersPage() {
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
-  const [tab, setTab] = useState<OrderStatus>("novo");
+  const [tab, setTab] = useState<OrderStatus | "mapa">("novo");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);
   const openManual = async () => {
@@ -120,8 +121,10 @@ function OrdersPage() {
           const on = tab === col.key;
           return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
         })}
+        <button role="tab" aria-selected={tab === "mapa"} onClick={() => setTab("mapa")} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${tab === "mapa" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><MapPin className="h-4 w-4" />Estafetas no mapa</button>
       </div>
       <div className="mt-4">
+        {tab === "mapa" && <LiveCouriers />}
         {columns.filter((col) => col.key === tab).map((col) => {
           const items = sorted.filter((o) => o.status === col.key);
           const groups = groupByService(items);
