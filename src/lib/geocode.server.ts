@@ -7,6 +7,22 @@ export function houseNumber(address: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
+export async function geocodeAddressPt(address: string): Promise<Geo | null> {
+  if (address.trim().length < 5) return null;
+  try {
+    const query = new URLSearchParams({ format: "jsonv2", countrycodes: "pt", limit: "1", q: address.trim() });
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?${query}`, { headers: { Accept: "application/json", "Accept-Language": "pt", "User-Agent": "MatturoBurger/1.0" } });
+    if (!response.ok) return null;
+    const results = await response.json() as { lat?: string; lon?: string; display_name?: string }[];
+    const first = results[0];
+    const lat = Number(first?.lat);
+    const lng = Number(first?.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return { lat, lng, street: first?.display_name ?? null, exact: true };
+  } catch { /* sem rede */ }
+  return null;
+}
+
 export async function geocodePt(address: string, postal: string): Promise<Geo | null> {
   const cp = postal.replace(/\s/g, "");
   if (!/^\d{4}-?\d{3}$/.test(cp)) return null;
