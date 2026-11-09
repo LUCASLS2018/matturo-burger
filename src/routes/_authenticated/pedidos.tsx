@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
+import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChevronDown, Clock, MapPin, Phone, Plus, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
 import { nextOrderSteps, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
+import { ManualOrder, manualMenuQuery } from "@/components/restaurant/ManualOrder";
+import { publicSettingsQuery } from "@/lib/settings-query";
 
 const ordersQuery = queryOptions({ queryKey: ["matturo-admin-orders"], queryFn: () => adminOrders() });
 const boardQuery = queryOptions({ queryKey: ["matturo-order-couriers"], queryFn: () => orderCourierBoard() });
@@ -44,6 +46,16 @@ function OrdersPage() {
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
+  const [manualOpen, setManualOpen] = useState(false);
+  const [loadingManual, setLoadingManual] = useState(false);
+  const openManual = async () => {
+    setLoadingManual(true);
+    try {
+      await Promise.all([qc.fetchQuery(manualMenuQuery), qc.fetchQuery(publicSettingsQuery)]);
+      setManualOpen(true);
+    } catch { toast.error("Não foi possível carregar o formulário. Tente novamente."); }
+    finally { setLoadingManual(false); }
+  };
   const sendToCourier = async (orderId: string) => {
     const courierId = pick[orderId] ?? board.couriers[0]?.id; if (!courierId) return;
     try { await assign({ data: { orderId, courierId } }); toast.success("Pedido enviado ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }
@@ -85,6 +97,7 @@ function OrdersPage() {
           <h1 className="section-title mt-1">Central de pedidos</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <Button size="sm" disabled={loadingManual} onClick={() => void openManual()}><Plus />{loadingManual ? "A carregar…" : "Criar pedido manual"}</Button>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium"><span className="h-2 w-2 animate-pulse rounded-full bg-primary" />Em direto</span>
           <Button asChild variant="outline" size="sm"><Link to="/pedidos-concluidos"><CheckCircle2 />Concluídos</Link></Button>
           <Button variant={sound ? "default" : "outline"} size="sm" onClick={() => setSound(!sound)}>{sound ? <Bell /> : <BellOff />}{sound ? "Som ligado" : "Som desligado"}</Button>
@@ -129,6 +142,7 @@ function OrdersPage() {
           {showCancelled && <div className="mt-4 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">{cancelled.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={async () => {}} onMove={change} />)}</div>}
         </div>
       )}
+      {manualOpen && <Suspense fallback={null}><ManualOrder onClose={() => setManualOpen(false)} /></Suspense>}
     </div>
   );
 }
