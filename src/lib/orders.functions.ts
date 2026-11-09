@@ -6,7 +6,7 @@ import { orderServices, needsDeliveryAddress } from "./order-service";
 import { findZone } from "./restaurant-settings";
 import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./order-pricing";
 import { tokenHash } from "./delivery";
-import { loyaltyBalance, REWARD_POINTS, REWARD_SLUG } from "./loyalty";
+import { groupPhoneLoyalty, loyaltyBalance, REWARD_POINTS, REWARD_SLUG } from "./loyalty";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -227,18 +227,22 @@ export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requi
   setResponseHeader("Cache-Control", "no-store");
   await assertAdmin(context.supabase);
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-  const [orders, redemptions, profiles] = await Promise.all([
-    db.from("matturo_orders").select("customer_id,customer_name,customer_phone,subtotal_cents,status").not("customer_id", "is", null).limit(5000),
-    db.from("matturo_loyalty_redemptions").select("customer_id,points,created_at,matturo_orders(status,reference)").order("created_at", { ascending: false }),
-    db.from("matturo_profiles").select("id,name"),
-  ]);
-  if (orders.error || redemptions.error || profiles.error) throw new Error("Não foi possível carregar a fidelização.");
-  const reds = redemptions.data as unknown as { customer_id: string; points: number; created_at: string; matturo_orders: { status: string; reference: string } | null }[];
-  const ids = [...new Set(orders.data.map((o) => o.customer_id as string))];
-  return ids.map((id) => {
-    const own = orders.data.filter((o) => o.customer_id === id);
-    const r = reds.filter((x) => x.customer_id === id);
-    const b = loyaltyBalance(own, r.map((x) => ({ points: x.points, order_status: x.matturo_orders?.status ?? "novo" })));
-    return { id, name: profiles.data.find((p) => p.id === id)?.name || own[0]!.customer_name, phone: own[0]!.customer_phone, ...b, redemptions: r.map((x) => ({ at: x.created_at, reference: x.matturo_orders?.reference ?? "", cancelled: x.matturo_orders?.status === "cancelado" })) };
-  }).sort((a, b) => b.available - a.available);
+  // Read every page: PostgREST caps each response even when a larger limit is requested.
+  const orders: { customer_name: string; customer_phone: string; subtotal_cents: number; status: string }[] = [];
+  const redemptions: { phone: string; points: number; order_status: string; at: string; reference: string }[] = [];
+  for (let offset = 0; ; offset += 500) {
+    const page = await db.from("matturo_orders").select("customer_name,customer_phone,subtotal_cents,status").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+    if (page.error) throw new Error("Não foi possível carregar a fidelização.");
+    orders.push(...page.data);
+    if (page.data.length < 500) break;
+  }
+  for (let offset = 0; ; offset += 500) {
+    const page = await db.from("matturo_loyalty_redemptions").select("points,created_at,matturo_orders(customer_phone,status,reference)").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+    if (page.error) throw new Error("Não foi possível carregar a fidelização.");
+    for (const row of page.data) {
+      if (row.matturo_orders) redemptions.push({ phone: row.matturo_orders.customer_phone, points: row.points, order_status: row.matturo_orders.status, at: row.created_at, reference: row.matturo_orders.reference });
+    }
+    if (page.data.length < 500) break;
+  }
+  return groupPhoneLoyalty(orders, redemptions);
 });

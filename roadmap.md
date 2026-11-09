@@ -1,6 +1,7 @@
 # Matturo Burger
 
-- [ ] Switch loyalty accumulation and redemption to customer telephone without requiring an account; present isolated data changes and secure redemption for approval first.
+- [ ] Guest loyalty redemption: awaiting approval of telephone-ownership confirmation and isolated transactional debit changes; telephone alone cannot authorize spending another customer's points.
+- [x] Automatically associate every customer's eligible order points to the checkout telephone; no registration or manual enrollment. Admin aggregation includes historical guest orders; six loyalty tests passed.
 
 - [x] Present and obtain approval for the complete Matturo management architecture: onsite orders, live order administration, autosaved catalogue/categories, courier assignment, customer access and restaurant pause controls.
 - [x] Create isolated restaurant settings and zone resources and administration page with revision-checked persistence; preserve existing catalogue and ordering channel until the order stage.

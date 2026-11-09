@@ -23,11 +23,10 @@ function LoyaltyPage() {
       <h1 className="section-title mt-3">Fidelização</h1>
       <p className="mt-3 text-sm text-muted-foreground">Cada 1 € gasto em produtos (pedidos concluídos, sem portes) = 1 ponto. Aos 100 pontos o cliente resgata um Hamburguinho grátis e os 100 pontos são debitados.</p>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Clientes com conta</p><p className="text-2xl font-bold">{data.length}</p></div>
+        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Telemóveis de clientes</p><p className="text-2xl font-bold">{data.length}</p></div>
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Prontos a resgatar</p><p className="text-2xl font-bold">{data.filter((c) => c.available >= 100).length}</p></div>
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Hamburguinhos resgatados</p><p className="text-2xl font-bold">{redeemed}</p></div>
       </div>
-      <p className="mt-4 text-xs text-muted-foreground">Só acumulam pontos os pedidos feitos com conta de cliente iniciada.</p>
       <ul className="mt-6 space-y-3">
         {data.map((c) => (
           <li key={c.id} className="rounded-lg border border-border bg-card p-4">
@@ -43,7 +42,7 @@ function LoyaltyPage() {
             {c.redemptions.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Resgates: {c.redemptions.map((r) => `${r.reference} (${new Date(r.at).toLocaleDateString("pt-PT")}${r.cancelled ? ", cancelado — pontos devolvidos" : ""})`).join(" · ")}</p>}
           </li>
         ))}
-        {!data.length && <li className="text-sm text-muted-foreground">Ainda não há clientes com conta.</li>}
+        {!data.length && <li className="text-sm text-muted-foreground">Ainda não há pedidos de clientes.</li>}
       </ul>
     </div>
   );
