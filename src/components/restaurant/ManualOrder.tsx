@@ -13,6 +13,7 @@ import { orderServices, needsDeliveryAddress, type OrderService } from "@/lib/or
 import { dishTotal, selectionValid, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
+import { menuCategoriesQuery } from "@/lib/menu-query";
 
 export const manualMenuQuery = queryOptions({ queryKey: ["matturo-manual-menu"], queryFn: () => adminMenu(), staleTime: 0 });
 type Line = { key: string; dish: Dish; selected: Record<string, number>; notes: string };
@@ -26,6 +27,7 @@ function ProductPhoto({ dish, className }: { dish: Dish; className: string }) {
 export function ManualOrder({ onClose }: { onClose: () => void }) {
   const { data: menu } = useSuspenseQuery(manualMenuQuery);
   const { data: settings } = useSuspenseQuery(publicSettingsQuery);
+  const { data: categories } = useSuspenseQuery(menuCategoriesQuery);
   const qc = useQueryClient();
   const save = useServerFn(createManualOrder);
   const [name, setName] = useState("");
@@ -35,6 +37,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const [notes, setNotes] = useState("");
   const [service, setService] = useState<OrderService>("Retirada");
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
   const [dishId, setDishId] = useState("");
   const [selected, setSelected] = useState<Record<string, number>>({});
   const [dishNotes, setDishNotes] = useState("");
@@ -49,6 +52,9 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const subtotal = lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0);
   const fee = zone ? zone.fee_cents / 100 : 0;
   const resetPrice = () => { setChangedTotal(null); };
+  const availableMenu = menu.filter((item) => item.visible && item.available);
+  const categorySlugs = [...new Set(availableMenu.map((item) => item.category))];
+  const visibleCategories = [...categories.filter((item) => categorySlugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.name })), ...categorySlugs.filter((slug) => !categories.some((item) => item.slug === slug)).map((slug) => ({ slug, name: slug }))];
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (busy || !lines.length) return;
@@ -84,8 +90,13 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             <div className="flex flex-wrap gap-2">{orderServices.map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); resetPrice(); }}>{value}</Button>)}</div>
             {delivery && <div className="space-y-3"><label className="block text-sm font-medium">Morada<input required maxLength={250} value={address} onChange={(e) => setAddress(e.target.value)} className={fieldClass} /></label><label className="block text-sm font-medium">Código postal<input required maxLength={8} value={postal} onChange={(e) => { setPostal(e.target.value); resetPrice(); }} placeholder="2600-000" className={fieldClass} /></label><p className="text-xs text-muted-foreground">{zone ? `${zone.name} · Entrega ${money(fee)}` : "Selecione um código postal de uma zona de entrega ativa."}</p></div>}
             <label className="block text-sm font-medium">Procurar produto<input value={search} onChange={(e) => setSearch(e.target.value)} className={fieldClass} /></label>
-            <div aria-label="Produtos" className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto pr-1">
-              {menu.filter((item) => item.visible && item.available && item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())).map((item) => <Button type="button" key={item.id} aria-label={`Selecionar ${item.name}`} aria-pressed={dishId === item.id} variant="outline" className={`h-auto min-w-0 flex-col items-stretch gap-2 whitespace-normal p-2 text-left ${dishId === item.id ? "border-primary bg-primary/5" : ""}`} onClick={() => { setDishId(item.id); setSelected({}); setDishNotes(""); }}><ProductPhoto dish={item} className="h-24 w-full" /><span className="text-xs font-semibold leading-snug">{item.name}</span><span className="text-xs text-primary">{money(item.price)}</span></Button>)}
+            <div aria-label="Categorias de produtos" className="flex gap-2 overflow-x-auto pb-2"><Button type="button" size="sm" variant={!category ? "default" : "outline"} onClick={() => setCategory("")}>Todas</Button>{visibleCategories.map((item) => <Button type="button" key={item.slug} size="sm" variant={category === item.slug ? "default" : "outline"} onClick={() => setCategory(item.slug)}>{item.name}</Button>)}</div>
+            <div aria-label="Produtos" className="max-h-80 space-y-4 overflow-y-auto pr-1">
+              {visibleCategories.filter((item) => !category || item.slug === category).map((group) => {
+                const products = availableMenu.filter((item) => item.category === group.slug && item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
+                return products.length ? <section key={group.slug}><h3 className="mb-2 text-xs font-semibold uppercase text-muted-foreground">{group.name}</h3><div className="grid grid-cols-2 gap-2">{products.map((item) => <Button type="button" key={item.id} aria-label={`Selecionar ${item.name}`} aria-pressed={dishId === item.id} variant="outline" className={`h-auto min-w-0 flex-col items-stretch gap-2 whitespace-normal p-2 text-left ${dishId === item.id ? "border-primary bg-primary/5" : ""}`} onClick={() => { setDishId(item.id); setSelected({}); setDishNotes(""); }}><ProductPhoto dish={item} className="h-24 w-full" /><span className="text-xs font-semibold leading-snug">{item.name}</span><span className="text-xs text-primary">{money(item.price)}</span></Button>)}</div></section> : null;
+              })}
+              {!availableMenu.some((item) => (!category || item.category === category) && item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) && <p className="py-6 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</p>}
             </div>
             {dish && <div className="space-y-4 border-t border-border pt-4">
               <div className="flex items-center gap-3"><ProductPhoto dish={dish} className="h-16 w-16" /><h3 className="min-w-0 text-sm font-semibold">{dish.name}</h3></div>
