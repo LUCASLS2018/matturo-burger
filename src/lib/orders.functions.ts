@@ -7,7 +7,7 @@ import { findZone } from "./restaurant-settings";
 import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./order-pricing";
 import { tokenHash } from "./delivery";
 import { REWARD_SLUG } from "./loyalty";
-import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum, DELIVERY_REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
+import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice } from "./loyalty-phone";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
@@ -71,7 +71,6 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
   const zone = delivery ? findZone(data.postal ?? "", zones.data) : null;
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");
   const subtotal = lines.reduce((sum, line) => sum + line.line_total_cents, 0);
-  if (!meetsRewardMinimum(data.service, rewardIndex >= 0, subtotal)) throw new Error(DELIVERY_REWARD_MINIMUM_MESSAGE);
   const fee = zone?.fee_cents ?? 0;
   const total = subtotal + fee;
   if (total !== data.expectedTotalCents && !data.acceptRepriced) return { kind: "price_changed" as const, totalCents: total };
