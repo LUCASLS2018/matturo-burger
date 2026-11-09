@@ -2,6 +2,7 @@
 
 - [x] Bloquear pedidos fora do horário publicado e mostrar FECHADO no site público, usando Europe/Lisbon e validação no servidor; 88 testes e verificação visual pública passaram.
 - [ ] Adicionar configuração de entregas e preços por raio calculado a partir da morada da loja.
+- [ ] Tornar o fecho por imprevisto mais evidente: botão «Fechar agora» nas configurações e FECHADO no site mesmo dentro do horário.
 
 - [x] Daily order numbering from 1, restarting at Lisbon midnight: isolated atomic counter, historical backfill and shared display; 17 tests and transactional insert/retry/cancellation checks passed. Authenticated admin visual check remains unavailable with external Supabase.
 
