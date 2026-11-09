@@ -1,5 +1,7 @@
 # Matturo Burger
 
+- [ ] Switch loyalty accumulation and redemption to customer telephone without requiring an account; present isolated data changes and secure redemption for approval first.
+
 - [x] Present and obtain approval for the complete Matturo management architecture: onsite orders, live order administration, autosaved catalogue/categories, courier assignment, customer access and restaurant pause controls.
 - [x] Create isolated restaurant settings and zone resources and administration page with revision-checked persistence; preserve existing catalogue and ordering channel until the order stage.
 - [x] Owner activated both delivery zones (2600 → 3,00 €, 1111 → 4,00 €) and wired checkout to charge the matched zone fee, block delivery outside active zones and carry the fee into the order text.
