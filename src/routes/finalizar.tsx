@@ -51,7 +51,7 @@ function Checkout() {
     navigator.geolocation.getCurrentPosition(async (position) => {
       try {
         const result = await lookup({ data: { lat: position.coords.latitude, lng: position.coords.longitude } });
-        setAddress(result.address + " — confirme o número da porta e andar");
+        setAddress(result.address);
         if (result.postal) setPostal(result.postal);
         setPriceChange(null);
       } catch (cause) {
