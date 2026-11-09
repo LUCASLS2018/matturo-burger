@@ -16,25 +16,30 @@ const rows = [
 
 describe("summarizeDailyResults", () => {
   const results = summarizeDailyResults(rows, profiles);
+  const dayAt = (index: number) => {
+    const entry = results[index];
+    if (!entry) throw new Error(`Falta o dia ${index}`);
+    return entry;
+  };
 
   it("puts the newest day first", () => {
     expect(results.map((day) => day.day)).toEqual(["2026-11-07", "2026-11-06"]);
   });
 
   it("totals each day's deliveries and value", () => {
-    expect(results[0]).toMatchObject({ deliveries: 3, valueCents: 5000 });
-    expect(results[1]).toMatchObject({ deliveries: 2, valueCents: 3000 });
+    expect(dayAt(0)).toMatchObject({ deliveries: 3, valueCents: 5000 });
+    expect(dayAt(1)).toMatchObject({ deliveries: 2, valueCents: 3000 });
   });
 
   it("splits each day per courier", () => {
-    expect(results[0].couriers).toEqual([
+    expect(dayAt(0).couriers).toEqual([
       { id: "ana", name: "Ana", deliveries: 2, valueCents: 4000 },
       { id: "bruno", name: "Bruno", deliveries: 1, valueCents: 1000 },
     ]);
   });
 
   it("keeps a delivery without a courier visible as sem estafeta", () => {
-    expect(results[1].couriers).toContainEqual({ id: "sem-estafeta", name: "Sem estafeta", deliveries: 1, valueCents: 0 });
+    expect(dayAt(1).couriers).toContainEqual({ id: "sem-estafeta", name: "Sem estafeta", deliveries: 1, valueCents: 0 });
   });
 
   it("shows nothing when there are no completed deliveries", () => {
