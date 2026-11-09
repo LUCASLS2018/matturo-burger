@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canAcceptOrders, isRestaurantOpen } from "./opening-hours";
+import { canAcceptOrders, isRestaurantOpen, lisbonDateTimeToDate, scheduledOrderError } from "./opening-hours";
 
 describe("Matturo opening hours in Europe/Lisbon", () => {
   it("stays closed all Monday", () => {

@@ -40,3 +40,40 @@ export function isRestaurantOpen(date: Date): boolean {
 export function canAcceptOrders(paused: boolean, date: Date): boolean {
   return !paused && isRestaurantOpen(date);
 }
+
+const lisbonDateTime = new Intl.DateTimeFormat("en-CA", {
+  timeZone: RESTAURANT_TIME_ZONE,
+  year: "numeric", month: "2-digit", day: "2-digit",
+  hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+});
+
+function lisbonTimestamp(date: Date): number {
+  const parts = lisbonDateTime.formatToParts(date);
+  const value = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((part) => part.type === type)?.value);
+  return Date.UTC(value("year"), value("month") - 1, value("day"), value("hour"), value("minute"));
+}
+
+/** Converts a datetime-local value explicitly from Portugal time, not the device timezone. */
+export function lisbonDateTimeToDate(value: string): Date | null {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+  if (!match) return null;
+  const [, year, month, day, hour, minute] = match;
+  const desired = Date.UTC(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
+  if (!Number.isFinite(desired)) return null;
+  let utc = desired;
+  for (let attempt = 0; attempt < 3; attempt += 1) utc = desired - (lisbonTimestamp(new Date(utc)) - utc);
+  const result = new Date(utc);
+  return lisbonTimestamp(result) === desired ? result : null;
+}
+
+export function scheduledOrderError(scheduledFor: string | undefined, now: Date): string | null {
+  if (!scheduledFor) return null;
+  const scheduled = new Date(scheduledFor);
+  if (!Number.isFinite(scheduled.getTime()) || scheduled.getTime() <= now.getTime()) return "Escolha uma data e hora futuras para o pedido agendado.";
+  if (!isRestaurantOpen(scheduled)) return "A hora agendada tem de estar dentro do horário de funcionamento: terça a domingo, 12:00–15:00 ou 19:00–21:45.";
+  return null;
+}
+
+export function formatLisbonDateTime(value: string): string {
+  return new Intl.DateTimeFormat("pt-PT", { timeZone: RESTAURANT_TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+}

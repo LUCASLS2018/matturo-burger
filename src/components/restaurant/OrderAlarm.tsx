@@ -11,7 +11,7 @@ export function OrderAlarm() {
   useEffect(() => {
     let alive = true;
     const check = async () => {
-      const r = await supabase.from("matturo_orders").select("id", { count: "exact", head: true }).eq("status", "novo");
+      const r = await supabase.from("matturo_orders").select("id", { count: "exact", head: true }).eq("status", "novo").is("scheduled_for", null);
       if (alive) setPending(r.error ? 0 : r.count ?? 0);
     };
     void check();

@@ -4,7 +4,7 @@ type TicketOrder = {
   reference: string; daily_number?: number | null; order_day?: string | null;
   customer_name: string; customer_phone: string; service: string;
   address?: string | null; postal_code?: string | null; notes?: string | null;
-  created_at: string; delivery_fee_cents: number; total_cents: number;
+  created_at: string; scheduled_for?: string | null; delivery_fee_cents: number; total_cents: number;
   matturo_order_items: { name: string; options: unknown; qty: number; line_total_cents: number }[];
 };
 
