@@ -1,4 +1,5 @@
 import { render, screen, cleanup } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
@@ -65,7 +66,7 @@ vi.mock("@tanstack/react-query", () => ({
 
 import { Route } from "@/routes/_authenticated/pedidos";
 
-const OrdersPage = (Route as unknown as { component: () => React.ReactElement }).component;
+const OrdersPage = (Route as unknown as { component: () => ReactElement }).component;
 
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 
