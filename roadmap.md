@@ -1,5 +1,6 @@
 # Matturo Burger
 
+- [x] Esclarecer o custo adicional Lovable para percursos: uso do conector e execução podem consumir créditos; a tarifa específica por cálculo não está confirmada, e a faixa gratuita do Google não garante custo zero na Lovable.
 - [x] Informar o custo de referência para percursos rodoviários: Google Routes Essentials, 10 000 cálculos gratuitos/mês e US$ 5 por 1 000 adicionais na primeira faixa; ligação e condições de faturação ainda não escolhidas.
 
 - [ ] Usar distância pelo percurso rodoviário nas faixas de entrega e portes, sem fallback em linha reta — aguarda autorização para ligar um serviço de rotas adequado a pedidos comerciais; serviços públicos de demonstração não garantem disponibilidade.
