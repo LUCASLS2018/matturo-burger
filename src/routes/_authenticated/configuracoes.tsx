@@ -4,6 +4,7 @@ import {useServerFn} from '@tanstack/react-start';
 import {useEffect,useState} from 'react';
 import {ArrowLeft,Pause,Play,Plus,MapPin,Clock3} from 'lucide-react';
 import {OPENING_HOURS_SUMMARY} from '@/lib/opening-hours';
+import {RadiusDeliverySettings} from '@/components/restaurant/RadiusDeliverySettings';
 import {Button} from '@/components/ui/button';
 import {adminSettings,setOrderPause,saveDeliveryZone} from '@/lib/settings.functions';
 import {money,restaurantHead} from '@/lib/restaurant';

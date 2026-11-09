@@ -10,7 +10,7 @@ import { useCart } from "@/lib/cart";
 import { money, restaurantHead } from "@/lib/restaurant";
 import { orderServices, needsDeliveryAddress } from "@/lib/order-service";
 import { publicSettingsQuery } from "@/lib/settings-query";
-import { publicSettings } from "@/lib/settings.functions";
+import { publicSettings, quoteRadiusDelivery } from "@/lib/settings.functions";
 import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { canonicalPhone, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";

@@ -39,8 +39,8 @@ async function createOrder(data: z.infer<typeof orderInput>) {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [settings, zones, menu] = await Promise.all([
-    db.from("matturo_restaurant_settings").select("orders_paused").eq("id", true).single(),
-    db.from("matturo_delivery_zones").select("name,postal_prefixes,fee_cents").eq("active", true),
+    db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude").eq("id", true).single(),
+    db.from("matturo_delivery_zones").select("name,postal_prefixes,fee_cents,max_distance_km").eq("active", true),
     db.from("matturo_menu_items").select(menuFields).eq("visible", true),
   ]);
   if (settings.error || zones.error || menu.error) throw new Error("Não foi possível registar o pedido. Tente novamente.");

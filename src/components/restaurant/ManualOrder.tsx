@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { adminMenu } from "@/lib/menu.functions";
 import { createManualOrder } from "@/lib/orders.functions";
+import { quoteRadiusDelivery } from "@/lib/settings.functions";
 import { publicSettingsQuery } from "@/lib/settings-query";
 import { findZone } from "@/lib/restaurant-settings";
 import { orderServices, needsDeliveryAddress, type OrderService } from "@/lib/order-service";

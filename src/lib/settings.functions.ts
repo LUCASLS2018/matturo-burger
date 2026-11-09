@@ -22,7 +22,9 @@ function publicDb(url: string, key: string) {
 
 export const publicSettings = createServerFn({ method: "GET" }).handler(async () => {
   setResponseHeader("Cache-Control", "no-store");
-  const { url, key } = publicEnvironment();
+  const url = process.env["SUPABASE_URL"];
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
+  if (!url || !key) throw new Error("Não foi possível consultar o atendimento.");
   const db = publicDb(url, key);
   const [settings, zones] = await Promise.all([
     db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude").eq("id", true).single(),
@@ -45,7 +47,9 @@ export const quoteRadiusDelivery = createServerFn({ method: "POST" })
   }).parse(input))
   .handler(async ({ data }) => {
     setResponseHeader("Cache-Control", "no-store");
-    const { url, key } = publicEnvironment();
+    const url = process.env["SUPABASE_URL"];
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
+  if (!url || !key) throw new Error("Não foi possível consultar o atendimento.");
     const db = publicDb(url, key);
     const [settings, zones] = await Promise.all([
       db.from("matturo_restaurant_settings").select("delivery_mode,store_latitude,store_longitude").eq("id", true).single(),
