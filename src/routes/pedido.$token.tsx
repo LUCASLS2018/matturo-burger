@@ -6,6 +6,7 @@ import { BellRing } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ClientOnly } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { OrderAlerts } from "@/components/restaurant/OrderAlerts";
 const DeliveryMap = lazy(() => import("@/components/restaurant/DeliveryMap"));
 import { orderByToken } from "@/lib/orders.functions";
 import { orderStatusLabels, orderStatuses, type OrderStatus } from "@/lib/order-pricing";
@@ -63,6 +64,7 @@ function OrderPage() {
         {o.delivery_fee_cents > 0 && <div className="flex justify-between"><span>Entrega ({o.zone_name})</span><span>{money(o.delivery_fee_cents / 100)}</span></div>}
         <div className="flex justify-between text-lg font-semibold"><span>Total</span><span>{money(o.total_cents / 100)}</span></div>
       </div>
+      <OrderAlerts orderToken={token} path={`/pedido/${token}`} />
       <p className="mt-6 text-sm text-muted-foreground">Guarde este endereço para acompanhar o pedido. A página atualiza sozinha.</p>
     </div>
   );

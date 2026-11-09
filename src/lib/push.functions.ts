@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { tokenHash } from "./delivery";
 import { orderAccessValid } from "./order-pricing";
+import { orderAlertPath } from "./push";
 
 // A customer registers this device from their own order page. The order link is the
 // only proof they may receive alerts about that order, so it is verified on the server.

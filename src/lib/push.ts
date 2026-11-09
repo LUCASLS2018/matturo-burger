@@ -21,6 +21,11 @@ export function pushConfigured() {
   return Boolean(apiKey && projectId && appId && vapidKey && messagingSenderId);
 }
 
+/** Only this order's own page may be opened by an alert — never an address typed by a browser. */
+export function orderAlertPath(path: string) {
+  return /^\/pedido\/[A-Za-z0-9_-]{10,200}$/.test(path);
+}
+
 /**
  * Asks the browser for notification permission and returns this device's push token.
  * Must be called from a click handler: browsers ignore permission requests without a user gesture.
