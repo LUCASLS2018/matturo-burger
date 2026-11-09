@@ -212,6 +212,7 @@ export type Database = {
           created_at: string
           fee_cents: number
           id: string
+          max_distance_km: number | null
           name: string
           postal_prefixes: string[]
           revision: number
@@ -222,6 +223,7 @@ export type Database = {
           created_at?: string
           fee_cents: number
           id?: string
+          max_distance_km?: number | null
           name: string
           postal_prefixes: string[]
           revision?: number
@@ -232,6 +234,7 @@ export type Database = {
           created_at?: string
           fee_cents?: number
           id?: string
+          max_distance_km?: number | null
           name?: string
           postal_prefixes?: string[]
           revision?: number
@@ -862,23 +865,35 @@ export type Database = {
       matturo_restaurant_settings: {
         Row: {
           created_at: string
+          delivery_mode: string
           id: boolean
           orders_paused: boolean
           revision: number
+          store_address: string
+          store_latitude: number | null
+          store_longitude: number | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          delivery_mode?: string
           id?: boolean
           orders_paused?: boolean
           revision?: number
+          store_address?: string
+          store_latitude?: number | null
+          store_longitude?: number | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          delivery_mode?: string
           id?: boolean
           orders_paused?: boolean
           revision?: number
+          store_address?: string
+          store_latitude?: number | null
+          store_longitude?: number | null
           updated_at?: string
         }
         Relationships: []

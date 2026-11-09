@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { adminMenu } from "@/lib/menu.functions";
 import { createManualOrder } from "@/lib/orders.functions";
+import { quoteRadiusDelivery } from "@/lib/settings.functions";
 import { publicSettingsQuery } from "@/lib/settings-query";
 import { findZone } from "@/lib/restaurant-settings";
 import { orderServices, needsDeliveryAddress, type OrderService } from "@/lib/order-service";
@@ -31,6 +32,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const { data: categories } = useSuspenseQuery(menuCategoriesQuery);
   const qc = useQueryClient();
   const save = useServerFn(createManualOrder);
+  const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -50,10 +52,23 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const productsRef = useRef<HTMLDivElement>(null);
   const dish = menu.find((item) => item.id === dishId);
   const delivery = needsDeliveryAddress(service);
-  const zone = delivery ? findZone(postal, settings.zones) : null;
+  const radiusMode = delivery && settings.deliveryMode === "radius";
+  const [radiusQuote, setRadiusQuote] = useState<{ zone: { name: string; fee_cents: number; max_distance_km: number | null } | null; distanceKm: number } | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const zone = delivery ? radiusMode ? radiusQuote?.zone ?? null : findZone(postal, settings.zones) : null;
   const subtotal = lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0);
   const fee = zone ? zone.fee_cents / 100 : 0;
   const resetPrice = () => { setChangedTotal(null); };
+  const verifyRadius = async () => {
+    if (quoting) return;
+    setQuoting(true); setError(""); setRadiusQuote(null); resetPrice();
+    try {
+      const result = await quoteDelivery({ data: { address, postal } });
+      setRadiusQuote(result);
+      if (!result.zone) setError(`A morada fica a ${String(result.distanceKm).replace(".", ",")} km da loja e está fora do raio de entrega.`);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível calcular a distância."); }
+    finally { setQuoting(false); }
+  };
   const availableMenu = menu.filter((item) => item.visible && item.available);
   const categorySlugs = [...new Set(availableMenu.map((item) => item.category))];
   const visibleCategories = [...categories.filter((item) => categorySlugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.name })), ...categorySlugs.filter((slug) => !categories.some((item) => item.slug === slug)).map((slug) => ({ slug, name: slug }))];
@@ -89,8 +104,8 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
               <label className="text-sm font-medium">Nome do cliente<input required maxLength={100} value={name} onChange={(e) => setName(e.target.value)} className={fieldClass} /></label>
               <label className="text-sm font-medium">Telemóvel<input required type="tel" maxLength={30} value={phone} onChange={(e) => setPhone(e.target.value)} className={fieldClass} /></label>
             </div>
-            <div className="flex flex-wrap gap-2">{orderServices.map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); resetPrice(); }}>{value}</Button>)}</div>
-            {delivery && <div className="space-y-3"><label className="block text-sm font-medium">Morada<input required maxLength={250} value={address} onChange={(e) => setAddress(e.target.value)} className={fieldClass} /></label><label className="block text-sm font-medium">Código postal<input required maxLength={8} value={postal} onChange={(e) => { setPostal(e.target.value); resetPrice(); }} placeholder="2600-000" className={fieldClass} /></label><p className="text-xs text-muted-foreground">{zone ? `${zone.name} · Entrega ${money(fee)}` : "Selecione um código postal de uma zona de entrega ativa."}</p></div>}
+            <div className="flex flex-wrap gap-2">{orderServices.map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); setRadiusQuote(null); resetPrice(); }}>{value}</Button>)}</div>
+            {delivery && <div className="space-y-3"><label className="block text-sm font-medium">Morada<input required maxLength={250} value={address} onChange={(e) => { setAddress(e.target.value); setRadiusQuote(null); resetPrice(); }} className={fieldClass} /></label><label className="block text-sm font-medium">Código postal<input required maxLength={8} value={postal} onChange={(e) => { setPostal(e.target.value); setRadiusQuote(null); resetPrice(); }} placeholder="2600-000" className={fieldClass} /></label>{radiusMode && <Button type="button" size="sm" variant="outline" disabled={quoting || !address.trim() || !postal.trim()} onClick={() => void verifyRadius()}>{quoting ? "A calcular…" : "Verificar distância e portes"}</Button>}<p className="text-xs text-muted-foreground">{zone ? `${radiusQuote ? `${String(radiusQuote.distanceKm).replace(".", ",")} km · ` : ""}${zone.name} · Entrega ${money(fee)}` : radiusMode ? "Calcule a distância para confirmar que a morada está dentro do raio." : "Selecione um código postal de uma zona de entrega ativa."}</p></div>}
             <label className="block text-sm font-medium">Procurar produto<input value={search} onChange={(e) => setSearch(e.target.value)} className={fieldClass} /></label>
             <div aria-label="Categorias de produtos" className="flex gap-2 overflow-x-auto pb-2"><Button type="button" size="sm" variant={!category ? "default" : "outline"} onClick={() => setCategory("")}>Todas</Button>{visibleCategories.map((item) => <Button type="button" key={item.slug} size="sm" variant={category === item.slug ? "default" : "outline"} onClick={() => setCategory(item.slug)}>{item.name}</Button>)}</div>
             <div ref={productsRef} tabIndex={-1} aria-label="Produtos" className="max-h-80 space-y-4 overflow-y-auto pr-1">

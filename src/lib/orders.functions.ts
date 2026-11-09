@@ -12,6 +12,7 @@ import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 import { CLOSED_ORDER_MESSAGE, isRestaurantOpen } from "./opening-hours";
+import { distanceKm, findRadiusZone, radiusZoneLabel } from "./delivery-radius";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
 const orderInput = z.object({
@@ -38,8 +39,8 @@ async function createOrder(data: z.infer<typeof orderInput>) {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [settings, zones, menu] = await Promise.all([
-    db.from("matturo_restaurant_settings").select("orders_paused").eq("id", true).single(),
-    db.from("matturo_delivery_zones").select("name,postal_prefixes,fee_cents").eq("active", true),
+    db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude").eq("id", true).single(),
+    db.from("matturo_delivery_zones").select("name,postal_prefixes,fee_cents,max_distance_km").eq("active", true),
     db.from("matturo_menu_items").select(menuFields).eq("visible", true),
   ]);
   if (settings.error || zones.error || menu.error) throw new Error("Não foi possível registar o pedido. Tente novamente.");
@@ -73,7 +74,24 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     lines[rewardIndex] = { ...line, name: `${line.name} (GRÁTIS · fidelização)`, unit_price_cents: unit, line_total_cents: unit };
   }
   const delivery = needsDeliveryAddress(data.service);
-  const zone = delivery ? findZone(data.postal ?? "", zones.data) : null;
+  let zone: { name: string; fee_cents: number } | null = null;
+  if (delivery && data.address) {
+    if (settings.data.delivery_mode === "radius") {
+      if (settings.data.store_latitude === null || settings.data.store_longitude === null) throw new Error("A entrega por raio ainda não está configurada.");
+      const { geocodePt } = await import("./geocode.server");
+      const point = await geocodePt(data.address, data.postal ?? "");
+      if (!point) throw new Error("Não foi possível localizar a morada. Confirme a rua, o número e o código postal completo.");
+      const distance = distanceKm(
+        { lat: settings.data.store_latitude, lng: settings.data.store_longitude },
+        { lat: point.lat, lng: point.lng },
+      );
+      const radiusZone = findRadiusZone(distance, zones.data);
+      zone = radiusZone ? { ...radiusZone, name: radiusZoneLabel(radiusZone.name, distance) } : null;
+      if (!zone) throw new Error("Esta morada fica fora do raio de entrega do Matturo.");
+    } else {
+      zone = findZone(data.postal ?? "", zones.data);
+    }
+  }
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");
   const subtotal = lines.reduce((sum, line) => sum + line.line_total_cents, 0);
   if (!meetsRewardMinimum(rewardIndex >= 0, subtotal)) throw new Error(REWARD_MINIMUM_MESSAGE);

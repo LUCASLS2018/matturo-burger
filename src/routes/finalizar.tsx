@@ -10,7 +10,7 @@ import { useCart } from "@/lib/cart";
 import { money, restaurantHead } from "@/lib/restaurant";
 import { orderServices, needsDeliveryAddress } from "@/lib/order-service";
 import { publicSettingsQuery } from "@/lib/settings-query";
-import { publicSettings } from "@/lib/settings.functions";
+import { publicSettings, quoteRadiusDelivery } from "@/lib/settings.functions";
 import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { canonicalPhone, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";
@@ -29,6 +29,7 @@ function Checkout() {
   const submitOrder = useServerFn(placeOrder);
   const claim = useServerFn(claimOrder);
   const checkSettings = useServerFn(publicSettings);
+  const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const { data: settings } = useSuspenseQuery(publicSettingsQuery);
   const [phone, setPhone] = useState("");
   const [sending, setSending] = useState(false);
@@ -40,7 +41,10 @@ function Checkout() {
   const [priceChange, setPriceChange] = useState<number | null>(null);
   const submission = useRef<{ id: string; token: string } | null>(null);
   const delivery = needsDeliveryAddress(service);
-  const zone = delivery ? findZone(postal, settings.zones) : null;
+  const radiusMode = delivery && settings.deliveryMode === "radius";
+  const [radiusQuote, setRadiusQuote] = useState<{ zone: { name: string; fee_cents: number; max_distance_km: number | null } | null; distanceKm: number } | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const zone = delivery ? radiusMode ? radiusQuote?.zone ?? null : findZone(postal, settings.zones) : null;
   const fee = zone ? zone.fee_cents / 100 : 0;
   const total = subtotal + fee;
   const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
@@ -57,11 +61,24 @@ function Checkout() {
         const result = await lookup({ data: { lat: position.coords.latitude, lng: position.coords.longitude } });
         setAddress(result.address);
         if (result.postal) setPostal(result.postal);
+        setRadiusQuote(null);
         setPriceChange(null);
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Não foi possível obter a morada.");
       } finally { setLocating(false); }
     }, () => { setLocating(false); setError("Não foi possível aceder à localização. Autorize a localização ou escreva a morada."); }, { enableHighAccuracy: true, timeout: 15000 });
+  };
+
+  const verifyRadius = async () => {
+    if (quoting) return;
+    setQuoting(true); setError(""); setRadiusQuote(null); setPriceChange(null);
+    try {
+      const result = await quoteDelivery({ data: { address, postal } });
+      setRadiusQuote(result);
+      if (!result.zone) setError(`A morada fica a ${String(result.distanceKm).replace(".", ",")} km da loja e está fora do raio de entrega.`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Não foi possível calcular a distância.");
+    } finally { setQuoting(false); }
   };
 
   const send = async () => {
@@ -70,7 +87,7 @@ function Checkout() {
     let normalizedPhone: string;
     try { normalizedPhone = canonicalPhone(phone); } catch { setError("Indique um telemóvel válido."); return; }
     if (!name.trim() || (delivery && (!address.trim() || !zone))) {
-      setError(delivery && !zone ? "Indique o seu nome, a morada e um código postal de uma zona de entrega." : "Indique o seu nome, um telemóvel válido e, para delivery, a morada de entrega.");
+      setError(delivery && !zone ? radiusMode ? radiusQuote ? "Esta morada está fora do raio de entrega." : "Verifique a distância e os portes antes de enviar o pedido." : "Indique o seu nome, a morada e um código postal de uma zona de entrega." : "Indique o seu nome, um telemóvel válido e, para delivery, a morada de entrega.");
       return;
     }
     if (!payment) { setError("Escolha a forma de pagamento."); return; }
@@ -81,7 +98,7 @@ function Checkout() {
     setSending(true); setError("");
     try {
       const latest = await checkSettings();
-      if (latest.paused) { setError("O Matturo está temporariamente sem aceitar pedidos."); return; }
+      if (latest.paused) { setError("O Matturo está FECHADO temporariamente e não está a aceitar pedidos."); return; }
       if (!latest.isOpen) { setError(CLOSED_ORDER_MESSAGE); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
@@ -104,17 +121,18 @@ function Checkout() {
     <Button asChild variant="link" className="mb-6 px-0"><Link to="/carrinho"><ArrowLeft />Voltar ao pedido</Link></Button>
     <h1 className="section-title">Quase à mesa.</h1>
     {!settings.isOpen && <p role="status" className="mt-6 border-l-4 border-destructive bg-destructive/10 p-4 font-semibold text-destructive">{CLOSED_ORDER_MESSAGE}</p>}
-    {settings.isOpen && settings.paused && <p role="status" className="mt-6 border-l-4 border-primary bg-secondary p-4">O Matturo está temporariamente sem aceitar pedidos.</p>}
+    {settings.isOpen && settings.paused && <p role="status" className="mt-6 border-l-4 border-primary bg-secondary p-4">O Matturo está FECHADO temporariamente e não está a aceitar pedidos.</p>}
     {!items.length ? <div className="py-12"><p>O seu pedido está vazio.</p><Button asChild className="mt-5"><Link to="/cardapio">Ver cardápio</Link></Button></div> : <>
-      <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); }}>{item}</Button>)}</div>
+      <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); setRadiusQuote(null); }}>{item}</Button>)}</div>
       <form onSubmit={(event) => { event.preventDefault(); void send(); }} className="mt-8 space-y-6">
         <label className="block text-sm font-medium">O seu nome<input required value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" maxLength={100} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
         <label className="block text-sm font-medium">Telemóvel<input required type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" maxLength={30} placeholder="912 345 678" className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
         <Button asChild variant="link" className="px-0"><Link to="/pontos">Os meus pontos · Confirmar telemóvel</Link></Button>
         {delivery && <div className="space-y-4">
           <Button type="button" variant="outline" disabled={locating} onClick={useLocation} className="h-11 w-full sm:w-auto"><LocateFixed />{locating ? "A obter localização…" : "Usar a minha localização atual"}</Button>
-          <label className="block text-sm font-medium">Morada de entrega<textarea required value={address} onChange={(event) => setAddress(event.target.value)} autoComplete="street-address" maxLength={250} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
-          <label className="block text-sm font-medium">Código postal<input required value={postal} onChange={(event) => { setPostal(event.target.value); setPriceChange(null); }} autoComplete="postal-code" inputMode="numeric" placeholder="0000-000" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">{settings.zones.length ? "Entregamos em " + settings.zones.map((item) => `${item.name} (${item.postal_prefixes.join(", ")})`).join(" e ") + "." : "Ainda não há zonas de entrega ativadas."}</span></label>
+          <label className="block text-sm font-medium">Morada de entrega<textarea required value={address} onChange={(event) => { setAddress(event.target.value); setRadiusQuote(null); setPriceChange(null); }} autoComplete="street-address" maxLength={250} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
+          <label className="block text-sm font-medium">Código postal<input required value={postal} onChange={(event) => { setPostal(event.target.value); setRadiusQuote(null); setPriceChange(null); }} autoComplete="postal-code" inputMode="numeric" placeholder="0000-000" maxLength={8} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /><span className="mt-2 block text-xs leading-relaxed text-muted-foreground">{radiusMode ? "Usamos a morada e o código postal completo para calcular a distância desde a loja." : settings.zones.some((item) => item.max_distance_km === null) ? "Entregamos em " + settings.zones.filter((item) => item.max_distance_km === null).map((item) => `${item.name} (${item.postal_prefixes.join(", ")})`).join(" e ") + "." : "Ainda não há zonas de entrega ativadas."}</span></label>
+          {radiusMode && <div className="rounded-md border border-border p-4"><Button type="button" variant="outline" disabled={quoting || !address.trim() || !postal.trim()} onClick={() => void verifyRadius()}>{quoting ? "A calcular distância…" : "Verificar distância e portes"}</Button>{radiusQuote && <p className="mt-3 text-sm text-muted-foreground">Distância da loja: <strong className="text-foreground">{String(radiusQuote.distanceKm).replace(".", ",")} km</strong>{zone ? ` · ${zone.name} · ${money(fee)}` : " · fora do raio de entrega"}</p>}</div>}
         </div>}
         <fieldset className="space-y-3"><legend className="text-sm font-medium">Forma de pagamento</legend>
           <div className="flex flex-wrap gap-3">{(["Multibanco", "Dinheiro"] as const).map((item) => <Button key={item} type="button" aria-pressed={payment === item} variant={payment === item ? "default" : "outline"} onClick={() => setPayment(item)}>{item}</Button>)}</div>
@@ -127,7 +145,7 @@ function Checkout() {
         <p className="text-sm leading-relaxed text-muted-foreground">O pedido chega diretamente ao Matturo. Pagamento no levantamento, na entrega ou à mesa. Vai poder acompanhar o estado numa página privada.</p>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {!rewardMinimumMet && <p role="status" className="text-sm text-destructive">{REWARD_MINIMUM_MESSAGE}</p>}
-        <Button type="submit" disabled={!settings.isOpen || settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{!settings.isOpen ? "FECHADO" : sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
+        <Button type="submit" disabled={!settings.isOpen || settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{!settings.isOpen || settings.paused ? "FECHADO" : sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
       </form>
     </>}
   </div>;
