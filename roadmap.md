@@ -1,6 +1,6 @@
 # Matturo Burger
 
-- [ ] Daily order numbering from 1, restarting at Lisbon midnight; awaiting approval of isolated numbering fields and atomic counter.
+- [x] Daily order numbering from 1, restarting at Lisbon midnight: isolated atomic counter, historical backfill and shared display; 17 tests and transactional insert/retry/cancellation checks passed. Authenticated admin visual check remains unavailable with external Supabase.
 
 - [x] Show original product photographs grouped by categories in the manual admin order form.
 

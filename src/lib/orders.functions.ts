@@ -1,3 +1,4 @@
+import { orderNumber } from "./order-number";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestIP, setResponseHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
@@ -232,7 +233,7 @@ export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requi
   // Read every page: PostgREST caps each response even when a larger limit is requested.
   const orders: { customer_name: string; customer_phone: string }[] = [];
   const wallets: { id: string; phone: string; balance: number }[] = [];
-  const movements: { wallet_id: string; points: number; kind: string; created_at: string; matturo_orders: { reference: string; status: string } | null }[] = [];
+  const movements: { wallet_id: string; points: number; kind: string; created_at: string; matturo_orders: { reference: string; status: string; daily_number: number; order_day: string } | null }[] = [];
   for (let offset = 0; ; offset += 500) {
     const page = await db.from("matturo_orders").select("customer_name,customer_phone").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
     if (page.error) throw new Error("Não foi possível carregar a fidelização.");
@@ -246,7 +247,7 @@ export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requi
     if (page.data.length < 500) break;
   }
   for (let offset = 0; ; offset += 500) {
-    const page = await db.from("matturo_loyalty_movements").select("wallet_id,points,kind,created_at,matturo_orders(reference,status)").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+    const page = await db.from("matturo_loyalty_movements").select("wallet_id,points,kind,created_at,matturo_orders(reference,status,daily_number,order_day)").order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
     if (page.error) throw new Error("Não foi possível carregar a fidelização.");
     movements.push(...page.data);
     if (page.data.length < 500) break;
@@ -260,6 +261,6 @@ export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requi
     const earned = own.filter((movement) => movement.kind === "earn").reduce((sum, movement) => sum + movement.points, 0);
     const spent = -own.filter((movement) => movement.kind !== "earn").reduce((sum, movement) => sum + movement.points, 0);
     return { id: wallet.id, name: names.get(wallet.phone) ?? "Cliente", phone: wallet.phone, available: wallet.balance, earned, spent,
-      redemptions: own.filter((movement) => movement.kind === "redeem").map((movement) => ({ at: movement.created_at, reference: movement.matturo_orders?.reference ?? "", cancelled: movement.matturo_orders?.status === "cancelado" })) };
+      redemptions: own.filter((movement) => movement.kind === "redeem").map((movement) => ({ at: movement.created_at, reference: movement.matturo_orders?.reference ?? "", number: movement.matturo_orders ? orderNumber(movement.matturo_orders) : "—", cancelled: movement.matturo_orders?.status === "cancelado" })) };
   }).sort((a, b) => b.available - a.available);
 });

@@ -39,7 +39,7 @@ function LoyaltyPage() {
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${Math.min(100, c.available)}%` }} /></div>
             {c.available >= 100 && <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary"><Gift className="h-3 w-3" />Pode resgatar um Hamburguinho grátis</p>}
-            {c.redemptions.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Resgates: {c.redemptions.map((r) => `${r.reference} (${new Date(r.at).toLocaleDateString("pt-PT")}${r.cancelled ? ", cancelado — pontos devolvidos" : ""})`).join(" · ")}</p>}
+            {c.redemptions.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Resgates: {c.redemptions.map((r) => `#${r.number} (${new Date(r.at).toLocaleDateString("pt-PT")}${r.cancelled ? ", cancelado — pontos devolvidos" : ""})`).join(" · ")}</p>}
           </li>
         ))}
         {!data.length && <li className="text-sm text-muted-foreground">Ainda não há pedidos de clientes.</li>}
