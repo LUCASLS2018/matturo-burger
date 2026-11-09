@@ -117,9 +117,10 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             <label className="block text-sm font-medium">Observações do pedido<textarea rows={3} maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} className={fieldClass} /></label>
             <div className="space-y-2 border-t border-border pt-4 text-sm"><div className="flex justify-between"><span>Produtos</span><span>{money(subtotal)}</span></div>{delivery && <div className="flex justify-between"><span>Entrega</span><span>{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between text-lg font-bold"><span>Total</span><span>{money(changedTotal === null ? subtotal + fee : changedTotal / 100)}</span></div></div>
             {changedTotal !== null && <p role="status" className="text-sm text-primary">O preço mudou. Confirme o total atualizado para criar o pedido.</p>}
-            {settings.paused && <p role="status" className="text-sm text-destructive">O restaurante está sem aceitar pedidos.</p>}
+            {!settings.isOpen && <p role="status" className="text-sm text-destructive">O restaurante está FECHADO. Não é possível criar pedidos fora do horário.</p>}
+            {settings.isOpen && settings.paused && <p role="status" className="text-sm text-destructive">O restaurante está sem aceitar pedidos.</p>}
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || !lines.length || settings.paused || (delivery && !zone)}><Plus />{busy ? "A guardar…" : changedTotal !== null ? "Confirmar total e criar pedido" : "Criar pedido"}</Button>
+            <Button type="submit" className="w-full" disabled={busy || !lines.length || settings.paused || !settings.isOpen || (delivery && !zone)}><Plus />{busy ? "A guardar…" : changedTotal !== null ? "Confirmar total e criar pedido" : "Criar pedido"}</Button>
             <Button type="button" variant="ghost" className="w-full" disabled={busy} onClick={onClose}>Cancelar</Button>
           </div>
         </div>
