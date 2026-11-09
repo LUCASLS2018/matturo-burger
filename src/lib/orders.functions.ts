@@ -74,7 +74,24 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     lines[rewardIndex] = { ...line, name: `${line.name} (GRÁTIS · fidelização)`, unit_price_cents: unit, line_total_cents: unit };
   }
   const delivery = needsDeliveryAddress(data.service);
-  const zone = delivery ? findZone(data.postal ?? "", zones.data) : null;
+  let zone: { name: string; fee_cents: number } | null = null;
+  if (delivery && data.address) {
+    if (settings.data.delivery_mode === "radius") {
+      if (settings.data.store_latitude === null || settings.data.store_longitude === null) throw new Error("A entrega por raio ainda não está configurada.");
+      const { geocodePt } = await import("./geocode.server");
+      const point = await geocodePt(data.address, data.postal ?? "");
+      if (!point) throw new Error("Não foi possível localizar a morada. Confirme a rua, o número e o código postal completo.");
+      const distance = distanceKm(
+        { lat: settings.data.store_latitude, lng: settings.data.store_longitude },
+        { lat: point.lat, lng: point.lng },
+      );
+      const radiusZone = findRadiusZone(distance, zones.data);
+      zone = radiusZone ? { ...radiusZone, name: radiusZoneLabel(radiusZone.name, distance) } : null;
+      if (!zone) throw new Error("Esta morada fica fora do raio de entrega do Matturo.");
+    } else {
+      zone = findZone(data.postal ?? "", zones.data);
+    }
+  }
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");
   const subtotal = lines.reduce((sum, line) => sum + line.line_total_cents, 0);
   if (!meetsRewardMinimum(rewardIndex >= 0, subtotal)) throw new Error(REWARD_MINIMUM_MESSAGE);

@@ -32,6 +32,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const { data: categories } = useSuspenseQuery(menuCategoriesQuery);
   const qc = useQueryClient();
   const save = useServerFn(createManualOrder);
+  const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");

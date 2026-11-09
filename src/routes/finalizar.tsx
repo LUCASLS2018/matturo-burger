@@ -29,6 +29,7 @@ function Checkout() {
   const submitOrder = useServerFn(placeOrder);
   const claim = useServerFn(claimOrder);
   const checkSettings = useServerFn(publicSettings);
+  const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const { data: settings } = useSuspenseQuery(publicSettingsQuery);
   const [phone, setPhone] = useState("");
   const [sending, setSending] = useState(false);
