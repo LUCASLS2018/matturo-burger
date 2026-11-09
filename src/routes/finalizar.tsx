@@ -12,7 +12,7 @@ import { publicSettingsQuery } from "@/lib/settings-query";
 import { publicSettings } from "@/lib/settings.functions";
 import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
-import { canonicalPhone } from "@/lib/loyalty-phone";
+import { canonicalPhone, meetsRewardMinimum, DELIVERY_REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";
 
 export const Route = createFileRoute("/finalizar")({
   head: () => restaurantHead("Finalizar pedido", "Confirme e envie o seu pedido diretamente ao Matturo Burger."),
@@ -40,9 +40,11 @@ function Checkout() {
   const zone = delivery ? findZone(postal, settings.zones) : null;
   const fee = zone ? zone.fee_cents / 100 : 0;
   const total = subtotal + fee;
+  const rewardMinimumMet = meetsRewardMinimum(service, items.some((item) => item.reward), Math.round(subtotal * 100));
 
   const send = async () => {
     if (sending) return;
+    if (!rewardMinimumMet) { setError(DELIVERY_REWARD_MINIMUM_MESSAGE); return; }
     let normalizedPhone: string;
     try { normalizedPhone = canonicalPhone(phone); } catch { setError("Indique um telemóvel válido."); return; }
     if (!name.trim() || (delivery && (!address.trim() || !zone))) {
@@ -90,7 +92,8 @@ function Checkout() {
         {priceChange !== null && <p role="status" className="border-l-4 border-primary bg-secondary p-4 text-sm">O preço ou os portes mudaram. O total atualizado é <strong>{money(priceChange / 100)}</strong>; confirme esse valor para continuar.</p>}
         <p className="text-sm leading-relaxed text-muted-foreground">O pedido chega diretamente ao Matturo. Pagamento no levantamento, na entrega ou à mesa. Vai poder acompanhar o estado numa página privada.</p>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" disabled={settings.paused || sending} className="h-12 w-full"><Send />{sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
+        {!rewardMinimumMet && <p role="status" className="text-sm text-destructive">{DELIVERY_REWARD_MINIMUM_MESSAGE}</p>}
+        <Button type="submit" disabled={settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
       </form>
     </>}
   </div>;
