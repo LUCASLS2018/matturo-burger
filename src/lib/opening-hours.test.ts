@@ -38,4 +38,30 @@ describe("Matturo opening hours in Europe/Lisbon", () => {
     expect(canAcceptOrders(true, open)).toBe(false);
     expect(canAcceptOrders(false, closed)).toBe(false);
   });
+
+  it("converts the chosen time from Portugal in winter and summer", () => {
+    expect(lisbonDateTimeToDate("2026-11-10T12:00")?.toISOString()).toBe("2026-11-10T12:00:00.000Z");
+    expect(lisbonDateTimeToDate("2026-07-14T12:00")?.toISOString()).toBe("2026-07-14T11:00:00.000Z");
+  });
+
+  it("rejects a scheduled time before now", () => {
+    const now = new Date("2026-11-10T11:00:00Z");
+    expect(scheduledOrderError("2026-11-10T10:59:00Z", now)).toMatch("futuras");
+  });
+
+  it("rejects a scheduled time before opening or after closing", () => {
+    const now = new Date("2026-11-09T03:00:00Z");
+    expect(scheduledOrderError("2026-11-10T11:59:00Z", now)).toMatch("dentro do horário");
+    expect(scheduledOrderError("2026-11-10T21:45:00Z", now)).toMatch("dentro do horário");
+  });
+
+  it("allows a future scheduled time inside opening hours", () => {
+    const now = new Date("2026-11-09T03:00:00Z");
+    expect(scheduledOrderError("2026-11-10T12:00:00Z", now)).toBeNull();
+    expect(scheduledOrderError("2026-11-10T19:30:00Z", now)).toBeNull();
+  });
+
+  it("rejects a nonexistent Portugal local time at the DST change", () => {
+    expect(lisbonDateTimeToDate("2026-03-29T01:30")).toBeNull();
+  });
 });

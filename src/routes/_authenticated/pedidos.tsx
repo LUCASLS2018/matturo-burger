@@ -50,6 +50,7 @@ function OrdersPage() {
   const qc = useQueryClient();
   const move = useServerFn(setOrderStatus);
   const { data: board } = useSuspenseQuery(boardQuery);
+  const { data: settings } = useSuspenseQuery(publicSettingsQuery);
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
