@@ -232,7 +232,7 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
   .handler(async ({ data, context }) => {
     const db = context.supabase;
     await assertAdmin(db);
-    const order = await db.from("matturo_orders").select("reference,service,address,postal_code,customer_name,customer_phone,status").eq("id", data.orderId).single();
+    const order = await db.from("matturo_orders").select("reference,service,address,postal_code,customer_name,customer_phone,status,scheduled_for").eq("id", data.orderId).single();
     if (order.error) throw new Error("Pedido não encontrado.");
     if (order.data.service !== "Delivery" || !order.data.address) throw new Error("Só pedidos de delivery têm estafeta.");
     if (["concluido", "cancelado"].includes(order.data.status)) throw new Error("Pedido já fechado.");

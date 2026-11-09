@@ -100,6 +100,9 @@ function OrdersPage() {
   const visible = filterByOrderSource(data, sourceFilter);
   const sorted = oldestFirst(visible);
   const cancelled = sorted.filter((o) => o.status === "cancelado");
+  const scheduled = sorted.filter((o) => o.status === "novo" && o.scheduled_for);
+  const scheduledGroups = groupByService(scheduled);
+  const orderingOpen = settings.isOpen && !settings.paused;
 
   return (
     <div className="page-width py-10">
