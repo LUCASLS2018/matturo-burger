@@ -31,6 +31,11 @@ describe("manual phone order form", () => {
     expect(screen.getByRole("button", { name: /Adicionar ·/ })).toBeDisabled();
     fireEvent.click(screen.getByRole("radio", { name: /NAO QUERO/ }));
     fireEvent.click(screen.getByRole("button", { name: /Adicionar ·/ }));
+    expect(screen.queryByRole("button", { name: /Adicionar ·/ })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Produtos")).toHaveFocus();
+    fireEvent.click(screen.getByRole("button", { name: "Selecionar Hambúrguer" }));
+    expect(screen.getByRole("button", { name: /Adicionar ·/ })).toBeDisabled();
+    fireEvent.click(screen.getByRole("radio", { name: /NAO QUERO/ }));
     fireEvent.click(screen.getByRole("button", { name: /Adicionar ·/ }));
     fireEvent.click(screen.getByRole("button", { name: /^Criar pedido$/ }));
     await waitFor(() => expect(close).toHaveBeenCalledOnce());
