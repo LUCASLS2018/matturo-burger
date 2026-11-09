@@ -1,5 +1,7 @@
 # Matturo Burger
 
+- [x] Show original product photographs grouped by categories in the manual admin order form.
+
 - [ ] Guest loyalty redemption: awaiting approval of telephone-ownership confirmation and isolated transactional debit changes; telephone alone cannot authorize spending another customer's points.
 - [ ] Add secure guest telephone confirmation, private balance and reward flow; atomically debit on order submission and restore on cancellation. Await SMS availability and architecture approval.
 - [x] Automatically associate every customer's eligible order points to the checkout telephone; no registration or manual enrollment. Admin aggregation includes historical guest orders; six loyalty tests passed.
