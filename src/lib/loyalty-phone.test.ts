@@ -7,7 +7,7 @@ describe("secure telephone loyalty rules", () => {
     expect(canonicalPhone("00351 912 345 678")).toBe("+351912345678");
   });
   it("does not merge a foreign number with a Portuguese wallet", () => {
-    expect(canonicalPhone("+44 7700 900123")).not.toBe("+351912345678");
+    expect(canonicalPhone("+44 7911 123456")).not.toBe("+351912345678");
   });
   it("rejects an invalid telephone", () => {
     expect(() => canonicalPhone("123")).toThrow();
