@@ -74,7 +74,6 @@ function OrdersPage() {
       void qc.invalidateQueries({ queryKey: ordersQuery.queryKey });
       if (p.eventType === "INSERT") {
         toast.success("Novo pedido recebido");
-        if (soundRef.current) { const a = new AudioContext(); const o = a.createOscillator(); o.connect(a.destination); o.frequency.value = 880; o.start(); o.stop(a.currentTime + 0.4); }
       }
     }).subscribe();
     return () => { void supabase.removeChannel(ch); };
