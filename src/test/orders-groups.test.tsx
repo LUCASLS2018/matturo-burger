@@ -51,6 +51,7 @@ vi.mock("@/lib/orders.functions", () => ({
   orderCourierBoard: {},
   assignOrderCourier: {},
 }));
+vi.mock("@/lib/delivery.functions", () => ({ deliveryDashboard: {} }));
 vi.mock("@/components/restaurant/ManualOrder", () => ({
   ManualOrder: () => null,
   manualMenuQuery: { queryKey: ["manual-menu"] },

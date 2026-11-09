@@ -21,20 +21,23 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
   const deliveries = await db.from("matturo_deliveries").select("*").order("created_at", { ascending: false }).limit(100);
   if (deliveries.error) throw deliveries.error;
   const orderIds = deliveries.data.map((delivery) => delivery.order_id).filter((id): id is string => Boolean(id));
-  const [positions, events, profiles, couriers, availability, orders] = await Promise.all([
+  const [positions, events, profiles, couriers, availability, orders, deliveryTotals] = await Promise.all([
     db.from("matturo_delivery_positions").select("*"),
     db.from("matturo_delivery_events").select("*").order("created_at", { ascending: false }).limit(200),
     admin ? db.from("matturo_profiles").select("*") : Promise.resolve(profile),
     admin ? db.from("matturo_user_roles").select("user_id").eq("role", "courier") : Promise.resolve(null),
     db.from("matturo_courier_availability").select("*"),
     orderIds.length ? db.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,address,postal_code,notes,service,status,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
+    // A separate full-history count keeps courier totals correct while the detailed list stays limited to 100 rows.
+    db.from("matturo_deliveries").select("courier_id,status"),
   ]);
-  if (positions.error || events.error || availability.error || orders.error) throw new Error("Não foi possível carregar as entregas.");
+  if (positions.error || events.error || availability.error || orders.error || deliveryTotals.error) throw new Error("Não foi possível carregar as entregas.");
   return {
     admin, courier: roles.data.some((role) => role.role === "courier"), userId: context.userId,
     profile: profile.data, profiles: Array.isArray(profiles.data) ? profiles.data : [],
     courierIds: couriers?.data?.map((role) => role.user_id) ?? [], deliveries: deliveries.data,
     positions: positions.data, events: events.data ?? [], availability: availability.data, orders: orders.data,
+    deliveryTotals: deliveryTotals.data,
   };
 });
 
