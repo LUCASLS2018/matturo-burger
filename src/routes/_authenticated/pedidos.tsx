@@ -204,7 +204,7 @@ export function nearbyOrders<T extends { id: string; service: string; status: st
   const prefix = order.postal_code.replace(/\D/g, "").slice(0, 4);
   const assigned = new Set(board.deliveries.map((d) => d.order_id));
   if (assigned.has(order.id)) return [];
-  return all.filter((o) => o.id !== order.id && o.service === "Delivery" && isActive(o.status as OrderStatus) && !assigned.has(o.id)
+  return all.filter((o) => o.id !== order.id && o.service === "Delivery" && isActive(o.status as OrderStatus) && !(o.status === "novo" && o.scheduled_for) && !assigned.has(o.id)
     && ((o.postal_code ?? "").replace(/\D/g, "").slice(0, 4) === prefix || (!!order.zone_name && o.zone_name === order.zone_name)));
 }
 
@@ -260,6 +260,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, ordering
               <p className="font-semibold">{order.customer_name}</p>
               <a className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3 w-3" />{order.customer_phone}</a>
               {order.address && <p className="flex items-start gap-1.5 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3 shrink-0" />{order.address} · {order.postal_code} ({order.zone_name})</p>}
+              {order.scheduled_for && <p className="font-semibold text-primary">Agendado: {new Date(order.scheduled_for).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" })}</p>}
             </div>
             <ul className="space-y-1.5 rounded-lg bg-secondary/40 p-3 text-xs">
               {order.matturo_order_items.flatMap((i) => Array.from({ length: Math.max(1, i.qty) }, () => ({ ...i, qty: 1, line_total_cents: Math.round(i.line_total_cents / Math.max(1, i.qty)) }))).map((i, n) => <li key={n}><div className="flex justify-between gap-2"><span><b>{i.qty}×</b> {i.name}</span><span className="shrink-0 tabular-nums">{money(i.line_total_cents / 100)}</span></div>{Object.entries(i.options as Record<string, string>).map(([k, v]) => <p key={k} className="pl-4 text-[11px] text-muted-foreground">{k}: {v}</p>)}</li>)}
@@ -269,13 +270,13 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, ordering
               <span className="text-[11px] text-muted-foreground">{order.delivery_fee_cents ? `Inclui entrega ${money(order.delivery_fee_cents / 100)}` : "Total"}</span>
               <span className="text-lg font-bold tabular-nums">{money(order.total_cents / 100)}</span>
             </div>
-            {order.service === "Delivery" && isActive(order.status) && (delivery
+            {order.service === "Delivery" && isActive(order.status) && !(order.status === "novo" && order.scheduled_for) && (delivery
               ? <p className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs"><Bike className="h-3.5 w-3.5 text-primary" />Estafeta: <b>{board.couriers.find((c) => c.id === delivery.courier_id)?.name ?? "—"}</b> · {delivery.status === "active" ? "a caminho" : delivery.status === "delivered" ? "entregue" : "atribuído"}</p>
               : !board.couriers.length
                 ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
                 : <>{nearby.length > 0 && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-xs"><p className="font-semibold text-primary">{nearby.length} pedido{nearby.length > 1 ? "s" : ""} perto deste cliente</p><ul className="mt-1 space-y-0.5 text-muted-foreground">{nearby.map((n) => <li key={n.id}>#{orderNumber(n)} · {n.customer_name} · {n.address}</li>)}</ul><Button size="sm" className="mt-2 h-8 w-full" onClick={() => void onSendNearby?.(nearby.map((n) => n.id))}><Bike />Enviar todos ao mesmo estafeta</Button></div>}<div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div></>)}
           </div>
-          {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
+          {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} disabled={s === "aceite" && order.status === "novo" && !!order.scheduled_for && !orderingOpen} title={s === "aceite" && order.scheduled_for && !orderingOpen ? "Só pode aceitar com a loja aberta" : undefined} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
         </div>
       )}
     </article>
