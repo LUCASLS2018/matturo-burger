@@ -166,6 +166,8 @@ export const setOrderStatus = createServerFn({ method: "POST" }).middleware([req
   const result = await context.supabase.from("matturo_orders").update({ status: data.to }).eq("id", data.id).eq("status", data.from).select("id").maybeSingle();
   if (result.error) throw new Error("Não foi possível guardar. Tente novamente.");
   if (!result.data) throw new Error("Este pedido foi alterado noutra janela. Atualize a lista.");
+  const { notifyOrder } = await import("./push.server");
+  await notifyOrder(data.id).catch(() => 0);
   return { ok: true };
 });
 
@@ -206,6 +208,8 @@ export const assignOrderCourier = createServerFn({ method: "POST" }).middleware(
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const result = await supabaseAdmin.rpc("matturo_assign_order_courier", { p_admin_id: context.userId, p_order_id: data.orderId, p_courier_id: data.courierId, p_destination: destination, p_lat: point.lat, p_lng: point.lng });
     if (result.error) throw new Error(result.error.message.includes("inativo") ? "Este estafeta está inativo." : result.error.message.includes("duplicate") ? "Este pedido já tem estafeta." : "Não foi possível atribuir o estafeta.");
+    const { notifyOrder } = await import("./push.server");
+    await notifyOrder(data.orderId).catch(() => 0);
     return { id: result.data };
   });
 
