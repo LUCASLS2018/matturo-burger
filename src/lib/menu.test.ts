@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { dishes, dishTotal, menuItemToDish, selectionValid } from "./menu";
+import { dishes, dishTotal, menuItemToDish, selectionValid, type Dish } from "./menu";
 import { priceLine } from "./order-pricing";
 describe("Original Matturo menu", () => {
+  it.each(["Adicionar extras", "Quer ingrediente extra ?", "Pote de molho"])("accepts %s without selecting an extra", (name) => {
+    const dish: Dish = {
+      id: "optional-extras", name: "Produto", slug: "produto", description: "", category: "hamburguer",
+      price: 8, image: null, available: true, visible: true,
+      groups: [{ id: "extras", name, required: false, min: 0, max: 10,
+        modifiers: [{ id: "cheddar", name: "Cheddar", price: 1.5, max: 2 }] }],
+    };
+    expect(selectionValid(dish, {})).toBe(true);
+    expect(priceLine({ productId: dish.id, qty: 1, selected: {} }, [dish]).unit_price_cents).toBe(800);
+    expect(priceLine({ productId: dish.id, qty: 1, selected: { cheddar: 1 } }, [dish]).unit_price_cents).toBe(950);
+  });
   it("preserves the exact original Matturo burger price", () => {
     const dish = dishes.find(p => p.slug === "hamburguer-matturo");
     expect(dish?.price).toBe(8);
