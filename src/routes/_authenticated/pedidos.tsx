@@ -167,6 +167,14 @@ function OrdersPage() {
             </section>
           );
         })}
+        {tab === "agendados" && <section role="tabpanel" aria-label="Pedidos agendados">
+          {!orderingOpen && scheduled.length > 0 && <p className="mb-4 rounded-xl border border-border bg-card p-3 text-sm">A loja está fechada: estes pedidos só podem ser aceites durante o horário de funcionamento.</p>}
+          {!scheduled.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos agendados</p>}
+          {scheduledGroups.map((group) => <div key={group.service} className="mb-8 last:mb-0">
+            <ServiceGroupHeading service={group.service} count={group.orders.length} />
+            <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{group.orders.map((o) => <OrderCard key={o.id} order={o} board={board} courierPick="" onPick={() => {}} onSend={sendToCourier} onMove={change} orderingOpen={orderingOpen} />)}</div>
+          </div>)}
+        </section>}
       </div>
 
       {cancelled.length > 0 && (
@@ -191,7 +199,7 @@ function OrdersPage() {
   );
 }
 
-export function nearbyOrders<T extends { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null }>(order: T, all: T[], board: { deliveries: { order_id: string | null }[] }) {
+export function nearbyOrders<T extends { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null; scheduled_for?: string | null }>(order: T, all: T[], board: { deliveries: { order_id: string | null }[] }) {
   if (order.service !== "Delivery" || !order.postal_code) return [];
   const prefix = order.postal_code.replace(/\D/g, "").slice(0, 4);
   const assigned = new Set(board.deliveries.map((d) => d.order_id));
