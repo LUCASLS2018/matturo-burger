@@ -15,6 +15,7 @@ import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { canonicalPhone, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";
 import { detectOrderSource } from "@/lib/order-source";
+import { CLOSED_ORDER_MESSAGE } from "@/lib/opening-hours";
 
 export const Route = createFileRoute("/finalizar")({
   head: () => restaurantHead("Finalizar pedido", "Confirme e envie o seu pedido diretamente ao Matturo Burger."),
@@ -81,6 +82,7 @@ function Checkout() {
     try {
       const latest = await checkSettings();
       if (latest.paused) { setError("O Matturo está temporariamente sem aceitar pedidos."); return; }
+      if (!latest.isOpen) { setError(CLOSED_ORDER_MESSAGE); return; }
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await submitOrder({ data: {
         name, phone: normalizedPhone, service, source: detectOrderSource(), address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
@@ -101,7 +103,8 @@ function Checkout() {
   return <div className="page-width max-w-3xl py-12">
     <Button asChild variant="link" className="mb-6 px-0"><Link to="/carrinho"><ArrowLeft />Voltar ao pedido</Link></Button>
     <h1 className="section-title">Quase à mesa.</h1>
-    {settings.paused && <p role="status" className="mt-6 border-l-4 border-primary bg-secondary p-4">O Matturo está temporariamente sem aceitar pedidos.</p>}
+    {!settings.isOpen && <p role="status" className="mt-6 border-l-4 border-destructive bg-destructive/10 p-4 font-semibold text-destructive">{CLOSED_ORDER_MESSAGE}</p>}
+    {settings.isOpen && settings.paused && <p role="status" className="mt-6 border-l-4 border-primary bg-secondary p-4">O Matturo está temporariamente sem aceitar pedidos.</p>}
     {!items.length ? <div className="py-12"><p>O seu pedido está vazio.</p><Button asChild className="mt-5"><Link to="/cardapio">Ver cardápio</Link></Button></div> : <>
       <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); }}>{item}</Button>)}</div>
       <form onSubmit={(event) => { event.preventDefault(); void send(); }} className="mt-8 space-y-6">
@@ -124,7 +127,7 @@ function Checkout() {
         <p className="text-sm leading-relaxed text-muted-foreground">O pedido chega diretamente ao Matturo. Pagamento no levantamento, na entrega ou à mesa. Vai poder acompanhar o estado numa página privada.</p>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {!rewardMinimumMet && <p role="status" className="text-sm text-destructive">{REWARD_MINIMUM_MESSAGE}</p>}
-        <Button type="submit" disabled={settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
+        <Button type="submit" disabled={!settings.isOpen || settings.paused || sending || !rewardMinimumMet} className="h-12 w-full"><Send />{!settings.isOpen ? "FECHADO" : sending ? "A enviar…" : priceChange !== null ? "Confirmar novo total e enviar" : "Enviar pedido"}</Button>
       </form>
     </>}
   </div>;

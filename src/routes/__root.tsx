@@ -18,6 +18,7 @@ import { LoyaltyBanner } from "@/components/restaurant/LoyaltyBanner";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { publicSettingsQuery } from "@/lib/settings-query";
 
 function NotFoundComponent() {
   return (
@@ -111,6 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(publicSettingsQuery),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

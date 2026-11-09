@@ -1,5 +1,8 @@
 # Matturo Burger
 
+- [x] Bloquear pedidos fora do horário publicado e mostrar FECHADO no site público, usando Europe/Lisbon e validação no servidor; 88 testes e verificação visual pública passaram.
+- [ ] Adicionar configuração de entregas e preços por raio calculado a partir da morada da loja.
+
 - [x] Daily order numbering from 1, restarting at Lisbon midnight: isolated atomic counter, historical backfill and shared display; 17 tests and transactional insert/retry/cancellation checks passed. Authenticated admin visual check remains unavailable with external Supabase.
 
 - [x] Show original product photographs grouped by categories in the manual admin order form.

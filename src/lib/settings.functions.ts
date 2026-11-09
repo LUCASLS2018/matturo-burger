@@ -5,10 +5,11 @@ import {z} from 'zod';
 import {requireSupabaseAuth} from '@/integrations/supabase/auth-middleware';
 import type {Database} from '@/integrations/supabase/types';
 import {zoneSchema} from './restaurant-settings';
+import {isRestaurantOpen} from './opening-hours';
 export const publicSettings=createServerFn({method:'GET'}).handler(async()=>{
  setResponseHeader('Cache-Control','no-store');const url=process.env['SUPABASE_URL'];const key=process.env['SUPABASE_PUBLISHABLE_KEY'];if(!url||!key)throw new Error('Não foi possível consultar o atendimento.');
  const db=createClient<Database>(url,key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:(input,init)=>{const headers=new Headers(init?.headers);if(key.startsWith('sb_')&&headers.get('Authorization')===`Bearer ${key}`)headers.delete('Authorization');headers.set('apikey',key);return fetch(input,{...init,headers});}}});
- const [settings,zones]=await Promise.all([db.from('matturo_restaurant_settings').select('orders_paused').eq('id',true).single(),db.from('matturo_delivery_zones').select('id,name,postal_prefixes,fee_cents').eq('active',true).order('name')]);if(settings.error||zones.error)throw new Error('Não foi possível consultar o atendimento.');return {paused:settings.data.orders_paused,zones:zones.data};
+ const [settings,zones]=await Promise.all([db.from('matturo_restaurant_settings').select('orders_paused').eq('id',true).single(),db.from('matturo_delivery_zones').select('id,name,postal_prefixes,fee_cents').eq('active',true).order('name')]);if(settings.error||zones.error)throw new Error('Não foi possível consultar o atendimento.');return {paused:settings.data.orders_paused,isOpen:isRestaurantOpen(new Date()),zones:zones.data};
 });
 export const adminSettings=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).handler(async({context})=>{
  setResponseHeader('Cache-Control','no-store');const role=await context.supabase.rpc('matturo_has_role',{wanted:'admin'});if(role.error||!role.data)throw new Error('Acesso reservado ao administrador.');
