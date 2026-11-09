@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { authorizeCourier, changeDelivery, deliveryDashboard, issueTrackingLink, recordPosition, setCourierAvailability } from "@/lib/delivery.functions";
 import { deliveryLabels, nextDeliveryState } from "@/lib/delivery";
+import { summarizeCourierDeliveries } from "@/lib/courier-delivery-stats";
 import { money } from "@/lib/restaurant";
 import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -71,12 +72,13 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const ownOpen = data.deliveries.filter((delivery) => delivery.courier_id === data.userId && openStates.includes(delivery.status)).length;
   const availability = ownOpen ? "busy" : ownAvailability?.state ?? "available";
 
-  const [tab, setTab] = useState<"open" | "done">("open");
+  const [tab, setTab] = useState<"open" | "done" | "couriers">("open");
   const [openId, setOpenId] = useState<string | null>(null);
   const [showProfile, setShowProfile] = useState(false);
   const active = data.deliveries.filter((d) => !["delivered", "cancelled"].includes(d.status));
   const done = data.deliveries.filter((d) => ["delivered", "cancelled"].includes(d.status));
-  const list = tab === "open" ? active : done;
+  const list = tab === "done" ? done : active;
+  const courierStats = summarizeCourierDeliveries(data.courierIds, data.profiles, data.deliveryTotals);
   const today = new Date().toDateString();
   const doneToday = done.filter((d) => d.status === "delivered" && data.events.some((e) => e.delivery_id === d.id && e.status === "delivered" && new Date(e.created_at).toDateString() === today)).length;
   const onRoad = active.filter((d) => d.status === "active").length;
@@ -122,12 +124,30 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     {error && <p role="alert" className="mt-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
     {link && <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3"><LinkIcon className="h-4 w-4 text-primary" /><span className="text-xs text-muted-foreground">Link do cliente (24 h):</span><a href={link} className="min-w-0 flex-1 truncate text-sm text-primary">{link}</a><Button size="sm" onClick={copy}><Copy />Copiar</Button></div>}
 
-    <div className="mt-6 flex gap-2 border-b border-border">
-      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length]] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
+    <div className="mt-6 flex gap-2 overflow-x-auto border-b border-border">
+      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length], ...(data.admin ? [["couriers", "Estafetas", courierStats.length] as const] : [])] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
     </div>
 
-    {!list.length && <p className="py-12 text-center text-sm text-muted-foreground">{tab === "open" ? "Sem entregas ativas." : "Sem entregas concluídas."}</p>}
-    <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">{list.map((delivery) => {
+    {tab === "couriers" && <section aria-label="Entregas por estafeta" className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {courierStats.map((courier) => {
+        const availabilityState = data.availability.find((row) => row.user_id === courier.id)?.state;
+        const stateLabel = courier.active ? "Com entregas em curso" : availabilityState === "inactive" ? "Inativo" : "Disponível";
+        return <article key={courier.id} className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Bike className="h-5 w-5" /></div>
+            <div className="min-w-0"><h2 className="truncate font-semibold">{courier.name}</h2><p className="mt-0.5 text-xs text-muted-foreground">{stateLabel}</p></div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Entregas feitas</p><p className="mt-1 text-2xl font-bold">{courier.delivered}</p></div>
+            <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Em curso</p><p className="mt-1 text-2xl font-bold">{courier.active}</p></div>
+          </div>
+        </article>;
+      })}
+      {!courierStats.length && <p className="col-span-full rounded-xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">Ainda não há estafetas autorizados.</p>}
+    </section>}
+
+    {tab !== "couriers" && !list.length && <p className="py-12 text-center text-sm text-muted-foreground">{tab === "open" ? "Sem entregas ativas." : "Sem entregas concluídas."}</p>}
+    {tab !== "couriers" && <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">{list.map((delivery) => {
       const position = delivery.status === "active" ? data.positions.find((item) => item.delivery_id === delivery.id) ?? null : null;
       const order = data.orders.find((item) => item.id === delivery.order_id);
       const next = nextDeliveryState[delivery.status];
@@ -162,7 +182,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
           <details className="text-xs"><summary className="cursor-pointer text-muted-foreground">Histórico de estados</summary><ol className="mt-2 space-y-1 border-l border-border pl-3">{data.events.filter((event) => event.delivery_id === delivery.id).map((event) => <li key={event.id}>{deliveryLabels[event.status]} · {new Date(event.created_at).toLocaleString("pt-PT")}</li>)}</ol></details>
         </div>}
       </article>;
-    })}</div>
+    })}</div>}
     {data.courier && <p className="mt-8 text-sm text-muted-foreground">A localização é partilhada apenas durante a entrega ativa. Mantenha esta página aberta e o telemóvel desbloqueado.</p>}
   </div>;
 }
