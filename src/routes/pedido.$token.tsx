@@ -11,6 +11,7 @@ const DeliveryMap = lazy(() => import("@/components/restaurant/DeliveryMap"));
 import { orderByToken } from "@/lib/orders.functions";
 import { orderStatusLabels, orderStatuses, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
+import { formatLisbonDateTime } from "@/lib/opening-hours";
 
 const q = (token: string) => queryOptions({ queryKey: ["matturo-order", token], queryFn: () => orderByToken({ data: { token } }), refetchInterval: 10000 });
 

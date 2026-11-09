@@ -49,6 +49,8 @@ function Checkout() {
   const total = subtotal + fee;
   const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
 
+  const [scheduled, setScheduled] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState("");
   const [payment, setPayment] = useState<"" | "Multibanco" | "Dinheiro">("");
   const [cash, setCash] = useState("");
   const [locating, setLocating] = useState(false);

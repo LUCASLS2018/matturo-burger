@@ -54,7 +54,7 @@ function OrdersPage() {
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
-  const [tab, setTab] = useState<OrderStatus | "mapa">("novo");
+  const [tab, setTab] = useState<OrderStatus | "mapa" | "agendados">("novo");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("todos");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);

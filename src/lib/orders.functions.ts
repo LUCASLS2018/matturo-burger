@@ -45,8 +45,11 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     db.from("matturo_menu_items").select(menuFields).eq("visible", true),
   ]);
   if (settings.error || zones.error || menu.error) throw new Error("Não foi possível registar o pedido. Tente novamente.");
-  if (settings.data.orders_paused) throw new Error("O Matturo está temporariamente sem aceitar pedidos.");
-  if (!isRestaurantOpen(new Date())) throw new Error(CLOSED_ORDER_MESSAGE);
+  if (settings.data.orders_paused) throw new Error("O Matturo está FECHADO temporariamente e não está a aceitar pedidos.");
+  const now = new Date();
+  const scheduleError = scheduledOrderError(data.scheduledFor, now);
+  if (scheduleError) throw new Error(scheduleError);
+  if (!isRestaurantOpen(now) && !data.scheduledFor) throw new Error(CLOSED_ORDER_MESSAGE);
   const itemIds = menu.data.map((item) => item.id);
   const [groups, modifiers] = await Promise.all([
     db.from("matturo_modifier_groups").select("item_id,id,name,required,min,max,position,revision").in("item_id", itemIds),
