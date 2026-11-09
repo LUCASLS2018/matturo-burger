@@ -34,7 +34,7 @@ export function isRestaurantOpen(date: Date): boolean {
   const minute = Number(value("minute"));
   if (weekday === undefined || !Number.isInteger(hour) || !Number.isInteger(minute)) return false;
   const currentMinutes = hour * 60 + minute;
-  return weeklyHours[weekday].some((interval) => currentMinutes >= interval.start && currentMinutes < interval.end);
+  return (weeklyHours[weekday] ?? []).some((interval) => currentMinutes >= interval.start && currentMinutes < interval.end);
 }
 
 export function canAcceptOrders(paused: boolean, date: Date): boolean {
