@@ -12,7 +12,7 @@ export function OpeningStatus() {
       <Clock3 className="h-4 w-4 shrink-0" aria-hidden="true" />
       <strong className="shrink-0 tracking-[0.14em]">{label}</strong>
       <span className="hidden sm:inline">·</span>
-      <span className="leading-relaxed">{closed ? OPENING_HOURS_SUMMARY : settings.paused ? "A equipa pausou temporariamente os novos pedidos." : "Já pode fazer o seu pedido."}</span>
+      <span className="leading-relaxed">{!settings.isOpen ? OPENING_HOURS_SUMMARY : settings.paused ? "Fechado temporariamente pela equipa. Para já não são aceites novos pedidos." : "Já pode fazer o seu pedido."}</span>
     </div>
   </div>;
 }
