@@ -12,6 +12,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
       getUser: () => getUser(),
+      getSession: () => Promise.resolve({ data: { session: null } }),
       onAuthStateChange: (callback: (event: string, session: unknown) => void) => onAuthStateChange(callback),
     },
   },

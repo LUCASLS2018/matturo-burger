@@ -1,11 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestIP, setResponseHeader } from "@tanstack/react-start/server";
+import { getRequestHeader, getRequestIP, setResponseHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { orderServices, needsDeliveryAddress } from "./order-service";
 import { findZone } from "./restaurant-settings";
 import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./order-pricing";
 import { tokenHash } from "./delivery";
+import { loyaltyBalance, REWARD_POINTS, REWARD_SLUG } from "./loyalty";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function customerBalance(db: SupabaseClient<any>, customerId: string) {
+  const [orders, redemptions] = await Promise.all([
+    db.from("matturo_orders").select("subtotal_cents,status").eq("customer_id", customerId),
+    db.from("matturo_loyalty_redemptions").select("points,matturo_orders(status)").eq("customer_id", customerId),
+  ]);
+  if (orders.error || redemptions.error) throw new Error("Não foi possível consultar os pontos.");
+  return loyaltyBalance(orders.data, (redemptions.data as unknown as { points: number; matturo_orders: { status: string } | null }[]).map((r) => ({ points: r.points, order_status: r.matturo_orders?.status ?? "novo" })));
+}
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
@@ -24,6 +36,7 @@ const orderInput = z.object({
     productId: z.string().uuid(), qty: z.number().int(),
     options: z.record(z.string().max(100), z.string().max(600)).default({}),
     selected: z.record(z.string().uuid(), z.number().int().min(0).max(100)).optional(),
+    reward: z.boolean().optional(),
   })).min(1).max(60),
 });
 
@@ -48,6 +61,22 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
     (modifiers.data as ModifierRecord[]).filter((modifier) => modifier.item_id === item.id),
   )));
   const lines = data.items.map((line) => priceLine(line, currentMenu));
+  const rewardIndex = data.items.findIndex((line) => line.reward);
+  let rewardCustomer: string | null = null;
+  if (rewardIndex >= 0) {
+    if (data.items.filter((line) => line.reward).length > 1) throw new Error("Só pode resgatar um Hamburguinho por pedido.");
+    const dish = currentMenu.find((item) => item.id === data.items[rewardIndex]!.productId);
+    if (!dish || dish.slug !== REWARD_SLUG || data.items[rewardIndex]!.qty !== 1) throw new Error("Recompensa inválida.");
+    const token = (getRequestHeader("authorization") ?? "").replace(/^Bearer /, "");
+    const user = token ? await db.auth.getUser(token) : null;
+    if (!user?.data.user) throw new Error("Inicie sessão na sua conta para resgatar o Hamburguinho.");
+    rewardCustomer = user.data.user.id;
+    const balance = await customerBalance(db, rewardCustomer);
+    if (balance.available < REWARD_POINTS) throw new Error("Ainda não tem 100 pontos para resgatar.");
+    const line = lines[rewardIndex]!;
+    const unit = Math.max(0, line.unit_price_cents - Math.round(dish.price * 100));
+    lines[rewardIndex] = { ...line, name: `${line.name} (GRÁTIS · fidelização)`, unit_price_cents: unit, line_total_cents: unit };
+  }
   const delivery = needsDeliveryAddress(data.service);
   const zone = delivery ? findZone(data.postal ?? "", zones.data) : null;
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");
@@ -70,6 +99,11 @@ export const placeOrder = createServerFn({ method: "POST" }).inputValidator((inp
   if (result.error || !result.data?.[0]) {
     console.error(result.error);
     throw new Error(result.error?.message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : "Não foi possível registar o pedido. Tente novamente.");
+  }
+  if (rewardCustomer) {
+    await db.from("matturo_orders").update({ customer_id: rewardCustomer }).eq("id", result.data[0].id).is("customer_id", null);
+    const saved = await db.from("matturo_loyalty_redemptions").insert({ customer_id: rewardCustomer, order_id: result.data[0].id, points: REWARD_POINTS });
+    if (saved.error && saved.error.code !== "23505") console.error(saved.error);
   }
   return { kind: "created" as const, reference: result.data[0].reference, token: data.accessToken };
 });
@@ -181,4 +215,30 @@ export const adminCustomers = createServerFn({ method: "POST" }).middleware([req
   if (result.error) throw new Error("Não foi possível carregar os clientes.");
   const { groupCustomers } = await import("./customers");
   return groupCustomers(result.data);
+});
+
+export const myLoyalty = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  setResponseHeader("Cache-Control", "no-store");
+  const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+  return customerBalance(db, context.userId);
+});
+
+export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  setResponseHeader("Cache-Control", "no-store");
+  await assertAdmin(context.supabase);
+  const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+  const [orders, redemptions, profiles] = await Promise.all([
+    db.from("matturo_orders").select("customer_id,customer_name,customer_phone,subtotal_cents,status").not("customer_id", "is", null).limit(5000),
+    db.from("matturo_loyalty_redemptions").select("customer_id,points,created_at,matturo_orders(status,reference)").order("created_at", { ascending: false }),
+    db.from("matturo_profiles").select("id,name"),
+  ]);
+  if (orders.error || redemptions.error || profiles.error) throw new Error("Não foi possível carregar a fidelização.");
+  const reds = redemptions.data as unknown as { customer_id: string; points: number; created_at: string; matturo_orders: { status: string; reference: string } | null }[];
+  const ids = [...new Set(orders.data.map((o) => o.customer_id as string))];
+  return ids.map((id) => {
+    const own = orders.data.filter((o) => o.customer_id === id);
+    const r = reds.filter((x) => x.customer_id === id);
+    const b = loyaltyBalance(own, r.map((x) => ({ points: x.points, order_status: x.matturo_orders?.status ?? "novo" })));
+    return { id, name: profiles.data.find((p) => p.id === id)?.name || own[0]!.customer_name, phone: own[0]!.customer_phone, ...b, redemptions: r.map((x) => ({ at: x.created_at, reference: x.matturo_orders?.reference ?? "", cancelled: x.matturo_orders?.status === "cancelado" })) };
+  }).sort((a, b) => b.available - a.available);
 });

@@ -3,23 +3,26 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { LogOut, PackageOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { myOrders } from "@/lib/orders.functions";
+import { myLoyalty, myOrders } from "@/lib/orders.functions";
 import { orderStatusLabels, type OrderStatus } from "@/lib/order-pricing";
 import { money, restaurantHead } from "@/lib/restaurant";
 
+const loyaltyQuery = queryOptions({ queryKey: ["matturo-my-loyalty"], queryFn: () => myLoyalty() });
 const accountOrdersQuery = queryOptions({ queryKey: ["matturo-my-orders"], queryFn: () => myOrders(), refetchInterval: 15000 });
 export const Route = createFileRoute("/_authenticated/minha-conta")({
   head: () => restaurantHead("Os meus pedidos", "Histórico privado dos seus pedidos Matturo Burger."),
-  loader: ({ context }) => context.queryClient.ensureQueryData(accountOrdersQuery),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(accountOrdersQuery), context.queryClient.ensureQueryData(loyaltyQuery)]),
   component: CustomerAccount,
 });
 
 function CustomerAccount() {
   const { data: orders } = useSuspenseQuery(accountOrdersQuery);
+  const { data: points } = useSuspenseQuery(loyaltyQuery);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   return <div className="page-width max-w-4xl py-12">
     <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="mb-3 text-xs font-semibold text-primary">MATTURO · CLIENTE</p><h1 className="section-title">Os meus pedidos</h1><p className="mt-3 text-sm text-muted-foreground">Só a sua conta pode consultar este histórico.</p></div><Button variant="outline" onClick={async () => { await supabase.auth.signOut(); await queryClient.cancelQueries(); queryClient.clear(); await navigate({ to: "/conta", replace: true }); }}><LogOut />Sair</Button></div>
+    <div className="mt-8 rounded-lg border border-border bg-card p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-semibold text-primary">CARTEIRA DE FIDELIZAÇÃO</p><p className="mt-1 text-2xl font-bold">{points.available} pontos</p><p className="text-xs text-muted-foreground">1 € em produtos = 1 ponto (pedidos concluídos). 100 pontos = 1 Hamburguinho grátis.</p></div>{points.available >= 100 && <Button asChild><Link to="/produto/$slug" params={{ slug: "hamburguinho" }} search={{ recompensa: true }}>Resgatar Hamburguinho</Link></Button>}</div><div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${Math.min(100, points.available)}%` }} /></div></div>
     {!orders.length && <div className="mt-12 rounded-lg border border-border bg-card p-8 text-center"><PackageOpen className="mx-auto h-10 w-10 text-primary" /><h2 className="mt-4 text-lg font-semibold">Ainda não há pedidos nesta conta</h2><p className="mt-2 text-sm text-muted-foreground">Os pedidos feitos com esta sessão iniciada aparecem aqui.</p><Button asChild className="mt-5"><Link to="/cardapio">Ver cardápio</Link></Button></div>}
     <div className="mt-8 space-y-5">{orders.map((order) => <article key={order.id} className="rounded-lg border border-border bg-card p-5">
       <div className="flex flex-wrap justify-between gap-3"><div><h2 className="font-semibold">{order.reference} · {order.service}</h2><p className="mt-1 text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString("pt-PT")}</p></div><span className="h-fit rounded-full bg-secondary px-3 py-1 text-xs font-semibold">{orderStatusLabels[order.status as OrderStatus]}</span></div>

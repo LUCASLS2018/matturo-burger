@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowRight, ClipboardList, LayoutDashboard, LogOut, MapPin, Settings, Truck, Users, Utensils } from "lucide-react";
+import { ArrowRight, ClipboardList, Gift, LayoutDashboard, LogOut, MapPin, Settings, Truck, Users, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { teamSummary } from "@/lib/delivery.functions";
@@ -21,6 +21,7 @@ function PanelHub() {
   const areas = [
     { to: "/pedidos" as const, icon: ClipboardList, title: "Pedidos", text: "Lista ao vivo dos pedidos recebidos, com estados e cancelamentos.", admin: true },
     { to: "/clientes" as const, icon: Users, title: "Clientes", text: "Nome, telemóvel, morada, últimos pedidos e total gasto.", admin: true },
+    { to: "/fidelizacao" as const, icon: Gift, title: "Fidelização", text: "Pontos dos clientes (1 € = 1 ponto) e Hamburguinhos resgatados.", admin: true },
     { to: "/gerir-menu" as const, icon: Utensils, title: "Produtos", text: "Nomes, preços, descrições, disponibilidade e fotografias.", admin: true },
     { to: "/entregas" as const, icon: Truck, title: "Entregas", text: "Entregas atribuídas, perfil de estafeta e rastreamento.", admin: false },
     { to: "/configuracoes" as const, icon: Settings, title: "Configurações", text: "Pausar pedidos e gerir zonas de delivery com portes.", admin: true },

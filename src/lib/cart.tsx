@@ -11,6 +11,7 @@ export type CartItem = {
   options: Record<string, string>;
   selected?: Record<string, number>;
   qty: number;
+  reward?: boolean;
 };
 
 type CartCtx = {
