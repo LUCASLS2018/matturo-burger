@@ -1,5 +1,8 @@
 # Matturo Burger
 
+- [ ] Usar distância pelo percurso rodoviário nas faixas de entrega e portes, sem fallback em linha reta.
+- [ ] Retirar Comer no local das modalidades disponíveis para novos pedidos, preservando o histórico.
+
 - [x] Bloquear pedidos fora do horário publicado e mostrar FECHADO no site público, usando Europe/Lisbon e validação no servidor; 88 testes e verificação visual pública passaram.
 - [x] Adicionar configuração de entregas e preços por raio calculado a partir da morada da loja; 98 testes, cálculo real de distância e compilação passaram. Falta ao dono configurar/ativar as suas faixas.
 - [x] Permitir pedidos agendados fora do horário, com data/hora futura dentro do funcionamento e aceitação apenas depois da loja abrir; 105 testes e validação visual móvel/desktop passaram. Não foi criado um pedido real de teste.
