@@ -5,6 +5,7 @@ vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mocks.save }));
 vi.mock("@/lib/orders.functions", () => ({ createManualOrder: {} }));
 vi.mock("@/lib/menu.functions", () => ({ adminMenu: {} }));
 vi.mock("@/lib/settings-query", () => ({ publicSettingsQuery: { queryKey: ["settings"] } }));
+vi.mock("@/lib/settings.functions", () => ({ quoteRadiusDelivery: {} }));
 vi.mock("@/lib/menu-query", () => ({ menuCategoriesQuery: { queryKey: ["categories"] } }));
 vi.mock("@tanstack/react-query", () => ({
   queryOptions: (options: unknown) => options,

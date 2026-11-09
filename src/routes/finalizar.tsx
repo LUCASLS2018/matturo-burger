@@ -122,7 +122,7 @@ function Checkout() {
     {!settings.isOpen && <p role="status" className="mt-6 border-l-4 border-destructive bg-destructive/10 p-4 font-semibold text-destructive">{CLOSED_ORDER_MESSAGE}</p>}
     {settings.isOpen && settings.paused && <p role="status" className="mt-6 border-l-4 border-primary bg-secondary p-4">O Matturo está FECHADO temporariamente e não está a aceitar pedidos.</p>}
     {!items.length ? <div className="py-12"><p>O seu pedido está vazio.</p><Button asChild className="mt-5"><Link to="/cardapio">Ver cardápio</Link></Button></div> : <>
-      <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); }}>{item}</Button>)}</div>
+      <div className="mt-8 flex flex-wrap gap-3" aria-label="Modalidade do pedido">{orderServices.map((item) => <Button key={item} variant={item === service ? "default" : "outline"} onClick={() => { setService(item); setPriceChange(null); setRadiusQuote(null); }}>{item}</Button>)}</div>
       <form onSubmit={(event) => { event.preventDefault(); void send(); }} className="mt-8 space-y-6">
         <label className="block text-sm font-medium">O seu nome<input required value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" maxLength={100} className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
         <label className="block text-sm font-medium">Telemóvel<input required type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" maxLength={30} placeholder="912 345 678" className="mt-2 h-12 w-full rounded-md border border-input bg-card px-4" /></label>
