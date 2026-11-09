@@ -142,7 +142,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
             <div className="min-w-0"><h2 className="truncate font-semibold">{courier.name}</h2><p className="mt-0.5 text-xs text-muted-foreground">{stateLabel}</p></div>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Entregas feitas</p><p className="mt-1 text-2xl font-bold">{courier.delivered}</p></div>
+            <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Entregas hoje</p><p className="mt-1 text-2xl font-bold">{courier.delivered}</p></div>
             <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Em curso</p><p className="mt-1 text-2xl font-bold">{courier.active}</p></div>
           </div>
         </article>;
