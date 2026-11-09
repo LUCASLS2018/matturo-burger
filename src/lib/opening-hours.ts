@@ -66,6 +66,10 @@ export function lisbonDateTimeToDate(value: string): Date | null {
   return lisbonTimestamp(result) === desired ? result : null;
 }
 
+export function canAcceptScheduledOrder(scheduledFor: string | null, paused: boolean, now: Date): boolean {
+  return !scheduledFor || (!paused && isRestaurantOpen(now));
+}
+
 export function scheduledOrderError(scheduledFor: string | undefined, now: Date): string | null {
   if (!scheduledFor) return null;
   const scheduled = new Date(scheduledFor);

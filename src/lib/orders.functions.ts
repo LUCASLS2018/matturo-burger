@@ -11,7 +11,7 @@ import { REWARD_SLUG } from "./loyalty";
 import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
-import { CLOSED_ORDER_MESSAGE, isRestaurantOpen, scheduledOrderError } from "./opening-hours";
+import { CLOSED_ORDER_MESSAGE, canAcceptScheduledOrder, isRestaurantOpen, scheduledOrderError } from "./opening-hours";
 import { distanceKm, findRadiusZone, radiusZoneLabel } from "./delivery-radius";
 
 const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
