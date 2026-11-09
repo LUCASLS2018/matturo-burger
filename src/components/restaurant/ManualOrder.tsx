@@ -1,3 +1,4 @@
+import { orderNumber } from "@/lib/order-number";
 import { useRef, useState } from "react";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -71,7 +72,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
       if (result.kind === "price_changed") { setChangedTotal(result.totalCents); return; }
       await qc.invalidateQueries({ queryKey: ["matturo-admin-orders"] });
       await qc.invalidateQueries({ queryKey: ["matturo-admin-customers"] });
-      toast.success(`Pedido #${result.reference} criado`);
+      toast.success(`Pedido #${orderNumber(result)} criado`);
       onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível criar o pedido."); }
     finally { setBusy(false); }

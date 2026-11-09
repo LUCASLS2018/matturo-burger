@@ -27,7 +27,7 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
     admin ? db.from("matturo_profiles").select("*") : Promise.resolve(profile),
     admin ? db.from("matturo_user_roles").select("user_id").eq("role", "courier") : Promise.resolve(null),
     db.from("matturo_courier_availability").select("*"),
-    orderIds.length ? db.from("matturo_orders").select("id,reference,customer_name,customer_phone,address,postal_code,notes,service,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
+    orderIds.length ? db.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,customer_phone,address,postal_code,notes,service,total_cents,matturo_order_items(name,options,qty,line_total_cents)").in("id", orderIds) : Promise.resolve({ data: [] as never[], error: null }),
   ]);
   if (positions.error || events.error || availability.error || orders.error) throw new Error("Não foi possível carregar as entregas.");
   return {
@@ -110,8 +110,11 @@ export const customerTracking = createServerFn({ method: "POST" }).inputValidato
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const link = await supabaseAdmin.from("matturo_tracking_links").select("delivery_id,expires_at,revoked_at").eq("token_hash", await tokenHash(data.token)).maybeSingle();
   if (!link.data || !validTrackingLink(link.data.expires_at, link.data.revoked_at)) throw new Error("Link inválido ou expirado.");
-  const delivery = await supabaseAdmin.from("matturo_deliveries").select("reference,destination,destination_lat,destination_lng,status,updated_at").eq("id", link.data.delivery_id).single();
+  const delivery = await supabaseAdmin.from("matturo_deliveries").select("reference,order_id,destination,destination_lat,destination_lng,status,updated_at").eq("id", link.data.delivery_id).single();
   if (delivery.error) throw delivery.error;
   const position = delivery.data.status === "active" ? await supabaseAdmin.from("matturo_delivery_positions").select("latitude,longitude,recorded_at").eq("delivery_id", link.data.delivery_id).maybeSingle() : null;
-  return { delivery: { ...delivery.data, destination: delivery.data.destination.split(" — ")[0] }, position: position?.data ?? null };
+  const order = delivery.data.order_id ? await supabaseAdmin.from("matturo_orders").select("daily_number,order_day").eq("id", delivery.data.order_id).maybeSingle() : null;
+  if (order?.error) throw new Error("Não foi possível carregar o número do pedido.");
+  const { order_id: _orderId, ...publicDelivery } = delivery.data;
+  return { delivery: { ...publicDelivery, daily_number: order?.data?.daily_number ?? null, order_day: order?.data?.order_day ?? null, destination: delivery.data.destination.split(" — ")[0] }, position: position?.data ?? null };
 });

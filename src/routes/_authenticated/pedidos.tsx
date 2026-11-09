@@ -1,3 +1,4 @@
+import { orderNumber } from "@/lib/order-number";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -211,7 +212,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary"><Icon className="h-4 w-4" /></span>
           <span className="min-w-0 flex-1">
             <span className="flex min-w-0 items-center gap-2">
-              <b className="shrink-0 text-sm">#{order.reference}</b>
+              <b className="shrink-0 text-sm">#{orderNumber(order)}</b>
               <span className="truncate text-xs font-semibold">{order.customer_name}</span>
             </span>
             <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{timeAgo(order.created_at)} · {order.service}</span>
@@ -244,7 +245,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, nearby =
               ? <p className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs"><Bike className="h-3.5 w-3.5 text-primary" />Estafeta: <b>{board.couriers.find((c) => c.id === delivery.courier_id)?.name ?? "—"}</b> · {delivery.status === "active" ? "a caminho" : delivery.status === "delivered" ? "entregue" : "atribuído"}</p>
               : !board.couriers.length
                 ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
-                : <>{nearby.length > 0 && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-xs"><p className="font-semibold text-primary">{nearby.length} pedido{nearby.length > 1 ? "s" : ""} perto deste cliente</p><ul className="mt-1 space-y-0.5 text-muted-foreground">{nearby.map((n) => <li key={n.id}>#{n.reference} · {n.customer_name} · {n.address}</li>)}</ul><Button size="sm" className="mt-2 h-8 w-full" onClick={() => void onSendNearby?.(nearby.map((n) => n.id))}><Bike />Enviar todos ao mesmo estafeta</Button></div>}<div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div></>)}
+                : <>{nearby.length > 0 && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-xs"><p className="font-semibold text-primary">{nearby.length} pedido{nearby.length > 1 ? "s" : ""} perto deste cliente</p><ul className="mt-1 space-y-0.5 text-muted-foreground">{nearby.map((n) => <li key={n.id}>#{orderNumber(n)} · {n.customer_name} · {n.address}</li>)}</ul><Button size="sm" className="mt-2 h-8 w-full" onClick={() => void onSendNearby?.(nearby.map((n) => n.id))}><Bike />Enviar todos ao mesmo estafeta</Button></div>}<div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div></>)}
           </div>
           {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} onClick={() => void onMove(order.id, order.status as OrderStatus, s)}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
         </div>

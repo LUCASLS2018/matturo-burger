@@ -1,0 +1,1 @@
+CREATE POLICY matturo_daily_counters_service_only ON public.matturo_order_daily_counters FOR ALL TO service_role USING(true) WITH CHECK(true);

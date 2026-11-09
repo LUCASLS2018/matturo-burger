@@ -1,11 +1,12 @@
+import { orderNumber } from "./order-number";
 export type CustomerOrderRow = {
-  reference: string; customer_name: string; customer_phone: string; address: string | null; postal_code: string | null;
+  daily_number?: number; order_day?: string; reference: string; customer_name: string; customer_phone: string; address: string | null; postal_code: string | null;
   service: string; total_cents: number; status: string; created_at: string;
 };
 
 export type Customer = {
   phone: string; name: string; address: string; postal: string; orders: number; spentCents: number;
-  lastAt: string; recent: { reference: string; service: string; totalCents: number; status: string; createdAt: string }[];
+  lastAt: string; recent: { number: string; reference: string; service: string; totalCents: number; status: string; createdAt: string }[];
 };
 
 export const normalizePhone = (phone: string) => phone.replace(/[^\d+]/g, "").replace(/^\+?351(?=\d{9}$)/, "");
@@ -23,7 +24,7 @@ export function groupCustomers(rows: CustomerOrderRow[]): Customer[] {
     }
     if (!c.address && row.address) { c.address = row.address; c.postal = row.postal_code ?? ""; }
     if (row.status !== "cancelado") { c.orders += 1; c.spentCents += row.total_cents; }
-    if (c.recent.length < 5) c.recent.push({ reference: row.reference, service: row.service, totalCents: row.total_cents, status: row.status, createdAt: row.created_at });
+    if (c.recent.length < 5) c.recent.push({ number: orderNumber(row), reference: row.reference, service: row.service, totalCents: row.total_cents, status: row.status, createdAt: row.created_at });
   }
   return [...map.values()].sort((a, b) => b.lastAt.localeCompare(a.lastAt));
 }

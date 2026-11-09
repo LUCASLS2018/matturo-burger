@@ -1,3 +1,4 @@
+import { orderNumber } from "@/lib/order-number";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ClientOnly, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -137,7 +138,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
         <button type="button" onClick={() => setOpenId(openId === delivery.id ? null : delivery.id)} className="flex w-full items-start gap-3 p-4 text-left">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Bike className="h-5 w-5" /></div>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold">{delivery.reference}</h3><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone(delivery.status)}`}>{deliveryLabels[delivery.status]}</span></div>
+            <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold">{order ? `Pedido #${orderNumber(order)}` : delivery.reference}</h3><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone(delivery.status)}`}>{deliveryLabels[delivery.status]}</span></div>
             <p className="mt-1 truncate text-sm text-muted-foreground">{order?.customer_name ? `${order.customer_name} · ` : ""}{delivery.destination}</p>
             {data.admin && <p className="mt-1 text-xs text-muted-foreground">Estafeta: <span className="font-medium text-foreground">{courierName}</span></p>}
           </div>

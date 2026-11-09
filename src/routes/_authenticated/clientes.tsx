@@ -52,7 +52,7 @@ function CustomersPage() {
               <Button size="sm" variant="ghost" onClick={() => setOpen(open === c.phone ? null : c.phone)}>{open === c.phone ? "Esconder pedidos" : "Últimos pedidos"}</Button>
             </div>
             {open === c.phone && <ul className="mt-4 divide-y divide-border border-t border-border text-sm">
-              {c.recent.map((o) => <li key={o.reference} className="flex flex-wrap justify-between gap-2 py-2"><span>{o.reference} · {o.service} · {date(o.createdAt)}</span><span>{orderStatusLabels[o.status as OrderStatus] ?? o.status} · <strong>{money(o.totalCents / 100)}</strong></span></li>)}
+              {c.recent.map((o) => <li key={o.reference} className="flex flex-wrap justify-between gap-2 py-2"><span>#{o.number} · {o.service} · {date(o.createdAt)}</span><span>{orderStatusLabels[o.status as OrderStatus] ?? o.status} · <strong>{money(o.totalCents / 100)}</strong></span></li>)}
             </ul>}
           </li>
         ))}
