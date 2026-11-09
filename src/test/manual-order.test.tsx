@@ -10,7 +10,7 @@ vi.mock("@tanstack/react-query", () => ({
   queryOptions: (options: unknown) => options,
   useQueryClient: () => ({ invalidateQueries: mocks.invalidate }),
   useSuspenseQuery: (query: { queryKey: string[] }) => ({ data: query.queryKey[0] === "settings"
-    ? { paused: false, isOpen: true, zones: [{ name: "vila franca de xira", postal_prefixes: ["2600"], fee_cents: 300 }] }
+    ? { paused: false, isOpen: true, deliveryMode: "postal", zones: [{ name: "vila franca de xira", postal_prefixes: ["2600"], fee_cents: 300 }] }
     : query.queryKey[0] === "categories" ? [{ slug: "hamburguer", name: "HAMBURGUER" }]
     : [{ id: "burger", slug: "hamburguer", category: "hamburguer", name: "Hambúrguer", price: 8, available: true, visible: true, groups: [{ id: "extras", name: "Extras", required: true, min: 1, max: 1, modifiers: [{ id: "none", name: "NAO QUERO", price: 0, max: 1 }] }] }] }),
 }));

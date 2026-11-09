@@ -59,6 +59,16 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const subtotal = lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0);
   const fee = zone ? zone.fee_cents / 100 : 0;
   const resetPrice = () => { setChangedTotal(null); };
+  const verifyRadius = async () => {
+    if (quoting) return;
+    setQuoting(true); setError(""); setRadiusQuote(null); resetPrice();
+    try {
+      const result = await quoteDelivery({ data: { address, postal } });
+      setRadiusQuote(result);
+      if (!result.zone) setError(`A morada fica a ${String(result.distanceKm).replace(".", ",")} km da loja e está fora do raio de entrega.`);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível calcular a distância."); }
+    finally { setQuoting(false); }
+  };
   const availableMenu = menu.filter((item) => item.visible && item.available);
   const categorySlugs = [...new Set(availableMenu.map((item) => item.category))];
   const visibleCategories = [...categories.filter((item) => categorySlugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.name })), ...categorySlugs.filter((slug) => !categories.some((item) => item.slug === slug)).map((slug) => ({ slug, name: slug }))];

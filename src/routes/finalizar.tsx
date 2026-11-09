@@ -68,6 +68,18 @@ function Checkout() {
     }, () => { setLocating(false); setError("Não foi possível aceder à localização. Autorize a localização ou escreva a morada."); }, { enableHighAccuracy: true, timeout: 15000 });
   };
 
+  const verifyRadius = async () => {
+    if (quoting) return;
+    setQuoting(true); setError(""); setRadiusQuote(null); setPriceChange(null);
+    try {
+      const result = await quoteDelivery({ data: { address, postal } });
+      setRadiusQuote(result);
+      if (!result.zone) setError(`A morada fica a ${String(result.distanceKm).replace(".", ",")} km da loja e está fora do raio de entrega.`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Não foi possível calcular a distância.");
+    } finally { setQuoting(false); }
+  };
+
   const send = async () => {
     if (sending) return;
     if (!rewardMinimumMet) { setError(REWARD_MINIMUM_MESSAGE); return; }
