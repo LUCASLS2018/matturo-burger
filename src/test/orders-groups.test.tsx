@@ -62,7 +62,7 @@ vi.mock("@tanstack/react-query", () => ({
   queryOptions: (options: unknown) => options,
   useQueryClient: () => ({ invalidateQueries: mocks.invalidate, fetchQuery: vi.fn() }),
   useSuspenseQuery: (query: { queryKey: string[] }) => ({
-    data: query.queryKey[0] === "matturo-order-couriers" ? mocks.board : query.queryKey[0] === "settings" ? { isOpen: true, paused: false } : mocks.orders,
+    data: query.queryKey[0] === "matturo-order-couriers" ? mocks.board : query.queryKey[0] === "settings" ? mocks.settings : mocks.orders,
   }),
 }));
 
