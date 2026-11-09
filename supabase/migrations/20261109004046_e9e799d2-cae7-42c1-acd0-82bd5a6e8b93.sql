@@ -1,0 +1,3 @@
+DELETE FROM public.matturo_loyalty_sessions WHERE wallet_id IN (SELECT id FROM public.matturo_loyalty_wallets WHERE phone IN ('+351969000111','+351969000222','+351969000333'));
+DELETE FROM public.matturo_loyalty_accounts WHERE wallet_id IN (SELECT id FROM public.matturo_loyalty_wallets WHERE phone IN ('+351969000111','+351969000222','+351969000333'));
+DELETE FROM public.matturo_loyalty_wallets WHERE phone IN ('+351969000111','+351969000222','+351969000333') AND balance=0;
