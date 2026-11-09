@@ -149,7 +149,7 @@ function OrdersPage() {
   );
 }
 
-export function nearbyOrders(order: { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null }, all: typeof order[], board: { deliveries: { order_id: string | null }[] }) {
+export function nearbyOrders<T extends { id: string; service: string; status: string; postal_code: string | null; zone_name: string | null }>(order: T, all: T[], board: { deliveries: { order_id: string | null }[] }) {
   if (order.service !== "Delivery" || !order.postal_code) return [];
   const prefix = order.postal_code.replace(/\D/g, "").slice(0, 4);
   const assigned = new Set(board.deliveries.map((d) => d.order_id));
