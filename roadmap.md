@@ -1,5 +1,7 @@
 # Matturo Burger
 
+- [x] Informar o custo de referência para percursos rodoviários: Google Routes Essentials, 10 000 cálculos gratuitos/mês e US$ 5 por 1 000 adicionais na primeira faixa; ligação e condições de faturação ainda não escolhidas.
+
 - [ ] Usar distância pelo percurso rodoviário nas faixas de entrega e portes, sem fallback em linha reta — aguarda autorização para ligar um serviço de rotas adequado a pedidos comerciais; serviços públicos de demonstração não garantem disponibilidade.
 - [x] Retirar Comer no local das modalidades disponíveis para novos pedidos, preservando o histórico; seis testes e verificação no carrinho passaram.
 
