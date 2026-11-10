@@ -14,6 +14,7 @@ import { publicSettings, quoteRadiusDelivery } from "@/lib/settings.functions";
 import { findZone } from "@/lib/restaurant-settings";
 import { supabase } from "@/integrations/supabase/client";
 import { canonicalPhone, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "@/lib/loyalty-phone";
+import { findReward, paidAfterReward } from "@/lib/loyalty-rewards";
 import { detectOrderSource } from "@/lib/order-source";
 import { CLOSED_ORDER_MESSAGE, lisbonDateTimeToDate, scheduledOrderError } from "@/lib/opening-hours";
 
@@ -24,7 +25,9 @@ export const Route = createFileRoute("/finalizar")({
 });
 
 function Checkout() {
-  const { items, subtotal, service, setService, clear } = useCart();
+  const { items, subtotal: productsTotal, service, setService, clear, rewardId, setRewardId } = useCart();
+  const reward = findReward(rewardId);
+  const subtotal = paidAfterReward(reward, Math.round(productsTotal * 100)) / 100;
   const navigate = useNavigate();
   const submitOrder = useServerFn(placeOrder);
   const claim = useServerFn(claimOrder);
@@ -48,7 +51,7 @@ function Checkout() {
   const outsideRadius = radiusMode && radiusQuote !== null && radiusQuote.zone === null;
   const fee = zone ? zone.fee_cents / 100 : 0;
   const total = subtotal + fee;
-  const rewardMinimumMet = meetsRewardMinimum(items.some((item) => item.reward), Math.round(subtotal * 100));
+  const rewardMinimumMet = meetsRewardMinimum(!!reward, Math.round(subtotal * 100));
 
   const [scheduled, setScheduled] = useState(false);
   const [scheduledFor, setScheduledFor] = useState("");
@@ -116,7 +119,8 @@ function Checkout() {
         name, phone: normalizedPhone, service, source: detectOrderSource(), scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes: fullNotes,
         expectedTotalCents: Math.round((priceChange ?? total) * 100), acceptRepriced: priceChange !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
-        items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, reward: item.reward })),
+        items: items.map((item) => ({ productId: item.productId, qty: item.qty, options: item.options, selected: item.selected, })),
+        rewardId: reward?.id,
       } });
       if (result.kind === "price_changed") { setPriceChange(result.totalCents); return; }
       const { data: session } = await supabase.auth.getSession();
@@ -155,7 +159,7 @@ function Checkout() {
         </fieldset>
         <label className="block text-sm font-medium">Observações (opcional)<textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={400} rows={3} className="mt-2 w-full rounded-md border border-input bg-card p-4" /></label>
         <ul className="divide-y divide-border border-y border-border">{items.map((item) => <li key={item.key} className="flex justify-between gap-3 py-4 text-sm"><span>{item.qty}× {item.name}</span><span className="shrink-0 font-semibold">{money(item.price * item.qty)}</span></li>)}</ul>
-        <div className="space-y-2 text-sm"><div className="flex justify-between"><span>Subtotal dos produtos</span><span className="font-semibold">{money(subtotal)}</span></div>{delivery && <div className="flex justify-between"><span>Entrega{zone ? ` — ${zone.name}` : ""}{zone ? ` (${postal.trim()})` : ""}</span><span className="font-semibold">{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between border-t border-border pt-3 text-lg font-semibold"><span>Total</span><span>{money(priceChange === null ? total : priceChange / 100)}</span></div></div>
+        <div className="space-y-2 text-sm">{reward && <div className="flex items-center justify-between gap-3 rounded-md bg-secondary p-3"><span>Recompensa: <strong>{reward.label}</strong> ({reward.points} pontos)</span><Button type="button" variant="link" className="h-auto p-0" onClick={() => setRewardId(null)}>Remover</Button></div>}{reward?.discountCents && <div className="flex justify-between"><span>Desconto fidelização</span><span className="font-semibold">−{money(reward.discountCents / 100)}</span></div>}<div className="flex justify-between"><span>Subtotal dos produtos</span><span className="font-semibold">{money(subtotal)}</span></div>{delivery && <div className="flex justify-between"><span>Entrega{zone ? ` — ${zone.name}` : ""}{zone ? ` (${postal.trim()})` : ""}</span><span className="font-semibold">{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between border-t border-border pt-3 text-lg font-semibold"><span>Total</span><span>{money(priceChange === null ? total : priceChange / 100)}</span></div></div>
         {priceChange !== null && <p role="status" className="border-l-4 border-primary bg-secondary p-4 text-sm">O preço ou os portes mudaram. O total atualizado é <strong>{money(priceChange / 100)}</strong>; confirme esse valor para continuar.</p>}
         <p className="text-sm leading-relaxed text-muted-foreground">O pedido chega diretamente ao Matturo. Pagamento no levantamento, na entrega ou à mesa. Vai poder acompanhar o estado numa página privada.</p>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
