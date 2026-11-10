@@ -17,10 +17,10 @@ export function printTicket(order: TicketOrder) {
     `<div class="row"><b>1x ${esc(i.name)}</b><span>${eur(i.line_total_cents / Math.max(1, i.qty))}</span></div>` +
     Object.entries((i.options ?? {}) as Record<string, string>).map(([k, v]) => `<div class="opt">${esc(k)}: ${esc(String(v))}</div>`).join("")).join("");
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>Pedido #${orderNumber(order)}</title><style>
-@page{size:80mm auto;margin:0}body{width:72mm;margin:0 auto;padding:4mm 0;font:12px/1.35 monospace;color:#000}
-h1{font-size:16px;text-align:center;margin:0}.big{font-size:22px;text-align:center;font-weight:bold;margin:4px 0}
-.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.row{display:flex;justify-content:space-between;gap:6px}
-.opt{padding-left:10px;font-size:11px}.tot{font-size:15px;font-weight:bold}</style></head><body>
+@page{size:80mm auto;margin:0}html,body{margin:0;padding:0}body{width:100%;box-sizing:border-box;padding:2mm 1.5mm;font:bold 17px/1.35 Arial,Helvetica,sans-serif;color:#000;-webkit-print-color-adjust:exact}
+h1{font-size:24px;text-align:center;margin:0}.big{font-size:40px;text-align:center;font-weight:900;margin:4px 0}
+.c{text-align:center}hr{border:0;border-top:2px dashed #000;margin:8px 0}.row{display:flex;justify-content:space-between;gap:6px}
+.opt{padding-left:10px;font-size:15px;font-weight:normal}.tot{font-size:24px;font-weight:900}</style></head><body>
 <h1>MATTURO BURGER</h1><div class="big">#${orderNumber(order)}</div>
 <div class="c">${esc(order.service)} · ${new Date(order.created_at).toLocaleString("pt-PT")}</div>${order.scheduled_for ? `<div class="c"><b>AGENDADO: ${new Date(order.scheduled_for).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon" })}</b></div>` : ""}<hr>
 <div><b>${esc(order.customer_name)}</b></div><div>${esc(order.customer_phone)}</div>
