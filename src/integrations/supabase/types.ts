@@ -960,6 +960,635 @@ export type Database = {
         }
         Relationships: []
       }
+      mf_audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          resource_id: string | null
+          resource_type: string | null
+          tenant_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          tenant_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_audit_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_campaign_recipients: {
+        Row: {
+          attempt_count: number
+          campaign_id: string
+          contact_id: string
+          created_at: string
+          delivered_at: string | null
+          error_code: string | null
+          error_detail: string | null
+          id: string
+          idempotency_key: string
+          provider_message_id: string | null
+          scheduled_for: string | null
+          sent_at: string | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          campaign_id: string
+          contact_id: string
+          created_at?: string
+          delivered_at?: string | null
+          error_code?: string | null
+          error_detail?: string | null
+          id?: string
+          idempotency_key: string
+          provider_message_id?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          attempt_count?: number
+          campaign_id?: string
+          contact_id?: string
+          created_at?: string
+          delivered_at?: string | null
+          error_code?: string | null
+          error_detail?: string | null
+          id?: string
+          idempotency_key?: string
+          provider_message_id?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_campaign_recipients_tenant_id_campaign_id_fkey"
+            columns: ["tenant_id", "campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mf_campaigns"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "mf_campaign_recipients_tenant_id_contact_id_fkey"
+            columns: ["tenant_id", "contact_id"]
+            isOneToOne: false
+            referencedRelation: "mf_contacts"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "mf_campaign_recipients_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_campaigns: {
+        Row: {
+          audience_count: number
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          pacing_seconds: number
+          scheduled_at: string | null
+          status: string
+          template_id: string
+          tenant_id: string
+          timezone: string
+          updated_at: string
+          whatsapp_account_id: string
+        }
+        Insert: {
+          audience_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          pacing_seconds?: number
+          scheduled_at?: string | null
+          status?: string
+          template_id: string
+          tenant_id: string
+          timezone?: string
+          updated_at?: string
+          whatsapp_account_id: string
+        }
+        Update: {
+          audience_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          pacing_seconds?: number
+          scheduled_at?: string | null
+          status?: string
+          template_id?: string
+          tenant_id?: string
+          timezone?: string
+          updated_at?: string
+          whatsapp_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_campaigns_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mf_campaigns_tenant_id_template_id_fkey"
+            columns: ["tenant_id", "template_id"]
+            isOneToOne: false
+            referencedRelation: "mf_message_templates"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "mf_campaigns_tenant_id_whatsapp_account_id_fkey"
+            columns: ["tenant_id", "whatsapp_account_id"]
+            isOneToOne: false
+            referencedRelation: "mf_whatsapp_accounts"
+            referencedColumns: ["tenant_id", "id"]
+          },
+        ]
+      }
+      mf_contacts: {
+        Row: {
+          consent_at: string | null
+          consent_source: string | null
+          consent_status: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          opted_out_at: string | null
+          phone_e164: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          consent_at?: string | null
+          consent_source?: string | null
+          consent_status?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          opted_out_at?: string | null
+          phone_e164: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          consent_at?: string | null
+          consent_source?: string | null
+          consent_status?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          opted_out_at?: string | null
+          phone_e164?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_contacts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_message_events: {
+        Row: {
+          campaign_recipient_id: string | null
+          event_payload: Json
+          event_type: string
+          id: string
+          occurred_at: string
+          provider_message_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          campaign_recipient_id?: string | null
+          event_payload?: Json
+          event_type: string
+          id?: string
+          occurred_at?: string
+          provider_message_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          campaign_recipient_id?: string | null
+          event_payload?: Json
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          provider_message_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_message_events_tenant_id_campaign_recipient_id_fkey"
+            columns: ["tenant_id", "campaign_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "mf_campaign_recipients"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "mf_message_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_message_templates: {
+        Row: {
+          approval_status: string
+          category: string
+          components: Json
+          created_at: string
+          id: string
+          language_code: string
+          meta_template_name: string
+          tenant_id: string
+          updated_at: string
+          whatsapp_account_id: string | null
+        }
+        Insert: {
+          approval_status?: string
+          category: string
+          components?: Json
+          created_at?: string
+          id?: string
+          language_code: string
+          meta_template_name: string
+          tenant_id: string
+          updated_at?: string
+          whatsapp_account_id?: string | null
+        }
+        Update: {
+          approval_status?: string
+          category?: string
+          components?: Json
+          created_at?: string
+          id?: string
+          language_code?: string
+          meta_template_name?: string
+          tenant_id?: string
+          updated_at?: string
+          whatsapp_account_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_message_templates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mf_message_templates_tenant_id_whatsapp_account_id_fkey"
+            columns: ["tenant_id", "whatsapp_account_id"]
+            isOneToOne: false
+            referencedRelation: "mf_whatsapp_accounts"
+            referencedColumns: ["tenant_id", "id"]
+          },
+        ]
+      }
+      mf_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_code: string
+          provider: string
+          provider_customer_id: string | null
+          provider_subscription_id: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_code?: string
+          provider?: string
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_code?: string
+          provider?: string
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_suppressions: {
+        Row: {
+          id: string
+          phone_e164: string
+          reason: string
+          source: string | null
+          suppressed_at: string
+          tenant_id: string
+        }
+        Insert: {
+          id?: string
+          phone_e164: string
+          reason?: string
+          source?: string | null
+          suppressed_at?: string
+          tenant_id: string
+        }
+        Update: {
+          id?: string
+          phone_e164?: string
+          reason?: string
+          source?: string | null
+          suppressed_at?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_suppressions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_tenant_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_tenant_members_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_tenants: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mf_usage_ledger: {
+        Row: {
+          campaign_id: string | null
+          campaign_recipient_id: string | null
+          created_at: string
+          description: string
+          entry_type: string
+          external_reference: string | null
+          id: string
+          tenant_id: string
+          units: number
+        }
+        Insert: {
+          campaign_id?: string | null
+          campaign_recipient_id?: string | null
+          created_at?: string
+          description: string
+          entry_type: string
+          external_reference?: string | null
+          id?: string
+          tenant_id: string
+          units: number
+        }
+        Update: {
+          campaign_id?: string | null
+          campaign_recipient_id?: string | null
+          created_at?: string
+          description?: string
+          entry_type?: string
+          external_reference?: string | null
+          id?: string
+          tenant_id?: string
+          units?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_usage_ledger_tenant_id_campaign_id_fkey"
+            columns: ["tenant_id", "campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mf_campaigns"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "mf_usage_ledger_tenant_id_campaign_recipient_id_fkey"
+            columns: ["tenant_id", "campaign_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "mf_campaign_recipients"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "mf_usage_ledger_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_webhook_inbox: {
+        Row: {
+          error_detail: string | null
+          event_key: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          processing_status: string
+          provider: string
+          received_at: string
+          tenant_id: string | null
+        }
+        Insert: {
+          error_detail?: string | null
+          event_key: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          processing_status?: string
+          provider?: string
+          received_at?: string
+          tenant_id?: string | null
+        }
+        Update: {
+          error_detail?: string | null
+          event_key?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          processing_status?: string
+          provider?: string
+          received_at?: string
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_webhook_inbox_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mf_whatsapp_accounts: {
+        Row: {
+          business_name: string | null
+          connection_status: string
+          created_at: string
+          credential_ref: string | null
+          display_phone_number: string | null
+          id: string
+          phone_number_id: string | null
+          provider: string
+          tenant_id: string
+          updated_at: string
+          waba_id: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          connection_status?: string
+          created_at?: string
+          credential_ref?: string | null
+          display_phone_number?: string | null
+          id?: string
+          phone_number_id?: string | null
+          provider?: string
+          tenant_id: string
+          updated_at?: string
+          waba_id?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          connection_status?: string
+          created_at?: string
+          credential_ref?: string | null
+          display_phone_number?: string | null
+          id?: string
+          phone_number_id?: string | null
+          provider?: string
+          tenant_id?: string
+          updated_at?: string
+          waba_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_whatsapp_accounts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "mf_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_attribute_values: {
         Row: {
           attribute_id: string
@@ -1544,6 +2173,15 @@ export type Database = {
             Returns: undefined
           }
         | { Args: { delivery: string; next_state: string }; Returns: undefined }
+      mf_create_tenant_for_user: {
+        Args: { p_name: string; p_slug: string; p_user_id: string }
+        Returns: {
+          subscription_status: string
+          tenant_id: string
+          tenant_name: string
+          tenant_slug: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

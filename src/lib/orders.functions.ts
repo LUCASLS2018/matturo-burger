@@ -7,8 +7,8 @@ import { orderServices, needsDeliveryAddress } from "./order-service";
 import { findZone } from "./restaurant-settings";
 import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./order-pricing";
 import { tokenHash } from "./delivery";
-import { REWARD_SLUG } from "./loyalty";
-import { canonicalPhone, loyaltyPhoneSchema, rewardUnitPrice, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
+import { findReward, paidAfterReward, rewardLines } from "./loyalty-rewards";
+import { canonicalPhone, loyaltyPhoneSchema, meetsRewardMinimum, REWARD_MINIMUM_MESSAGE } from "./loyalty-phone";
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 import { CLOSED_ORDER_MESSAGE, canAcceptScheduledOrder, isRestaurantOpen, scheduledOrderError } from "./opening-hours";
@@ -34,6 +34,7 @@ const orderInput = z.object({
     selected: z.record(z.string().uuid(), z.number().int().min(0).max(100)).optional(),
     reward: z.boolean().optional(),
   })).min(1).max(60),
+  rewardId: z.string().max(40).optional(),
 });
 
 async function createOrder(data: z.infer<typeof orderInput>) {
@@ -61,21 +62,16 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     (modifiers.data as ModifierRecord[]).filter((modifier) => modifier.item_id === item.id),
   )));
   const lines = data.items.map((line) => priceLine(line, currentMenu));
-  const rewardIndex = data.items.findIndex((line) => line.reward);
+  if (data.items.some((line) => line.reward)) throw new Error("Atualize a página e escolha a recompensa em Os meus pontos.");
+  const reward = data.rewardId ? findReward(data.rewardId) : null;
+  if (data.rewardId && !reward) throw new Error("Recompensa inválida.");
   let rewardSessionHash: string | null = null;
-  if (rewardIndex >= 0) {
-    if (data.items.filter((line) => line.reward).length > 1) throw new Error("Só pode resgatar um Hamburguinho por pedido.");
-    const inputLine = data.items[rewardIndex];
-    const line = lines[rewardIndex];
-    const dish = currentMenu.find((item) => item.id === inputLine?.productId);
-    if (!line || !dish || dish.slug !== REWARD_SLUG || inputLine?.qty !== 1) throw new Error("Recompensa inválida.");
+  if (reward) {
     const { verifiedLoyalty } = await import("./loyalty-session.server");
     const session = await verifiedLoyalty();
     if (!session || session.phone !== data.phone) throw new Error("Confirme o telemóvel deste pedido em Os meus pontos para resgatar.");
     rewardSessionHash = session.hash;
     // The transaction below checks balance under a lock, including idempotent retries.
-    const unit = rewardUnitPrice(line.unit_price_cents, Math.round(dish.price * 100));
-    lines[rewardIndex] = { ...line, name: `${line.name} (GRÁTIS · fidelização)`, unit_price_cents: unit, line_total_cents: unit };
   }
   const delivery = needsDeliveryAddress(data.service);
   let zone: { name: string; fee_cents: number } | null = null;
@@ -97,8 +93,11 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     }
   }
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");
-  const subtotal = lines.reduce((sum, line) => sum + line.line_total_cents, 0);
-  if (!meetsRewardMinimum(rewardIndex >= 0, subtotal)) throw new Error(REWARD_MINIMUM_MESSAGE);
+  const productsCents = lines.reduce((sum, line) => sum + line.line_total_cents, 0);
+  const subtotal = paidAfterReward(reward, productsCents);
+  if (!meetsRewardMinimum(!!reward, subtotal)) throw new Error(REWARD_MINIMUM_MESSAGE);
+  if (reward?.discountCents) lines.push({ dish_id: `recompensa:${reward.id}`, name: `${reward.label} (fidelização)`, options: {}, unit_price_cents: -reward.discountCents, qty: 1, line_total_cents: -reward.discountCents } as (typeof lines)[number]);
+  if (reward) lines.push(...(rewardLines(reward) as (typeof lines)[number][]));
   const fee = zone?.fee_cents ?? 0;
   const total = subtotal + fee;
   if (total !== data.expectedTotalCents && !data.acceptRepriced) return { kind: "price_changed" as const, totalCents: total };
@@ -115,11 +114,11 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     },
     p_items: lines,
     ...(rewardSessionHash ? { p_session_hash: rewardSessionHash } : {}),
-    p_reward: rewardIndex >= 0,
+    p_reward_points: reward?.points ?? 0,
   });
   if (result.error || !result.data?.[0]) {
     const message = result.error?.message ?? "";
-    throw new Error(message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : message.includes("100 pontos") ? "Ainda não tem 100 pontos disponíveis para resgatar." : message.includes("Confirme") ? "A confirmação do telemóvel expirou. Confirme novamente em Os meus pontos." : "Não foi possível registar o pedido. Tente novamente.");
+    throw new Error(message.includes("Demasiados") ? "Demasiados pedidos seguidos. Aguarde alguns minutos." : message.includes("pontos suficientes") ? "Não tem pontos suficientes para esta recompensa." : message.includes("Confirme") ? "A confirmação do telemóvel expirou. Confirme novamente em Os meus pontos." : "Não foi possível registar o pedido. Tente novamente.");
   }
   const numbered = await db.from("matturo_orders").select("daily_number,order_day").eq("id", result.data[0].id).single();
   if (numbered.error) throw new Error("Pedido guardado. Tente novamente para obter a confirmação.");
@@ -132,7 +131,7 @@ export const createManualOrder = createServerFn({ method: "POST" }).middleware([
   .inputValidator((input) => orderInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase);
-    if (data.items.some((item) => item.reward)) throw new Error("As ofertas devem ser resgatadas pela conta do cliente.");
+    if (data.items.some((item) => item.reward) || data.rewardId) throw new Error("As ofertas devem ser resgatadas pela conta do cliente.");
     return createOrder({ ...data, source: "telefone" satisfies OrderSource });
   });
 

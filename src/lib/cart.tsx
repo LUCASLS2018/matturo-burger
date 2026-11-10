@@ -24,6 +24,8 @@ type CartCtx = {
   setQty: (key: string, qty: number) => void;
   remove: (key: string) => void;
   clear: () => void;
+  rewardId: string | null;
+  setRewardId: (id: string | null) => void;
 };
 
 const Ctx = createContext<CartCtx | null>(null);
@@ -37,11 +39,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [service, setService] = useState<OrderService>("Retirada");
   const [items, setItems] = useState<CartItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [rewardId, setRewardId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
+      if (raw) setItems((JSON.parse(raw) as CartItem[]).filter((i) => !i.reward));
+      setRewardId(localStorage.getItem(STORAGE_KEY + "-reward"));
     } catch {
       /* ignore */
     }
@@ -51,6 +55,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loaded) localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, loaded]);
+  useEffect(() => {
+    if (!loaded) return;
+    if (rewardId) localStorage.setItem(STORAGE_KEY + "-reward", rewardId); else localStorage.removeItem(STORAGE_KEY + "-reward");
+  }, [rewardId, loaded]);
 
   const value = useMemo<CartCtx>(
     () => ({
@@ -69,9 +77,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setQty: (key, qty) =>
         setItems((prev) => (qty <= 0 ? prev.filter((i) => i.key !== key) : prev.map((i) => (i.key === key ? { ...i, qty } : i)))),
       remove: (key) => setItems((prev) => prev.filter((i) => i.key !== key)),
-      clear: () => setItems([]),
+      clear: () => { setItems([]); setRewardId(null); },
+      rewardId,
+      setRewardId,
     }),
-    [items, service],
+    [items, service, rewardId],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
