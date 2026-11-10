@@ -34,6 +34,7 @@ const orderInput = z.object({
     selected: z.record(z.string().uuid(), z.number().int().min(0).max(100)).optional(),
     reward: z.boolean().optional(),
   })).min(1).max(60),
+  rewardId: z.string().max(40).optional(),
 });
 
 async function createOrder(data: z.infer<typeof orderInput>) {
