@@ -67,10 +67,18 @@ export function ticketHtml(order: TicketOrder, audience: TicketAudience): string
 }
 
 /** Opens an 80 mm receipt and the browser print dialog (pick the thermal printer there). */
-export function printTicket(order: TicketOrder, audience: TicketAudience = "cliente") {
+export function bothTicketsHtml(order: TicketOrder): string {
+  const script = /<script>[\s\S]*?<\/script>/;
+  const kitchen = ticketHtml(order, "cozinha").replace(script, "").replace("</body></html>", "");
+  const client = ticketHtml(order, "cliente").split("<body>")[1];
+  // Page break between tickets so the printer's cutter cuts after each one.
+  return kitchen + `<div style="break-after:page;page-break-after:always"></div>` + client;
+}
+
+export function printTicket(order: TicketOrder, audience: TicketAudience | "ambos" = "cliente") {
   const w = window.open("", "_blank", "width=400,height=600");
   if (!w) return false;
-  w.document.write(ticketHtml(order, audience));
+  w.document.write(audience === "ambos" ? bothTicketsHtml(order) : ticketHtml(order, audience));
   w.document.close();
   return true;
 }
