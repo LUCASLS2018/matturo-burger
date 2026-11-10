@@ -4,7 +4,7 @@ import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-
 import { useServerFn } from "@tanstack/react-start";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChevronDown, Clock, MapPin, Phone, Plus, Printer, ShoppingBag, Utensils } from "lucide-react";
+import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChefHat, ChevronDown, Clock, MapPin, Phone, Plus, Printer, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
@@ -255,7 +255,10 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, ordering
       {expanded && (
         <div id={detailsId}>
           <div className="space-y-3 border-t border-border px-4 py-4 sm:px-5">
-            <Button size="sm" variant="outline" className="h-8 w-full" onClick={() => { if (!printTicket(order)) toast.error("Permita janelas pop-up para imprimir."); }}><Printer />Imprimir talão</Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="h-8 flex-1" onClick={() => { if (!printTicket(order, "cozinha")) toast.error("Permita janelas pop-up para imprimir."); }}><ChefHat />Talão cozinha</Button>
+              <Button size="sm" variant="outline" className="h-8 flex-1" onClick={() => { if (!printTicket(order, "cliente")) toast.error("Permita janelas pop-up para imprimir."); }}><Printer />Talão cliente</Button>
+            </div>
             <div className="space-y-1 text-sm">
               <p className="font-semibold">{order.customer_name}</p>
               <a className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary" href={`tel:${order.customer_phone}`}><Phone className="h-3 w-3" />{order.customer_phone}</a>
