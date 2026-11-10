@@ -15,7 +15,7 @@ export function rewardUnitPrice(unitCents: number, baseCents: number) {
 }
 
 export const REWARD_MINIMUM_CENTS = 700;
-export const REWARD_MINIMUM_MESSAGE = "Para resgatar a oferta, precisa de pelo menos 7 € em produtos pagos, sem contar os portes nem o Hamburguinho grátis.";
+export const REWARD_MINIMUM_MESSAGE = "Para resgatar a oferta, precisa de pelo menos 7 € em produtos pagos, depois do desconto e sem contar os portes nem os produtos grátis.";
 
 export function meetsRewardMinimum(hasReward: boolean, paidProductsCents: number) {
   return !hasReward || paidProductsCents >= REWARD_MINIMUM_CENTS;
