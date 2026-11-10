@@ -2128,7 +2128,7 @@ export type Database = {
         Args: {
           p_items: Json
           p_order: Json
-          p_reward?: boolean
+          p_reward_points?: number
           p_session_hash?: string
         }
         Returns: {
