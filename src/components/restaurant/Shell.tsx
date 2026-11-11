@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { restaurant } from "@/lib/restaurant";
 import logo from "@/assets/matturo/logo-black.png";
+import matturoLogoBlack from "@/assets/matturo-logo-black.png.asset.json";
+import ricksLogo from "@/assets/ricks-pizzaria-logo.png.asset.json";
 import {CustomerAccountAccess} from "./CustomerAccountAccess";
 import {OpeningStatus} from "./OpeningStatus";
 
@@ -13,7 +15,10 @@ export function RestaurantHeader() {
   const [open, setOpen] = useState(false);
   return <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-lg">
     <div className="page-width flex h-16 items-center justify-between gap-4 sm:h-24">
-      <Link to="/" aria-label="Matturo Burger — início" className="shrink-0"><img src={logo} alt="Matturo Burger" className="h-12 w-36 object-contain sm:h-20 sm:w-52 lg:w-64" /></Link>
+      <div className="flex shrink-0 items-center gap-3 sm:gap-5">
+        <Link to="/cardapio" aria-label="Matturo — hambúrgueres"><img src={matturoLogoBlack.url} alt="Matturo" className="h-10 w-auto sm:h-14 lg:h-16" /></Link>
+        <Link to="/cardapio" aria-label="Rick's Pizzaria — pizzas"><img src={ricksLogo.url} alt="Rick's Pizzaria" className="h-12 w-auto sm:h-16 lg:h-[68px]" /></Link>
+      </div>
       <nav aria-label="Navegação principal" className="hidden items-center gap-6 text-sm font-medium lg:flex">
         <Link to="/" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>Início</Link>
         <Link to="/cardapio" activeProps={{ className: "text-primary" }}>Cardápio</Link>
