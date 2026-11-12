@@ -15,7 +15,7 @@ const settings = {
   delivery_mode: "postal",
   store_address: "R. Alm. Cândido dos Reis, Vila Franca de Xira, Portugal",
   store_latitude: null,
-  store_longitude: null,
+  store_longitude: null, site_discount_active: false, site_discount_percent: 0,
 };
 
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
