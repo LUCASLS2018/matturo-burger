@@ -1,5 +1,5 @@
 import { orderNumber } from "@/lib/order-number";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Plus, Minus, Trash2, Phone, ShoppingBag, Utensils } from "lucide-react";
@@ -53,6 +53,8 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const [changedTotal, setChangedTotal] = useState<number | null>(null);
   const submission = useRef<{ id: string; token: string } | null>(null);
   const productsRef = useRef<HTMLDivElement>(null);
+  const modifiersRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (dishId) modifiersRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" }); }, [dishId]);
   const dish = menu.find((item) => item.id === dishId);
   const delivery = needsDeliveryAddress(service);
   const radiusMode = delivery && settings.deliveryMode === "radius";
@@ -128,14 +130,14 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
               })}
               {!availableMenu.some((item) => (!category || item.category === category) && item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) && <p className="py-6 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</p>}
             </div>
-            {dish && <div className="space-y-4 border-t border-border pt-4">
+            {dish && <div ref={modifiersRef} className="scroll-mt-4 space-y-4 border-t border-border pt-4">
               <div className="flex items-center gap-3"><ProductPhoto dish={dish} className="h-16 w-16" /><h3 className="min-w-0 text-sm font-semibold">{dish.name}</h3></div>
               {dish.groups.map((group) => <fieldset key={group.id}><legend className="text-sm font-semibold">{group.name}{group.required && <span className="ml-2 text-xs text-primary">Obrigatório</span>}</legend><div className="mt-2 space-y-2">{group.modifiers.map((modifier) => {
                 const count = selected[modifier.id] ?? 0;
                 return group.max === 1 ? <label key={modifier.id} className="flex min-h-10 items-center justify-between gap-2 text-sm"><span className="flex items-center gap-2"><input type="radio" name={group.id} checked={count === 1} onChange={() => setSelected((previous) => ({ ...previous, ...Object.fromEntries(group.modifiers.map((option) => [option.id, option.id === modifier.id ? 1 : 0])) }))} />{modifier.name}</span><span className="shrink-0 text-xs text-muted-foreground">{modifier.price ? `+ ${money(modifier.price)}` : "Sem custo"}</span></label> : <div key={modifier.id} className="flex items-center justify-between gap-2 text-sm"><span>{modifier.name}<span className="ml-2 text-xs text-muted-foreground">{money(modifier.price)}</span></span><div className="flex shrink-0 items-center"><Button type="button" variant="ghost" size="icon" aria-label={`Retirar ${modifier.name}`} disabled={!count} onClick={() => setSelected((previous) => ({ ...previous, [modifier.id]: count - 1 }))}><Minus /></Button><span className="w-5 text-center">{count}</span><Button type="button" variant="ghost" size="icon" aria-label={`Adicionar ${modifier.name}`} disabled={count >= modifier.max || group.modifiers.reduce((sum, option) => sum + (selected[option.id] ?? 0), 0) >= group.max} onClick={() => setSelected((previous) => ({ ...previous, [modifier.id]: count + 1 }))}><Plus /></Button></div></div>;
               })}</div></fieldset>)}
               <label className="block text-sm font-medium">Observações do produto<input maxLength={500} value={dishNotes} onChange={(e) => setDishNotes(e.target.value)} className={fieldClass} /></label>
-              <Button type="button" disabled={!selectionValid(dish, selected) || lines.length >= 60} onClick={() => { setLines((previous) => [...previous, { key: crypto.randomUUID(), dish, selected: { ...selected }, notes: dishNotes }]); setDishId(""); setSelected({}); setDishNotes(""); resetPrice(); productsRef.current?.focus({ preventScroll: true }); productsRef.current?.scrollIntoView?.({ block: "nearest" }); }}><Plus />Adicionar · {money(dishTotal(dish, selected))}</Button>
+              <Button type="button" disabled={!selectionValid(dish, selected) || lines.length >= 60} onClick={() => { setLines((previous) => [...previous, { key: crypto.randomUUID(), dish, selected: { ...selected }, notes: dishNotes }]); setDishId(""); setSelected({}); setDishNotes(""); resetPrice(); productsRef.current?.focus({ preventScroll: true }); productsRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" }); }}><Plus />Adicionar · {money(dishTotal(dish, selected))}</Button>
             </div>}
           </div>
           <div className="min-w-0 space-y-4 border-t border-border pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
