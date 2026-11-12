@@ -54,7 +54,7 @@ function OrdersPage() {
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
-  const [tab, setTab] = useState<OrderStatus | "mapa" | "agendados">("novo");
+  const [tab, setTab] = useState<OrderStatus | "mapa">("novo");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("todos");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);
@@ -129,11 +129,10 @@ function OrdersPage() {
 
       <div role="tablist" aria-label="Estado dos pedidos" className="mt-8 flex gap-2 overflow-x-auto border-b border-border pb-px">
         {columns.map((col) => {
-          const count = visible.filter((o) => o.status === col.key && (col.key !== "novo" || !o.scheduled_for)).length;
+          const count = visible.filter((o) => o.status === col.key).length;
           const on = tab === col.key;
           return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
         })}
-        <button role="tab" aria-selected={tab === "agendados"} onClick={() => setTab("agendados")} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${tab === "agendados" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><Clock className="h-4 w-4" />Agendados<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${tab === "agendados" ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{scheduled.length}</span></button>
         <button role="tab" aria-selected={tab === "mapa"} onClick={() => setTab("mapa")} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${tab === "mapa" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><MapPin className="h-4 w-4" />Estafetas no mapa</button>
       </div>
       <div className="mt-4">
@@ -158,6 +157,7 @@ function OrdersPage() {
                         onSend={sendToCourier}
                         onMove={change}
                         orderingOpen={orderingOpen}
+                        defaultExpanded={col.key !== "novo"}
                         nearby={nearbyOrders(o, sorted, board)}
                         onSendNearby={async (ids) => { const courierId = pick[o.id] ?? board.couriers[0]?.id; if (!courierId) return; for (const id of [o.id, ...ids]) { try { await assign({ data: { orderId: id, courierId } }); } catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível atribuir."); } } toast.success("Rota enviada ao estafeta"); await qc.invalidateQueries({ queryKey: boardQuery.queryKey }); }}
                       />
@@ -168,7 +168,8 @@ function OrdersPage() {
             </section>
           );
         })}
-        {tab === "agendados" && <section role="tabpanel" aria-label="Pedidos agendados">
+        {tab === "novo" && <section aria-label="Pedidos agendados" className="mt-8 border-t border-border pt-6">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold"><Clock className="h-4 w-4 text-primary" />Agendados <span className="rounded-full bg-secondary px-2 py-0.5 text-xs tabular-nums">{scheduled.length}</span></h2>
           {!orderingOpen && scheduled.length > 0 && <p className="mb-4 rounded-xl border border-border bg-card p-3 text-sm">A loja está fechada: estes pedidos só podem ser aceites durante o horário de funcionamento.</p>}
           {!scheduled.length && <p className="rounded-xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">Sem pedidos agendados</p>}
           {scheduledGroups.map((group) => <div key={group.service} className="mb-8 last:mb-0">
@@ -209,7 +210,8 @@ export function nearbyOrders<T extends { id: string; service: string; status: st
     && ((o.postal_code ?? "").replace(/\D/g, "").slice(0, 4) === prefix || (!!order.zone_name && o.zone_name === order.zone_name)));
 }
 
-function OrderCard({ order, board, courierPick, onPick, onSend, onMove, orderingOpen, nearby = [], onSendNearby }: {
+function OrderCard({ order, board, courierPick, onPick, onSend, onMove, orderingOpen, nearby = [], onSendNearby, defaultExpanded = false }: {
+  defaultExpanded?: boolean;
   nearby?: AdminOrder[];
   onSendNearby?: (ids: string[]) => Promise<void>;
   order: AdminOrder;
@@ -223,7 +225,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, ordering
   const Icon = serviceIcon(order.service);
   const delivery = board.deliveries.find((d) => d.order_id === order.id);
   const steps = nextOrderSteps(order.status as OrderStatus);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const detailsId = `pedido-${order.id}-detalhes`;
 
   return (
