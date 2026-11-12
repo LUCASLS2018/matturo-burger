@@ -13,7 +13,7 @@ import { orderStatusLabels, orderStatuses, type OrderStatus } from "@/lib/order-
 import { money, restaurantHead } from "@/lib/restaurant";
 import { formatLisbonDateTime } from "@/lib/opening-hours";
 
-const q = (token: string) => queryOptions({ queryKey: ["matturo-order", token], queryFn: () => orderByToken({ data: { token } }), refetchInterval: 10000 });
+const q = (token: string) => queryOptions({ queryKey: ["matturo-order", token], queryFn: () => orderByToken({ data: { token } }), refetchInterval: 1000 });
 
 export const Route = createFileRoute("/pedido/$token")({
   head: () => ({ ...restaurantHead("O seu pedido", "Acompanhe o estado do seu pedido Matturo Burger."), meta: [...restaurantHead("O seu pedido", "Acompanhe o estado do seu pedido Matturo Burger.").meta, { name: "robots", content: "noindex" }] }),
