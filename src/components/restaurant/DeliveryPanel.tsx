@@ -43,7 +43,29 @@ export default function DeliveryPanel({ data }: { data: Data }) {
       .subscribe();
     return () => { void supabase.removeChannel(channel); if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); };
   }, []);
-  useEffect(() => { if (tracking && !data.deliveries.some((delivery) => delivery.id === tracking && delivery.status === "active")) stop(); }, [data.deliveries, tracking]);
+  useEffect(() => { if (tracking && data.deliveries.some((delivery) => delivery.id === tracking && ["delivered", "cancelled"].includes(delivery.status))) stop(); }, [data.deliveries, tracking]);
+  useEffect(() => {
+    if (!tracking) return;
+    const id = tracking;
+    const send = (force = false) => {
+      if (!navigator.geolocation || inFlight.current || (!force && Date.now() - lastSent.current < 8000)) return;
+      navigator.geolocation.getCurrentPosition(async (current) => {
+        if (inFlight.current) return;
+        inFlight.current = true; lastSent.current = Date.now();
+        try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); setError(""); }
+        catch { setError("Localização não atualizada. Verifique a ligação."); }
+        finally { inFlight.current = false; }
+      }, () => undefined, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+    };
+    let lock: { release: () => Promise<void> } | null = null;
+    const nav = navigator as Navigator & { wakeLock?: { request: (type: "screen") => Promise<{ release: () => Promise<void> }> } };
+    const requestLock = async () => { try { if (nav.wakeLock && document.visibilityState === "visible") lock = await nav.wakeLock.request("screen"); } catch { /* sem wake lock */ } };
+    void requestLock();
+    const timer = window.setInterval(() => send(), 10000);
+    const onVisible = () => { if (document.visibilityState === "visible") { void requestLock(); send(true); } };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); void lock?.release().catch(() => undefined); };
+  }, [tracking]);
   useEffect(() => { if (data.profile?.photo_path) void supabase.storage.from("matturo-courier-photos").createSignedUrl(data.profile.photo_path, 300).then((result) => setPhoto(result.data?.signedUrl ?? "")); }, [data.profile?.photo_path]);
 
   const run = async (operation: () => Promise<unknown>) => {
@@ -67,7 +89,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
           try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); }
           catch { setError("Localização não atualizada. Verifique a ligação."); }
           finally { inFlight.current = false; }
-        }, () => setError("Não foi possível obter o GPS."), { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+        }, () => undefined, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
         await refresh();
       } catch (cause) { stop(); setError(cause instanceof Error ? cause.message : "Não foi possível iniciar."); }
       finally { setBusy(false); }
