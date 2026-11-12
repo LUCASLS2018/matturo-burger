@@ -10,6 +10,8 @@ import { deliveryLabels, nextDeliveryState } from "@/lib/delivery";
 import { summarizeCourierDeliveries } from "@/lib/courier-delivery-stats";
 import { summarizeDailyResults } from "@/lib/delivery-daily-results";
 import { money } from "@/lib/restaurant";
+import { summarizeDailySources } from "@/lib/daily-sources";
+import { orderSourceLabels } from "@/lib/order-source";
 import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { CourierAlerts } from "./CourierAlerts";
@@ -84,6 +86,8 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const list = tab === "done" ? done : active;
   const courierStats = summarizeCourierDeliveries(data.courierIds, data.profiles, data.deliveryTotals);
   const dailyResults = summarizeDailyResults(data.dailyResults, data.profiles);
+  const dailySources = summarizeDailySources(data.dailySources);
+  const historyDays = Array.from(new Set([...dailySources.map((d) => d.day), ...dailyResults.map((d) => d.day)])).sort((a, b) => b.localeCompare(a));
   const today = new Date().toDateString();
   const doneToday = done.filter((d) => d.status === "delivered" && data.events.some((e) => e.delivery_id === d.id && e.status === "delivered" && new Date(e.created_at).toDateString() === today)).length;
   const onRoad = active.filter((d) => d.status === "active").length;
@@ -132,7 +136,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     {link && <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3"><LinkIcon className="h-4 w-4 text-primary" /><span className="text-xs text-muted-foreground">Link do cliente (24 h):</span><a href={link} className="min-w-0 flex-1 truncate text-sm text-primary">{link}</a><Button size="sm" onClick={copy}><Copy />Copiar</Button></div>}
 
     <div className="mt-6 flex gap-2 overflow-x-auto border-b border-border">
-      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length], ...(data.admin ? [["couriers", "Estafetas", courierStats.length] as const, ["days", "Por dia", dailyResults.length] as const] : [])] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
+      {([["open", "Ativas", active.length], ["done", "Concluídas", done.length], ...(data.admin ? [["couriers", "Estafetas", courierStats.length] as const, ["days", "Por dia", historyDays.length] as const] : [])] as const).map(([key, label, count]) => <button key={key} onClick={() => setTab(key)} className={`-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium ${tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}>{label} <span className="ml-1 rounded-full bg-secondary px-2 py-0.5 text-xs">{count}</span></button>)}
     </div>
 
     {tab === "couriers" && <section aria-label="Entregas por estafeta" className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -154,7 +158,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     </section>}
 
     {tab === "days" && <section aria-label="Resultado das entregas por dia" className="mt-4 space-y-3">
-      {dailyResults.map((day) => <article key={day.day} className="rounded-xl border border-border bg-card p-4">
+      {historyDays.map((dayKey) => { const day = dailyResults.find((d) => d.day === dayKey) ?? { day: dayKey, deliveries: 0, valueCents: 0, couriers: [] }; const src = dailySources.find((d) => d.day === dayKey); return <article key={day.day} className="rounded-xl border border-border bg-card p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><CalendarDays className="h-5 w-5" /></span>
@@ -168,8 +172,9 @@ export default function DeliveryPanel({ data }: { data: Data }) {
             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{courier.deliveries} entrega{courier.deliveries === 1 ? "" : "s"} · {money(courier.valueCents / 100)}</span>
           </li>)}
         </ul>
-      </article>)}
-      {!dailyResults.length && <p className="rounded-xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">Ainda não há entregas concluídas para mostrar.</p>}
+        {src && <div className="mt-3 border-t border-border pt-3"><p className="text-xs font-semibold text-muted-foreground">Pedidos por origem · {src.orders} pedido{src.orders === 1 ? "" : "s"} · {money(src.valueCents / 100)}</p><div className="mt-2 grid grid-cols-3 gap-2">{src.sources.map((x) => <div key={x.source} className="rounded-lg bg-secondary/60 p-2"><p className="text-xs text-muted-foreground">{orderSourceLabels[x.source]}</p><p className="font-bold tabular-nums">{x.orders}</p><p className="text-xs tabular-nums text-muted-foreground">{money(x.valueCents / 100)}</p></div>)}</div></div>}
+      </article>; })}
+      {!historyDays.length && <p className="rounded-xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">Ainda não há entregas concluídas para mostrar.</p>}
     </section>}
 
     {tab !== "couriers" && tab !== "days" && !list.length && <p className="py-12 text-center text-sm text-muted-foreground">{tab === "open" ? "Sem entregas ativas." : "Sem entregas concluídas."}</p>}

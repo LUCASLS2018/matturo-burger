@@ -85,6 +85,7 @@ function OrdersPage() {
     return () => { void supabase.removeChannel(ch); };
   }, [qc]);
 
+  const lisbonToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon" }).format(new Date());
   const today = new Date().toDateString();
   const todays = data.filter((o) => new Date(o.created_at).toDateString() === today && o.status !== "cancelado");
   const stats = [
@@ -124,7 +125,7 @@ function OrdersPage() {
         {stats.map((s) => <div key={s.label} className="rounded-xl border border-border bg-card p-4"><p className="text-xs font-medium text-muted-foreground">{s.label}</p><p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p></div>)}
       </div>
 
-      <div className="mt-4"><OrderSourceFilter value={sourceFilter} onChange={setSourceFilter} orders={data} /></div>
+      <div className="mt-4"><OrderSourceFilter value={sourceFilter} onChange={setSourceFilter} orders={data.filter((o) => o.order_day === lisbonToday)} /></div>
 
       <div role="tablist" aria-label="Estado dos pedidos" className="mt-8 flex gap-2 overflow-x-auto border-b border-border pb-px">
         {columns.map((col) => {

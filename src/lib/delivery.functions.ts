@@ -21,7 +21,7 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
   const deliveries = await db.from("matturo_deliveries").select("*").order("created_at", { ascending: false }).limit(100);
   if (deliveries.error) throw deliveries.error;
   const orderIds = deliveries.data.map((delivery) => delivery.order_id).filter((id): id is string => Boolean(id));
-  const [positions, events, profiles, couriers, availability, orders, deliveryTotals, dailyResults] = await Promise.all([
+  const [positions, events, profiles, couriers, availability, orders, deliveryTotals, dailyResults, dailySources] = await Promise.all([
     db.from("matturo_delivery_positions").select("*"),
     db.from("matturo_delivery_events").select("*").order("created_at", { ascending: false }).limit(200),
     admin ? db.from("matturo_profiles").select("*") : Promise.resolve(profile),
@@ -32,8 +32,10 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
     db.from("matturo_deliveries").select("courier_id,status,completed_at"),
     // Daily results need the value of each completed delivery; only admins may read order totals.
     admin ? db.from("matturo_deliveries").select("courier_id,completed_at,matturo_orders(total_cents)").eq("status", "delivered") : Promise.resolve({ data: [] as never[], error: null }),
+    // Order history per day and origin (app/web/telefone), excluding cancelled orders.
+    admin ? db.from("matturo_orders").select("order_day,source,total_cents").neq("status", "cancelado").order("order_day", { ascending: false }).limit(5000) : Promise.resolve({ data: [] as never[], error: null }),
   ]);
-  if (positions.error || events.error || availability.error || orders.error || deliveryTotals.error || dailyResults.error) throw new Error("Não foi possível carregar as entregas.");
+  if (positions.error || events.error || availability.error || orders.error || deliveryTotals.error || dailyResults.error || dailySources.error) throw new Error("Não foi possível carregar as entregas.");
   return {
     admin, courier: roles.data.some((role) => role.role === "courier"), userId: context.userId,
     profile: profile.data, profiles: Array.isArray(profiles.data) ? profiles.data : [],
@@ -41,6 +43,7 @@ export const deliveryDashboard = createServerFn({ method: "POST" }).middleware([
     positions: positions.data, events: events.data ?? [], availability: availability.data, orders: orders.data,
     deliveryTotals: deliveryTotals.data,
     dailyResults: dailyResults.data,
+    dailySources: (dailySources.data ?? []) as { order_day: string; source: string; total_cents: number }[],
   };
 });
 
