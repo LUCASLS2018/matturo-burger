@@ -31,6 +31,7 @@ export async function startNativeWatch(onLocation: (l: Loc) => void, onError: (m
   }, (location, error) => {
     if (error) {
       if (error.code === "NOT_AUTHORIZED") { onError("Autorize a localização «Permitir sempre» nas definições."); void p.openSettings(); }
+      else onError("GPS da app com erro. Toque em «Retomar GPS».");
       return;
     }
     if (location) onLocation(location);

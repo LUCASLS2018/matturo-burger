@@ -33,10 +33,23 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const [photo, setPhoto] = useState("");
   const watch = useRef<number | null>(null);
   const nativeWatch = useRef<string | null>(null);
-  const inFlight = useRef(false);
+  const inFlight = useRef(0);
   const lastSent = useRef(0);
+  const autoResumed = useRef<string | null>(null);
+  const [gpsInfo, setGpsInfo] = useState<{ mode: "app" | "web"; at: number | null } | null>(null);
+  // Envia uma posição; um envio preso (rede suspensa em segundo plano) expira em 8 s para não bloquear os seguintes.
+  const sendPosition = async (id: string, lat: number, lng: number, accuracy: number, force = false) => {
+    const now = Date.now();
+    if (!force && ((inFlight.current && now - inFlight.current < 8000) || now - lastSent.current < 1000)) return;
+    inFlight.current = now; lastSent.current = now;
+    try {
+      await Promise.race([recordPosition({ data: { id, lat, lng, accuracy } }), new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))]);
+      setError(""); setGpsInfo((info) => ({ mode: info?.mode ?? (isNativeApp() ? "app" : "web"), at: Date.now() }));
+    } catch { setError("Localização não atualizada. Verifique a ligação."); }
+    finally { if (inFlight.current === now) inFlight.current = 0; }
+  };
   const refresh = () => query.invalidateQueries({ queryKey: ["matturo-deliveries"] });
-  const stop = () => { if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; if (nativeWatch.current) void stopNativeWatch(nativeWatch.current); nativeWatch.current = null; setTracking(null); };
+  const stop = () => { setGpsInfo(null); if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; if (nativeWatch.current) void stopNativeWatch(nativeWatch.current); nativeWatch.current = null; setTracking(null); };
 
   useEffect(() => {
     const channel = supabase.channel(`matturo-panel-${crypto.randomUUID()}`)
@@ -50,13 +63,9 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     if (!tracking || isNativeApp()) return;
     const id = tracking;
     const send = (force = false) => {
-      if (!navigator.geolocation || inFlight.current || (!force && Date.now() - lastSent.current < 1000)) return;
-      navigator.geolocation.getCurrentPosition(async (current) => {
-        if (inFlight.current) return;
-        inFlight.current = true; lastSent.current = Date.now();
-        try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); setError(""); }
-        catch { setError("Localização não atualizada. Verifique a ligação."); }
-        finally { inFlight.current = false; }
+      if (!navigator.geolocation || (!force && Date.now() - lastSent.current < 1000)) return;
+      navigator.geolocation.getCurrentPosition((current) => {
+        void sendPosition(id, current.coords.latitude, current.coords.longitude, current.coords.accuracy, force);
       }, () => undefined, { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 });
     };
     let lock: { release: () => Promise<void> } | null = null;
@@ -84,27 +93,29 @@ export default function DeliveryPanel({ data }: { data: Data }) {
       try {
         if (!resume) await changeDelivery({ data: { id, status: "active" } });
         stop(); setTracking(id);
-        await recordPosition({ data: { id, lat: position.coords.latitude, lng: position.coords.longitude, accuracy: position.coords.accuracy } });
-        if (isNativeApp()) {
-          nativeWatch.current = await startNativeWatch(async (loc) => {
-            if (inFlight.current || Date.now() - lastSent.current < 1000) return;
-            inFlight.current = true; lastSent.current = Date.now();
-            try { await recordPosition({ data: { id, lat: loc.latitude, lng: loc.longitude, accuracy: loc.accuracy } }); setError(""); }
-            catch { setError("Localização não atualizada. Verifique a ligação."); }
-            finally { inFlight.current = false; }
-          }, setError);
-        } else watch.current = navigator.geolocation.watchPosition(async (current) => {
-          if (inFlight.current || Date.now() - lastSent.current < 1000) return;
-          inFlight.current = true; lastSent.current = Date.now();
-          try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); }
-          catch { setError("Localização não atualizada. Verifique a ligação."); }
-          finally { inFlight.current = false; }
+        const native = isNativeApp();
+        setGpsInfo({ mode: native ? "app" : "web", at: null });
+        inFlight.current = 0;
+        await sendPosition(id, position.coords.latitude, position.coords.longitude, position.coords.accuracy, true);
+        if (native) {
+          nativeWatch.current = await startNativeWatch((loc) => { void sendPosition(id, loc.latitude, loc.longitude, loc.accuracy); }, setError);
+        } else watch.current = navigator.geolocation.watchPosition((current) => {
+          void sendPosition(id, current.coords.latitude, current.coords.longitude, current.coords.accuracy);
         }, () => undefined, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
         await refresh();
       } catch (cause) { stop(); setError(cause instanceof Error ? cause.message : "Não foi possível iniciar."); }
       finally { setBusy(false); }
     }, () => { setError("Autorize o acesso à localização para iniciar a entrega."); setBusy(false); }, { enableHighAccuracy: true, timeout: 20000 });
   };
+
+  // Retoma o GPS sozinho quando há uma entrega ativa deste estafeta (ex.: a app foi reaberta).
+  useEffect(() => {
+    if (!data.courier || tracking || busy) return;
+    const current = data.deliveries.find((delivery) => delivery.courier_id === data.userId && delivery.status === "active");
+    if (!current || autoResumed.current === current.id) return;
+    autoResumed.current = current.id;
+    start(current.id, true);
+  }, [data.deliveries, tracking]);
 
   const ownAvailability = data.availability.find((row) => row.user_id === data.userId);
   const ownOpen = data.deliveries.filter((delivery) => delivery.courier_id === data.userId && openStates.includes(delivery.status)).length;
@@ -236,7 +247,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
             {order.notes && <p className="mt-3 whitespace-pre-line italic">“{order.notes}”</p>}
             {(mine || data.admin) && <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3"><span className="text-xs font-medium">Cliente pagou com:</span>{paymentMethods.map((method) => <Button key={method} size="sm" variant={paymentFromNotes(order.notes) === method ? "default" : "outline"} disabled={busy || paymentFromNotes(order.notes) === method} onClick={() => run(async () => { await setDeliveryPayment({ data: { id: delivery.id, method } }); toast.success(`Pagamento alterado para ${method}`); })}>{method}</Button>)}</div>}
           </div>}
-          {delivery.status === "active" && <div><ClientOnly><Suspense fallback={<div className="h-72 rounded-lg bg-muted" />}><Map lat={delivery.destination_lat} lng={delivery.destination_lng} position={position} /></Suspense></ClientOnly><p className="mt-2 text-xs text-muted-foreground">{position ? `Última atualização: ${new Date(position.recorded_at).toLocaleTimeString("pt-PT")}` : "A aguardar GPS"}</p></div>}
+          {delivery.status === "active" && <div><ClientOnly><Suspense fallback={<div className="h-72 rounded-lg bg-muted" />}><Map lat={delivery.destination_lat} lng={delivery.destination_lng} position={position} /></Suspense></ClientOnly><p className="mt-2 text-xs text-muted-foreground">{position ? `Última atualização: ${new Date(position.recorded_at).toLocaleTimeString("pt-PT")}` : "A aguardar GPS"}</p>{mine && tracking === delivery.id && gpsInfo && <p className={`mt-1 text-xs font-medium ${gpsInfo.mode === "app" ? "text-primary" : "text-destructive"}`}>{gpsInfo.mode === "app" ? "GPS da app ativo — continua com Waze/Maps ou ecrã bloqueado" : "GPS do navegador — para se sair desta página"}{gpsInfo.at ? ` · enviado às ${new Date(gpsInfo.at).toLocaleTimeString("pt-PT")}` : ""}</p>}</div>}
           <div className="flex flex-wrap gap-2">
             {mine && next === "collected" && order && order.status !== "pronto" ? <p className="text-xs text-muted-foreground">Aguarde: o restaurante ainda não colocou este pedido «Em entrega».</p> : mine && next && (next === "active" ? (data.deliveries.some((d) => d.courier_id === data.userId && d.status === "active" && d.id !== delivery.id) ? <p className="text-xs text-muted-foreground">Próxima paragem — finalize a entrega em curso para iniciar esta.</p> : <Button disabled={busy || tracking !== null} onClick={() => start(delivery.id)}><Play />Iniciar entrega e GPS</Button>) : <Button disabled={busy} onClick={() => run(() => changeDelivery({ data: { id: delivery.id, status: next } }))}>{next === "to_restaurant" ? <Bike /> : next === "collected" ? <PackageCheck /> : <Check />}{next === "to_restaurant" ? "A caminho do restaurante" : next === "collected" ? "Pedido recolhido" : "Finalizar entrega"}</Button>)}
             {mine && delivery.status === "active" && tracking !== delivery.id && <Button disabled={busy} variant="outline" onClick={() => start(delivery.id, true)}>Retomar GPS</Button>}
