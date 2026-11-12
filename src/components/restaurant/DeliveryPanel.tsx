@@ -35,6 +35,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const nativeWatch = useRef<string | null>(null);
   const inFlight = useRef(0);
   const lastSent = useRef(0);
+  const asking = useRef(0);
   const autoResumed = useRef<string | null>(null);
   const [gpsInfo, setGpsInfo] = useState<{ mode: "app" | "web"; at: number | null } | null>(null);
   // Envia uma posição; um envio preso (rede suspensa em segundo plano) expira em 8 s para não bloquear os seguintes.
@@ -63,10 +64,12 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     if (!tracking || isNativeApp()) return;
     const id = tracking;
     const send = (force = false) => {
-      if (!navigator.geolocation || (!force && Date.now() - lastSent.current < 1000)) return;
+      if (!navigator.geolocation || (!force && (Date.now() - lastSent.current < 1000 || Date.now() - asking.current < 10000))) return;
+      asking.current = Date.now();
       navigator.geolocation.getCurrentPosition((current) => {
+        asking.current = 0;
         void sendPosition(id, current.coords.latitude, current.coords.longitude, current.coords.accuracy, force);
-      }, () => undefined, { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 });
+      }, () => { asking.current = 0; }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
     };
     let lock: { release: () => Promise<void> } | null = null;
     const nav = navigator as Navigator & { wakeLock?: { request: (type: "screen") => Promise<{ release: () => Promise<void> }> } };
