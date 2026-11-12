@@ -15,6 +15,7 @@ import { orderSourceLabels } from "@/lib/order-source";
 import { MapPin, LogOut, Play, Check, Link as LinkIcon, Camera, Navigation, PackageCheck, Bike, ArrowLeft, Copy, Phone, Users, Radio, CheckCircle2, ChevronDown, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { CourierAlerts } from "./CourierAlerts";
+import { isNativeApp, startNativeWatch, stopNativeWatch } from "@/lib/native-gps";
 
 const Map = lazy(() => import("./DeliveryMap"));
 type Data = Awaited<ReturnType<typeof deliveryDashboard>>;
@@ -31,10 +32,11 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   const [name, setName] = useState(data.profile?.name ?? "");
   const [photo, setPhoto] = useState("");
   const watch = useRef<number | null>(null);
+  const nativeWatch = useRef<string | null>(null);
   const inFlight = useRef(false);
   const lastSent = useRef(0);
   const refresh = () => query.invalidateQueries({ queryKey: ["matturo-deliveries"] });
-  const stop = () => { if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; setTracking(null); };
+  const stop = () => { if (watch.current !== null) navigator.geolocation.clearWatch(watch.current); watch.current = null; if (nativeWatch.current) void stopNativeWatch(nativeWatch.current); nativeWatch.current = null; setTracking(null); };
 
   useEffect(() => {
     const channel = supabase.channel(`matturo-panel-${crypto.randomUUID()}`)
@@ -45,7 +47,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   }, []);
   useEffect(() => { if (tracking && data.deliveries.some((delivery) => delivery.id === tracking && ["delivered", "cancelled"].includes(delivery.status))) stop(); }, [data.deliveries, tracking]);
   useEffect(() => {
-    if (!tracking) return;
+    if (!tracking || isNativeApp()) return;
     const id = tracking;
     const send = (force = false) => {
       if (!navigator.geolocation || inFlight.current || (!force && Date.now() - lastSent.current < 1000)) return;
@@ -83,7 +85,15 @@ export default function DeliveryPanel({ data }: { data: Data }) {
         if (!resume) await changeDelivery({ data: { id, status: "active" } });
         stop(); setTracking(id);
         await recordPosition({ data: { id, lat: position.coords.latitude, lng: position.coords.longitude, accuracy: position.coords.accuracy } });
-        watch.current = navigator.geolocation.watchPosition(async (current) => {
+        if (isNativeApp()) {
+          nativeWatch.current = await startNativeWatch(async (loc) => {
+            if (inFlight.current || Date.now() - lastSent.current < 1000) return;
+            inFlight.current = true; lastSent.current = Date.now();
+            try { await recordPosition({ data: { id, lat: loc.latitude, lng: loc.longitude, accuracy: loc.accuracy } }); setError(""); }
+            catch { setError("Localização não atualizada. Verifique a ligação."); }
+            finally { inFlight.current = false; }
+          }, setError);
+        } else watch.current = navigator.geolocation.watchPosition(async (current) => {
           if (inFlight.current || Date.now() - lastSent.current < 1000) return;
           inFlight.current = true; lastSent.current = Date.now();
           try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); }

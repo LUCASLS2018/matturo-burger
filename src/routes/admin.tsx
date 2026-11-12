@@ -49,7 +49,8 @@ function AdminLogin() {
       {message && <p role="status" className="text-sm text-destructive">{message}</p>}
       <Button type="submit" disabled={busy} className="h-12 w-full">{busy ? "Aguarde…" : signup ? "Registar estafeta" : "Entrar"}</Button>
       <Button type="button" variant="outline" className="h-11 w-full" onClick={() => { setSignup(!signup); setMessage(""); }}>{signup ? "Já tenho conta — entrar" : "Registar estafeta"}</Button>
-      <InstallAppButton label="Baixar app do estafeta" className="h-11 w-full" />
+      <a href="https://github.com/LUCASLS2018/matturo-burger/releases/download/apk-latest/matturo-entregas.apk" className="inline-flex h-11 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Baixar app Android do estafeta (APK)</a>
+      <InstallAppButton label="Instalar versão web" className="h-11 w-full" />
     </form>
   </div>;
 }

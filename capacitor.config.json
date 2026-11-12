@@ -1,0 +1,6 @@
+{
+  "appId": "org.matturoricks.entregas",
+  "appName": "Matturo Entregas",
+  "webDir": "capacitor-www",
+  "server": { "url": "https://matturoricks.org/entregas", "cleartext": false, "allowNavigation": ["matturoricks.org", "*.matturoricks.org", "*.supabase.co"] }
+}
