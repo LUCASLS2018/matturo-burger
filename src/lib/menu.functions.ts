@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { composeModifierGroups, menuItemToDish, type Dish, type EditableDish, type MenuItemRecord, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 
-const fields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
+const fields = "id,name,slug,description,category,price_cents,discount_percent,image,available,visible,revision,position" as const;
 const groupFields = "item_id,id,name,required,min,max,position,revision" as const;
 const modifierFields = "item_id,group_id,id,name,price_cents,max,position,revision" as const;
 const categoryFields = "id,name,slug,image,position,active,revision" as const;
@@ -120,7 +120,7 @@ const menuBase = z.object({
   id: z.string().uuid(), revision: z.number().int().positive(), name: z.string().trim().min(1).max(120),
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
   description: z.string().trim().max(2000), category: z.string().trim().min(1).max(80),
-  position: z.number().int().min(0).max(10000), price_cents: z.number().int().min(0).max(100000),
+  position: z.number().int().min(0).max(10000), price_cents: z.number().int().min(0).max(100000), discount_percent: z.number().int().min(0).max(90).default(0),
   available: z.boolean(), visible: z.boolean(), imagePath: z.string().max(500).nullable(),
 });
 const menuEdit = menuBase.superRefine((value, context) => {
@@ -134,7 +134,7 @@ export const saveMenuItem = createServerFn({ method: "POST" }).middleware([requi
   if (category.error || !category.data) throw new Error("Escolha uma categoria existente.");
   const result = await context.supabase.from("matturo_menu_items").update({
     name: data.name, slug: data.slug, description: data.description, category: data.category, position: data.position,
-    price_cents: data.price_cents, available: data.available, visible: data.visible, image: data.imagePath, revision: data.revision + 1,
+    price_cents: data.price_cents, discount_percent: data.discount_percent, available: data.available, visible: data.visible, image: data.imagePath, revision: data.revision + 1,
   }).eq("id", data.id).eq("revision", data.revision).select(fields).maybeSingle();
   if (result.error) throw new Error("Não foi possível guardar o produto. Tente novamente.");
   if (!result.data) throw new Error("Este produto foi alterado noutra janela. Atualize a página antes de editar.");

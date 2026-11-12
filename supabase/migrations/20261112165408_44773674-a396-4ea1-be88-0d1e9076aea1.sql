@@ -1,0 +1,1 @@
+ALTER TABLE public.matturo_menu_items ADD COLUMN discount_percent integer NOT NULL DEFAULT 0 CHECK (discount_percent BETWEEN 0 AND 90);

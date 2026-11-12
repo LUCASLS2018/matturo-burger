@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 const adminMenuQuery = queryOptions({ queryKey: ["matturo-admin-menu"], queryFn: () => adminMenu() });
 const adminCategoriesQuery = queryOptions({ queryKey: ["matturo-admin-categories"], queryFn: () => adminCategories() });
 
-type Draft = { name: string; slug: string; description: string; price: string; category: string; position: number; available: boolean; visible: boolean; imagePath: string | null };
+type Draft = { name: string; slug: string; description: string; price: string; discount: number; category: string; position: number; available: boolean; visible: boolean; imagePath: string | null };
 type SaveState = "idle" | "pending" | "saving" | "saved" | "error";
 
 const toDraft = (dish: EditableDish): Draft => ({
@@ -22,6 +22,7 @@ const toDraft = (dish: EditableDish): Draft => ({
   slug: dish.slug,
   description: dish.description,
   price: dish.price.toFixed(2),
+  discount: dish.discount ?? 0,
   category: dish.category,
   position: dish.position,
   available: dish.available,
@@ -86,6 +87,7 @@ function MenuAdminPage() {
             category: draft.category,
             position: draft.position,
             price_cents: Math.round(amount * 100),
+            discount_percent: Math.min(90, Math.max(0, Math.round(draft.discount || 0))),
             available: draft.available,
             visible: draft.visible,
             imagePath: draft.imagePath,
@@ -200,7 +202,7 @@ function MenuAdminPage() {
           </div>
           <div className="space-y-5"><label className="block text-sm font-medium">Nome<input value={draft.name} onChange={(event) => update("name", event.target.value)} maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
             <label className="block text-sm font-medium">Endereço do produto (slug)<input value={draft.slug} onChange={(event) => update("slug", event.target.value.toLowerCase())} pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxLength={120} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label>
-            <div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label><label className="block text-sm font-medium">Ordem no cardápio<input type="number" min={0} value={draft.position} onChange={(event) => update("position", Number(event.target.value))} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label></div>
+            <div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium">Preço (€)<input value={draft.price} onChange={(event) => update("price", event.target.value)} inputMode="decimal" className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label><label className="block text-sm font-medium">Desconto individual (%)<input type="number" min={0} max={90} value={draft.discount} onChange={(event) => update("discount", Number(event.target.value))} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /><span className="mt-1 block text-xs font-normal text-muted-foreground">{draft.discount > 0 ? `Preço final: ${(Math.round(Number(draft.price.replace(",", ".")) * (100 - draft.discount)) / 100).toFixed(2).replace(".", ",")} €` : "0 = sem desconto próprio"}</span></label><label className="block text-sm font-medium">Ordem no cardápio<input type="number" min={0} value={draft.position} onChange={(event) => update("position", Number(event.target.value))} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm" /></label></div>
             <label className="block text-sm font-medium">Categoria<select value={draft.category} onChange={(event) => update("category", event.target.value)} className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{categoryOptions.map((category) => <option key={category.id} value={category.slug}>{category.name}{category.active ? "" : " (inativa)"}</option>)}</select></label>
             <label className="block text-sm font-medium">Descrição<textarea value={draft.description} onChange={(event) => update("description", event.target.value)} maxLength={2000} rows={6} className="mt-2 w-full rounded-md border border-input bg-background p-3 text-sm" /></label>
             <div className="space-y-3 border-t border-border pt-5"><label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.available} onChange={(event) => update("available", event.target.checked)} className="h-4 w-4 accent-primary" />Disponível para pedidos</label><label className="flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.visible} onChange={(event) => update("visible", event.target.checked)} className="h-4 w-4 accent-primary" />Visível no cardápio</label></div>

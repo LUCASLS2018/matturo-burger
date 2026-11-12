@@ -15,7 +15,7 @@ import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type M
 import { CLOSED_ORDER_MESSAGE, canAcceptScheduledOrder, isRestaurantOpen, scheduledOrderError } from "./opening-hours";
 import { distanceKm, findRadiusZone, radiusZoneLabel } from "./delivery-radius";
 
-const menuFields = "id,name,slug,description,category,price_cents,image,available,visible,revision,position" as const;
+const menuFields = "id,name,slug,description,category,price_cents,discount_percent,image,available,visible,revision,position" as const;
 const orderInput = z.object({
   name: z.string().trim().min(1).max(100),
   phone: loyaltyPhoneSchema,
@@ -65,8 +65,9 @@ async function createOrder(data: z.infer<typeof orderInput>) {
   const discountPercent = settings.data.site_discount_active ? settings.data.site_discount_percent : 0;
   const lines = data.items.map((line) => {
     const priced = priceLine(line, currentMenu);
-    const category = currentMenu.find((dish) => dish.id === priced.dish_id)?.category ?? "";
-    const unit = Math.round(discountedPrice(priced.unit_price_cents, category, discountPercent));
+    const dish = currentMenu.find((d) => d.id === priced.dish_id);
+    const category = dish?.category ?? "";
+    const unit = Math.round(discountedPrice(priced.unit_price_cents, category, discountPercent, dish?.discount ?? 0));
     return { ...priced, unit_price_cents: unit, line_total_cents: unit * priced.qty };
   });
   if (data.items.some((line) => line.reward)) throw new Error("Atualize a página e escolha a recompensa em Os meus pontos.");

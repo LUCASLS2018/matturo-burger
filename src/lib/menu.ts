@@ -2,7 +2,7 @@ import snapshot from "@/assets/matturo/menu.json";
 
 export type Modifier = { id: string; name: string; price: number; max: number; revision?: number; position?: number };
 export type ModifierGroup = { id: string; name: string; required: boolean; min: number; max: number; modifiers: Modifier[]; revision?: number; position?: number };
-export type Dish = { id: string; name: string; slug: string; description: string; category: string; price: number; image: string | null; groups: ModifierGroup[]; available: boolean; visible: boolean };
+export type Dish = { id: string; name: string; slug: string; description: string; category: string; price: number; image: string | null; groups: ModifierGroup[]; available: boolean; visible: boolean; discount?: number };
 export const dishes: Dish[] = snapshot.products.filter((product) => product.visible);
 export const categories = snapshot.categories;
 
@@ -23,6 +23,7 @@ export type MenuItemRecord = {
   description: string;
   category: string;
   price_cents: number;
+  discount_percent?: number;
   image: string | null;
   available: boolean;
   visible: boolean;
@@ -64,6 +65,7 @@ export function menuItemToDish(item: Omit<MenuItemRecord, "revision" | "position
     description: item.description,
     category: item.category,
     price: item.price_cents / 100,
+    discount: item.discount_percent ?? 0,
     image: item.image,
     groups: groups ?? source?.groups ?? [],
     available: item.available,
