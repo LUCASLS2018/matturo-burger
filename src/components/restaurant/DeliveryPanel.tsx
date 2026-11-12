@@ -48,20 +48,20 @@ export default function DeliveryPanel({ data }: { data: Data }) {
     if (!tracking) return;
     const id = tracking;
     const send = (force = false) => {
-      if (!navigator.geolocation || inFlight.current || (!force && Date.now() - lastSent.current < 8000)) return;
+      if (!navigator.geolocation || inFlight.current || (!force && Date.now() - lastSent.current < 1000)) return;
       navigator.geolocation.getCurrentPosition(async (current) => {
         if (inFlight.current) return;
         inFlight.current = true; lastSent.current = Date.now();
         try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); setError(""); }
         catch { setError("Localização não atualizada. Verifique a ligação."); }
         finally { inFlight.current = false; }
-      }, () => undefined, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+      }, () => undefined, { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 });
     };
     let lock: { release: () => Promise<void> } | null = null;
     const nav = navigator as Navigator & { wakeLock?: { request: (type: "screen") => Promise<{ release: () => Promise<void> }> } };
     const requestLock = async () => { try { if (nav.wakeLock && document.visibilityState === "visible") lock = await nav.wakeLock.request("screen"); } catch { /* sem wake lock */ } };
     void requestLock();
-    const timer = window.setInterval(() => send(), 10000);
+    const timer = window.setInterval(() => send(), 1000);
     const onVisible = () => { if (document.visibilityState === "visible") { void requestLock(); send(true); } };
     document.addEventListener("visibilitychange", onVisible);
     return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); void lock?.release().catch(() => undefined); };
@@ -84,12 +84,12 @@ export default function DeliveryPanel({ data }: { data: Data }) {
         stop(); setTracking(id);
         await recordPosition({ data: { id, lat: position.coords.latitude, lng: position.coords.longitude, accuracy: position.coords.accuracy } });
         watch.current = navigator.geolocation.watchPosition(async (current) => {
-          if (inFlight.current || Date.now() - lastSent.current < 5000) return;
+          if (inFlight.current || Date.now() - lastSent.current < 1000) return;
           inFlight.current = true; lastSent.current = Date.now();
           try { await recordPosition({ data: { id, lat: current.coords.latitude, lng: current.coords.longitude, accuracy: current.coords.accuracy } }); }
           catch { setError("Localização não atualizada. Verifique a ligação."); }
           finally { inFlight.current = false; }
-        }, () => undefined, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+        }, () => undefined, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
         await refresh();
       } catch (cause) { stop(); setError(cause instanceof Error ? cause.message : "Não foi possível iniciar."); }
       finally { setBusy(false); }

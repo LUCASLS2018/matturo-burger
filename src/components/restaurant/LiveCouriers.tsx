@@ -14,7 +14,7 @@ const ago = (iso: string) => { const s = Math.round((Date.now() - new Date(iso).
 /** Admin view of couriers on an active delivery, refreshed every few seconds. */
 export function LiveCouriers() {
   const load = useServerFn(deliveryDashboard);
-  const { data, isLoading, error } = useQuery({ queryKey: ["matturo-live-couriers"], queryFn: () => load(), refetchInterval: 5000 });
+  const { data, isLoading, error } = useQuery({ queryKey: ["matturo-live-couriers"], queryFn: () => load(), refetchInterval: 1000 });
 
   const rows = useMemo(() => {
     if (!data) return [];
