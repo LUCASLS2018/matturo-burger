@@ -54,7 +54,7 @@ function OrdersPage() {
   const assign = useServerFn(assignOrderCourier);
   const [pick, setPick] = useState<Record<string, string>>({});
   const [showCancelled, setShowCancelled] = useState(false);
-  const [tab, setTab] = useState<OrderStatus | "mapa">("novo");
+  const [tab, setTab] = useState<OrderStatus>("novo");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("todos");
   const [manualOpen, setManualOpen] = useState(false);
   const [loadingManual, setLoadingManual] = useState(false);
@@ -133,10 +133,8 @@ function OrdersPage() {
           const on = tab === col.key;
           return <button key={col.key} role="tab" aria-selected={on} onClick={() => setTab(col.key)} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${on ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><span className={`h-2 w-2 rounded-full ${col.dot}`} />{col.label}<span className={`rounded-full px-2 py-0.5 text-xs tabular-nums ${on ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>{count}</span></button>;
         })}
-        <button role="tab" aria-selected={tab === "mapa"} onClick={() => setTab("mapa")} className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${tab === "mapa" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}><MapPin className="h-4 w-4" />Estafetas no mapa</button>
       </div>
       <div className="mt-4">
-        {tab === "mapa" && <LiveCouriers />}
         {columns.filter((col) => col.key === tab).map((col) => {
           const items = sorted.filter((o) => o.status === col.key && (col.key !== "novo" || !o.scheduled_for));
           const groups = groupByService(items);
@@ -197,6 +195,7 @@ function OrdersPage() {
         </div>
       )}
       {manualOpen && <Suspense fallback={null}><ManualOrder onClose={() => setManualOpen(false)} /></Suspense>}
+      <section className="mt-10 border-t border-border pt-6"><h2 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold"><MapPin className="h-5 w-5 text-primary" />Estafetas no mapa</h2><LiveCouriers /></section>
     </div>
   );
 }
