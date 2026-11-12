@@ -27,7 +27,7 @@ export const publicSettings = createServerFn({ method: "GET" }).handler(async ()
   if (!url || !key) throw new Error("Não foi possível consultar o atendimento.");
   const db = publicDb(url, key);
   const [settings, zones] = await Promise.all([
-    db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude").eq("id", true).single(),
+    db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude,site_discount_active,site_discount_percent").eq("id", true).single(),
     db.from("matturo_delivery_zones").select("id,name,postal_prefixes,fee_cents,max_distance_km").eq("active", true).order("name"),
   ]);
   if (settings.error || zones.error) throw new Error("Não foi possível consultar o atendimento.");
@@ -37,6 +37,7 @@ export const publicSettings = createServerFn({ method: "GET" }).handler(async ()
     deliveryMode: settings.data.delivery_mode === "radius" ? "radius" as const : "postal" as const,
     storeReady: settings.data.store_latitude !== null && settings.data.store_longitude !== null,
     zones: zones.data,
+    discountPercent: settings.data.site_discount_active ? settings.data.site_discount_percent : 0,
   };
 });
 
@@ -147,5 +148,17 @@ export const saveDeliveryZone = createServerFn({ method: "POST" }).middleware([r
       : await context.supabase.from("matturo_delivery_zones").insert(values).select().single();
     if (result.error) throw new Error("Não foi possível guardar a zona. Tente novamente.");
     if (!result.data) throw new Error("Esta zona foi alterada noutra janela. Atualize antes de editar.");
+    return result.data;
+  });
+
+export const setSiteDiscount = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ active: z.boolean(), percent: z.number().int().min(0).max(90), revision: z.number().int() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const role = await context.supabase.rpc("matturo_has_role", { wanted: "admin" });
+    if (role.error || !role.data) throw new Error("Acesso reservado ao administrador.");
+    if (data.active && data.percent < 1) throw new Error("Indique uma percentagem entre 1 e 90.");
+    const result = await context.supabase.from("matturo_restaurant_settings").update({ site_discount_active: data.active, site_discount_percent: data.percent, revision: data.revision + 1 }).eq("id", true).eq("revision", data.revision).select().maybeSingle();
+    if (result.error) throw new Error("Não foi possível guardar. Tente novamente.");
+    if (!result.data) throw new Error("As configurações foram alteradas noutra janela. Atualize antes de tentar novamente.");
     return result.data;
   });

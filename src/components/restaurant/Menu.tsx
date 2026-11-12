@@ -8,6 +8,7 @@ import { dishCutout } from "@/lib/dish-images";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { menuCategoriesQuery, menuQuery } from "@/lib/menu-query";
 import { publicSettingsQuery } from "@/lib/settings-query";
+import { discountedPrice } from "@/lib/site-discount";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const { data: settings } = useSuspenseQuery(publicSettingsQuery);
@@ -26,7 +27,7 @@ export function DishCard({ dish }: { dish: Dish }) {
         {acceptingOrders && dish.available ? <Button asChild size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" title={`Selecionar ${dish.name}`}><Link to="/produto/$slug" params={{ slug: dish.slug }} search={{ quantidade: 1 }} aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Link></Button> : <Button size="icon" variant="outline" className="ml-1 h-9 w-9 border-0 bg-card text-primary" disabled title="Pedidos pausados" aria-label={`Selecionar ${dish.name}`}><ShoppingBasket className="h-4 w-4" /></Button>}
       </div>
       <Link to="/produto/$slug" params={{ slug: dish.slug }}><h3 className="min-h-10 break-words text-sm font-semibold leading-5">{dish.name}</h3></Link>
-      <p className="mt-2 text-base font-semibold text-primary">{dish.available ? money(dish.price) : "Indisponível"}</p>
+      <p className="mt-2 text-base font-semibold text-primary">{!dish.available ? "Indisponível" : discountedPrice(dish.price, dish.category, settings.discountPercent) < dish.price ? <><span className="mr-2 text-xs font-normal text-muted-foreground line-through">{money(dish.price)}</span>{money(discountedPrice(dish.price, dish.category, settings.discountPercent))}<span className="ml-2 rounded bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground">-{settings.discountPercent}%</span></> : money(dish.price)}</p>
     </div>
   </article>;
 }

@@ -872,6 +872,8 @@ export type Database = {
           id: boolean
           orders_paused: boolean
           revision: number
+          site_discount_active: boolean
+          site_discount_percent: number
           store_address: string
           store_latitude: number | null
           store_longitude: number | null
@@ -883,6 +885,8 @@ export type Database = {
           id?: boolean
           orders_paused?: boolean
           revision?: number
+          site_discount_active?: boolean
+          site_discount_percent?: number
           store_address?: string
           store_latitude?: number | null
           store_longitude?: number | null
@@ -894,6 +898,8 @@ export type Database = {
           id?: boolean
           orders_paused?: boolean
           revision?: number
+          site_discount_active?: boolean
+          site_discount_percent?: number
           store_address?: string
           store_latitude?: number | null
           store_longitude?: number | null

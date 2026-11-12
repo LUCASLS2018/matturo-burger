@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { orderServices, needsDeliveryAddress } from "./order-service";
 import { findZone } from "./restaurant-settings";
+import { discountedPrice } from "./site-discount";
 import { priceLine, canMoveOrder, orderStatuses, orderAccessValid } from "./order-pricing";
 import { tokenHash } from "./delivery";
 import { findReward, paidAfterReward, rewardLines } from "./loyalty-rewards";
@@ -41,7 +42,7 @@ async function createOrder(data: z.infer<typeof orderInput>) {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [settings, zones, menu] = await Promise.all([
-    db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude").eq("id", true).single(),
+    db.from("matturo_restaurant_settings").select("orders_paused,delivery_mode,store_latitude,store_longitude,site_discount_active,site_discount_percent").eq("id", true).single(),
     db.from("matturo_delivery_zones").select("name,postal_prefixes,fee_cents,max_distance_km").eq("active", true),
     db.from("matturo_menu_items").select(menuFields).eq("visible", true),
   ]);
@@ -61,7 +62,13 @@ async function createOrder(data: z.infer<typeof orderInput>) {
     (groups.data as ModifierGroupRecord[]).filter((group) => group.item_id === item.id),
     (modifiers.data as ModifierRecord[]).filter((modifier) => modifier.item_id === item.id),
   )));
-  const lines = data.items.map((line) => priceLine(line, currentMenu));
+  const discountPercent = settings.data.site_discount_active ? settings.data.site_discount_percent : 0;
+  const lines = data.items.map((line) => {
+    const priced = priceLine(line, currentMenu);
+    const category = currentMenu.find((dish) => dish.id === priced.dish_id)?.category ?? "";
+    const unit = Math.round(discountedPrice(priced.unit_price_cents, category, discountPercent));
+    return { ...priced, unit_price_cents: unit, line_total_cents: unit * priced.qty };
+  });
   if (data.items.some((line) => line.reward)) throw new Error("Atualize a página e escolha a recompensa em Os meus pontos.");
   const reward = data.rewardId ? findReward(data.rewardId) : null;
   if (data.rewardId && !reward) throw new Error("Recompensa inválida.");

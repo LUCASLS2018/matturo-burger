@@ -1,0 +1,1 @@
+ALTER TABLE public.matturo_restaurant_settings ADD COLUMN site_discount_active boolean NOT NULL DEFAULT false, ADD COLUMN site_discount_percent integer NOT NULL DEFAULT 0 CHECK (site_discount_percent BETWEEN 0 AND 90);
