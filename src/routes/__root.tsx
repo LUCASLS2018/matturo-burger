@@ -124,7 +124,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt">
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__matturoInstall=e;window.dispatchEvent(new Event('matturo-install-ready'));});" }} />
+        <script dangerouslySetInnerHTML={{ __html: "(function(){var p=location.pathname;if(p.indexOf('/admin')===0||p.indexOf('/entregas')===0){var l=document.querySelector('link[rel=manifest]');if(l)l.href='/manifest-estafeta.webmanifest';}})();window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__matturoInstall=e;window.dispatchEvent(new Event('matturo-install-ready'));});" }} />
       </head>
       <body className="font-sans antialiased">
         {children}
