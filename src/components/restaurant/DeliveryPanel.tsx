@@ -61,7 +61,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
   }, []);
   useEffect(() => { if (tracking && data.deliveries.some((delivery) => delivery.id === tracking && ["delivered", "cancelled"].includes(delivery.status))) stop(); }, [data.deliveries, tracking]);
   useEffect(() => {
-    if (!tracking || isNativeApp()) return;
+    if (!tracking) return;
     const id = tracking;
     const send = (force = false) => {
       if (!navigator.geolocation || (!force && (Date.now() - lastSent.current < 1000 || Date.now() - asking.current < 10000))) return;
@@ -101,8 +101,9 @@ export default function DeliveryPanel({ data }: { data: Data }) {
         inFlight.current = 0;
         await sendPosition(id, position.coords.latitude, position.coords.longitude, position.coords.accuracy, true);
         if (native) {
-          nativeWatch.current = await startNativeWatch((loc) => { void sendPosition(id, loc.latitude, loc.longitude, loc.accuracy); }, setError);
-        } else watch.current = navigator.geolocation.watchPosition((current) => {
+          nativeWatch.current = await startNativeWatch((loc) => { void sendPosition(id, loc.latitude, loc.longitude, loc.accuracy); }, setError).catch(() => null);
+        }
+        watch.current = navigator.geolocation.watchPosition((current) => {
           void sendPosition(id, current.coords.latitude, current.coords.longitude, current.coords.accuracy);
         }, () => undefined, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
         await refresh();
