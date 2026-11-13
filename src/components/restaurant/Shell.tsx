@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart";
 import { restaurant } from "@/lib/restaurant";
 import matturoLogoBlack from "@/assets/matturo-logo-black.png.asset.json";
 import ricksLogo from "@/assets/ricks-pizzaria-logo.png.asset.json";
+import ricksLogoWhite from "@/assets/ricks-pizzaria-logo-white.png.asset.json";
 import {CustomerAccountAccess} from "./CustomerAccountAccess";
 import {OpeningStatus} from "./OpeningStatus";
 
@@ -41,7 +42,7 @@ export function RestaurantHeader() {
 export function RestaurantFooter() {
   return <footer className="bg-hero-surface text-hero-foreground">
     <div className="page-width grid gap-10 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
-      <div><div className="flex w-fit max-w-full items-center gap-4"><img src={matturoLogoBlack.url} alt="Matturo" className="h-16 w-auto object-contain brightness-0 invert sm:h-20" /><img src={ricksLogo.url} alt="Rick's Pizzaria" className="h-20 w-auto object-contain sm:h-24" /></div><p className="mt-4 max-w-xs text-sm leading-relaxed text-hero-foreground/70">Pizzas deliciosas e hambúrgueres incríveis, em Vila Franca de Xira.</p></div>
+      <div><div className="flex w-fit max-w-full items-center gap-4"><img src={matturoLogoBlack.url} alt="Matturo" className="h-16 w-auto object-contain brightness-0 invert sm:h-20" /><img src={ricksLogoWhite.url} alt="Rick's Pizzaria" className="h-20 w-auto object-contain sm:h-24" /></div><p className="mt-4 max-w-xs text-sm leading-relaxed text-hero-foreground/70">Pizzas deliciosas e hambúrgueres incríveis, em Vila Franca de Xira.</p></div>
       <div><h2 className="mb-5 font-semibold">Venha até ao Matturo</h2><a href={restaurant.maps} target="_blank" rel="noopener noreferrer" className="flex gap-2 text-sm leading-relaxed text-hero-foreground/70"><MapPin className="h-5 w-5 shrink-0" />{restaurant.address}</a><a href={restaurant.whatsapp} className="mt-4 block text-sm text-hero-foreground/70">{restaurant.phone}</a></div>
       <div><h2 className="mb-5 font-semibold">À sua maneira</h2><div className="flex flex-col gap-3 text-sm text-hero-foreground/70"><Link to="/cardapio">Cardápio</Link><Link to="/atendimento">Retirada e delivery</Link><Link to="/contactos">Contactos e horários</Link></div><div className="mt-5 flex gap-4"><a href={restaurant.instagram} aria-label="Instagram" target="_blank" rel="noopener noreferrer"><Instagram className="h-5 w-5" /></a><a href={restaurant.tiktok} target="_blank" rel="noopener noreferrer" className="text-sm">TikTok ↗</a></div></div>
     </div><div className="page-width border-t border-hero-foreground/15 py-6 text-xs text-hero-foreground/60">© Matturo Burger · Vila Franca de Xira</div>
