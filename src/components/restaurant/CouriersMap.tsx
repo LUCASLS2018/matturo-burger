@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export type CourierPoint = { id: string; name: string; label: string; lat: number; lng: number; destLat: number; destLng: number };
+export type CourierPoint = { id: string; name: string; label: string; lat: number | null; lng: number | null; destLat: number; destLng: number };
 
 const icon = () => L.divIcon({
   className: "delivery-courier-marker",
@@ -15,14 +15,16 @@ export default function CouriersMap({ points }: { points: CourierPoint[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
-  const fitted = useRef(false);
+  const fitted = useRef(0);
 
   useEffect(() => {
     if (!ref.current) return;
     const m = L.map(ref.current).setView([38.955, -8.99], 13);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>', maxZoom: 19 }).addTo(m);
+    setTimeout(() => m.invalidateSize(), 200);
+    const ro = new ResizeObserver(() => m.invalidateSize()); ro.observe(ref.current);
     map.current = m; layer.current = L.layerGroup().addTo(m);
-    return () => { m.remove(); map.current = null; layer.current = null; };
+    return () => { ro.disconnect(); m.remove(); map.current = null; layer.current = null; };
   }, []);
 
   useEffect(() => {
@@ -30,12 +32,14 @@ export default function CouriersMap({ points }: { points: CourierPoint[] }) {
     g.clearLayers();
     const bounds: L.LatLngExpression[] = [];
     for (const p of points) {
-      L.marker([p.lat, p.lng], { icon: icon() }).addTo(g).bindTooltip(`${p.name} · ${p.label}`, { permanent: true, direction: "top", offset: [0, -20] });
       L.circleMarker([p.destLat, p.destLng], { radius: 8, className: "delivery-destination" }).addTo(g).bindTooltip(`Destino ${p.label}`);
+      bounds.push([p.destLat, p.destLng]);
+      if (p.lat == null || p.lng == null) continue;
+      L.marker([p.lat, p.lng], { icon: icon() }).addTo(g).bindTooltip(`${p.name} · ${p.label}`, { permanent: true, direction: "top", offset: [0, -20] });
       L.polyline([[p.lat, p.lng], [p.destLat, p.destLng]], { dashArray: "6 6", weight: 2, className: "delivery-destination" }).addTo(g);
-      bounds.push([p.lat, p.lng], [p.destLat, p.destLng]);
+      bounds.push([p.lat, p.lng]);
     }
-    if (bounds.length && !fitted.current) { m.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 16 }); fitted.current = true; }
+    if (bounds.length && fitted.current !== bounds.length) { m.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 16 }); fitted.current = bounds.length; }
   }, [points]);
 
   return <div ref={ref} className="relative z-0 h-[520px] w-full rounded-xl border border-border" aria-label="Mapa dos estafetas" />;

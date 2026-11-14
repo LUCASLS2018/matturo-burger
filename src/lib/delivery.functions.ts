@@ -153,3 +153,22 @@ export const customerTracking = createServerFn({ method: "POST" }).inputValidato
   const { order_id: _orderId, ...publicDelivery } = delivery.data;
   return { delivery: { ...publicDelivery, daily_number: order?.data?.daily_number ?? null, order_day: order?.data?.order_day ?? null, destination: delivery.data.destination.split(" — ")[0] }, position: position?.data ?? null };
 });
+
+/** Lightweight feed for the admin live map: only in-progress deliveries, their latest positions, orders and courier names. */
+export const liveCouriersFeed = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  setResponseHeader("Cache-Control", "no-store");
+  const db = context.supabase;
+  const deliveries = await db.from("matturo_deliveries").select("*").neq("status", "delivered").order("created_at", { ascending: true }).limit(50);
+  if (deliveries.error) throw deliveries.error;
+  const ids = deliveries.data.map((d) => d.id);
+  const orderIds = deliveries.data.map((d) => d.order_id).filter((id): id is string => Boolean(id));
+  const courierIds = [...new Set(deliveries.data.map((d) => d.courier_id).filter(Boolean))] as string[];
+  const none = { data: [] as never[], error: null };
+  const [positions, orders, profiles] = await Promise.all([
+    ids.length ? db.from("matturo_delivery_positions").select("*").in("delivery_id", ids) : Promise.resolve(none),
+    orderIds.length ? db.from("matturo_orders").select("id,reference,order_day,daily_number,customer_name,status").in("id", orderIds) : Promise.resolve(none),
+    courierIds.length ? db.from("matturo_profiles").select("id,name").in("id", courierIds) : Promise.resolve(none),
+  ]);
+  if (positions.error || orders.error || profiles.error) throw new Error("Não foi possível carregar os estafetas.");
+  return { deliveries: deliveries.data, positions: positions.data ?? [], orders: (orders.data ?? []).filter((o) => o.status !== "cancelado"), profiles: profiles.data ?? [] };
+});
