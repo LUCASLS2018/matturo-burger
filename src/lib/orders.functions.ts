@@ -38,7 +38,12 @@ const orderInput = z.object({
   rewardId: z.string().max(40).optional(),
 });
 
-async function createOrder(data: z.infer<typeof orderInput>) {
+const manualOrderInput = orderInput.extend({
+  service: z.enum([...orderServices, "Comer no local"] as const),
+  table: z.string().trim().min(1).max(20).optional(),
+});
+
+async function createOrder(data: z.infer<typeof manualOrderInput>) {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [settings, zones, menu] = await Promise.all([
@@ -136,11 +141,25 @@ async function createOrder(data: z.infer<typeof orderInput>) {
 export const placeOrder = createServerFn({ method: "POST" }).inputValidator((input) => orderInput.parse(input)).handler(({ data }) => createOrder(data));
 
 export const createManualOrder = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
-  .inputValidator((input) => orderInput.parse(input))
+  .inputValidator((input) => manualOrderInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase);
     if (data.items.some((item) => item.reward) || data.rewardId) throw new Error("As ofertas devem ser resgatadas pela conta do cliente.");
-    return createOrder({ ...data, source: "telefone" satisfies OrderSource });
+    if (data.service === "Comer no local" && !data.table) throw new Error("Indique o número da mesa.");
+    const notes = data.service === "Comer no local" ? [`MESA ${data.table}`, data.notes].filter(Boolean).join("\n").slice(0, 500) : data.notes;
+    return createOrder({ ...data, notes, source: "telefone" satisfies OrderSource });
+  });
+
+/** Admin-only: points currently in the telephone wallet (exists even before the customer creates an account). */
+export const adminPhonePoints = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ phone: loyaltyPhoneSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const wallet = await db.from("matturo_loyalty_wallets").select("id,balance").eq("phone", data.phone).maybeSingle();
+    if (wallet.error) throw new Error("Não foi possível consultar os pontos.");
+    const account = wallet.data ? await db.from("matturo_loyalty_accounts").select("id").eq("wallet_id", wallet.data.id).maybeSingle() : null;
+    return { points: wallet.data?.balance ?? 0, hasAccount: Boolean(account?.data) };
   });
 
 export const orderByToken = createServerFn({ method: "GET" }).inputValidator((input) => z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).parse(input)).handler(async ({ data }) => {

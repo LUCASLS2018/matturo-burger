@@ -7,11 +7,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { adminMenu } from "@/lib/menu.functions";
-import { createManualOrder } from "@/lib/orders.functions";
+import { createManualOrder, adminPhonePoints } from "@/lib/orders.functions";
 import { quoteRadiusDelivery } from "@/lib/settings.functions";
 import { publicSettingsQuery } from "@/lib/settings-query";
 import { findZone } from "@/lib/restaurant-settings";
-import { orderServices, needsDeliveryAddress, type OrderService } from "@/lib/order-service";
+import { needsDeliveryAddress, type OrderService } from "@/lib/order-service";
 import { dishTotal, selectionValid, type Dish } from "@/lib/menu";
 import { money } from "@/lib/restaurant";
 import { dishCutout } from "@/lib/dish-images";
@@ -33,6 +33,9 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const { data: categories } = useSuspenseQuery(menuCategoriesQuery);
   const qc = useQueryClient();
   const save = useServerFn(createManualOrder);
+  const lookupPoints = useServerFn(adminPhonePoints);
+  const [table, setTable] = useState("");
+  const [points, setPoints] = useState<{ points: number; hasAccount: boolean } | null>(null);
   const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -54,6 +57,13 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const submission = useRef<{ id: string; token: string } | null>(null);
   const productsRef = useRef<HTMLDivElement>(null);
   const modifiersRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setPoints(null);
+    if (phone.replace(/\D/g, "").length < 9) return;
+    let live = true;
+    const timer = setTimeout(() => { lookupPoints({ data: { phone } }).then((r) => { if (live) setPoints(r); }).catch(() => {}); }, 400);
+    return () => { live = false; clearTimeout(timer); };
+  }, [phone, lookupPoints]);
   useEffect(() => { if (dishId) modifiersRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" }); }, [dishId]);
   const dish = menu.find((item) => item.id === dishId);
   const delivery = needsDeliveryAddress(service);
@@ -92,7 +102,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
     try {
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await save({ data: {
-        name, phone, service, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
+        name, phone, service, table: service === "Comer no local" ? table : undefined, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
         expectedTotalCents: changedTotal ?? Math.round((subtotal + fee) * 100), acceptRepriced: changedTotal !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: lines.map((line) => ({ productId: line.dish.id, qty: 1, selected: line.selected, options: line.notes.trim() ? { Observações: line.notes.trim() } : {} })),
@@ -117,7 +127,9 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
               <label className="text-sm font-medium">Nome do cliente<input required maxLength={100} value={name} onChange={(e) => setName(e.target.value)} className={fieldClass} /></label>
               <label className="text-sm font-medium">Telemóvel<input required type="tel" maxLength={30} value={phone} onChange={(e) => setPhone(e.target.value)} className={fieldClass} /></label>
             </div>
-            <div className="flex flex-wrap gap-2">{orderServices.map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); setRadiusQuote(null); resetPrice(); }}>{value}</Button>)}</div>
+            <div className="flex flex-wrap gap-2">{(["Retirada", "Delivery", "Comer no local"] as OrderService[]).map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); setRadiusQuote(null); resetPrice(); }}>{value === "Comer no local" ? "Mesa" : value}</Button>)}</div>
+            {points && <p role="status" className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm"><strong>{points.points} pontos</strong> neste telemóvel{points.points >= 100 ? " · já pode trocar por recompensa" : ""} · {points.hasAccount ? "cliente com conta" : "ainda sem conta (os pontos ficam guardados no número)"}</p>}
+            {service === "Comer no local" && <label className="block text-sm font-medium">Número da mesa<input required maxLength={20} value={table} onChange={(e) => setTable(e.target.value)} placeholder="Ex.: 3" className={fieldClass} /></label>}
             <div className="flex flex-wrap gap-2"><Button type="button" size="sm" variant={!scheduled ? "default" : "outline"} aria-pressed={!scheduled} onClick={() => { setScheduled(false); setError(""); }}>Assim que possível</Button><Button type="button" size="sm" variant={scheduled ? "default" : "outline"} aria-pressed={scheduled} onClick={() => { setScheduled(true); setError(""); }}>Agendar pedido</Button></div>
             {scheduled && <div><label className="block text-sm font-medium">Data e hora pretendida (hora de Portugal)<input required type="datetime-local" value={scheduledFor} onChange={(event) => { setScheduledFor(event.target.value); setError(""); }} className={fieldClass} /></label><p className="mt-2 text-xs text-muted-foreground">{OPENING_HOURS_SUMMARY}</p></div>}
             {delivery && <div className="space-y-3"><label className="block text-sm font-medium">Morada<input required maxLength={250} value={address} onChange={(e) => { setAddress(e.target.value); setRadiusQuote(null); resetPrice(); }} className={fieldClass} /></label><label className="block text-sm font-medium">Código postal<input required maxLength={8} value={postal} onChange={(e) => { setPostal(e.target.value); setRadiusQuote(null); resetPrice(); }} placeholder="2600-000" className={fieldClass} /></label>{radiusMode && <Button type="button" size="sm" variant="outline" disabled={quoting || !address.trim() || !postal.trim()} onClick={() => void verifyRadius()}>{quoting ? "A calcular…" : "Verificar distância e portes"}</Button>}<p className="text-xs text-muted-foreground">{zone ? `${radiusQuote ? `${String(radiusQuote.distanceKm).replace(".", ",")} km · ` : ""}${zone.name} · Entrega ${money(fee)}` : radiusMode ? "Calcule a distância para confirmar que a morada está dentro do raio." : "Selecione um código postal de uma zona de entrega ativa."}</p></div>}

@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, cleanup } from "@testing-library/re
 import { afterEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ save: vi.fn(), invalidate: vi.fn().mockResolvedValue(undefined), isOpen: true, paused: false }));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: () => mocks.save }));
-vi.mock("@/lib/orders.functions", () => ({ createManualOrder: {} }));
+vi.mock("@/lib/orders.functions", () => ({ createManualOrder: {}, adminPhonePoints: {} }));
 vi.mock("@/lib/menu.functions", () => ({ adminMenu: {} }));
 vi.mock("@/lib/settings-query", () => ({ publicSettingsQuery: { queryKey: ["settings"] } }));
 vi.mock("@/lib/settings.functions", () => ({ quoteRadiusDelivery: {} }));
