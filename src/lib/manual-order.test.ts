@@ -23,8 +23,8 @@ describe("manual order permissions", () => {
     await expect(invoke({ data: { items: [] }, context: { supabase: { rpc } } })).rejects.toThrow("Acesso reservado ao administrador.");
     expect(rpc).toHaveBeenCalledExactlyOnceWith("matturo_has_role", { wanted: "admin" });
   });
-  it("does not let manual entry spend customer loyalty points", async () => {
+  it("rejects free items sent as cart lines; rewards come only from the points list", async () => {
     const rpc = vi.fn().mockResolvedValue({ data: true, error: null });
-    await expect(invoke({ data: { items: [{ reward: true }] }, context: { supabase: { rpc } } })).rejects.toThrow("As ofertas devem ser resgatadas pela conta do cliente.");
+    await expect(invoke({ data: { items: [{ reward: true }] }, context: { supabase: { rpc } } })).rejects.toThrow("Escolha a recompensa na lista de pontos.");
   });
 });

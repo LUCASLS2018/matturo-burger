@@ -1,4 +1,5 @@
 import { orderNumber } from "@/lib/order-number";
+import { LOYALTY_REWARDS, findReward, paidAfterReward } from "@/lib/loyalty-rewards";
 import { useEffect, useRef, useState } from "react";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -35,6 +36,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const save = useServerFn(createManualOrder);
   const lookupPoints = useServerFn(adminPhonePoints);
   const [table, setTable] = useState("");
+  const [rewardId, setRewardId] = useState("");
   const [points, setPoints] = useState<{ points: number; hasAccount: boolean } | null>(null);
   const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const [name, setName] = useState("");
@@ -58,7 +60,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const productsRef = useRef<HTMLDivElement>(null);
   const modifiersRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    setPoints(null);
+    setPoints(null); setRewardId("");
     if (phone.replace(/\D/g, "").length < 9) return;
     let live = true;
     const timer = setTimeout(() => { lookupPoints({ data: { phone } }).then((r) => { if (live) setPoints(r); }).catch(() => {}); }, 400);
@@ -71,7 +73,8 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const [radiusQuote, setRadiusQuote] = useState<{ zone: { name: string; fee_cents: number; max_distance_km: number | null } | null; distanceKm: number } | null>(null);
   const [quoting, setQuoting] = useState(false);
   const zone = delivery ? radiusMode ? radiusQuote?.zone ?? null : findZone(postal, settings.zones) : null;
-  const subtotal = lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0);
+  const reward = findReward(rewardId) ?? null;
+  const subtotal = paidAfterReward(reward, Math.round(lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0) * 100)) / 100;
   const fee = zone ? zone.fee_cents / 100 : 0;
   const resetPrice = () => { setChangedTotal(null); };
   const verifyRadius = async () => {
@@ -102,7 +105,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
     try {
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await save({ data: {
-        name, phone, service, table: service === "Comer no local" ? table : undefined, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
+        name, phone, service, table: service === "Comer no local" ? table : undefined, rewardId: rewardId || undefined, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
         expectedTotalCents: changedTotal ?? Math.round((subtotal + fee) * 100), acceptRepriced: changedTotal !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: lines.map((line) => ({ productId: line.dish.id, qty: 1, selected: line.selected, options: line.notes.trim() ? { Observações: line.notes.trim() } : {} })),
@@ -129,6 +132,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             </div>
             <div className="flex flex-wrap gap-2">{(["Retirada", "Delivery", "Comer no local"] as OrderService[]).map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); setRadiusQuote(null); resetPrice(); }}>{value === "Comer no local" ? "Mesa" : value}</Button>)}</div>
             {points && <p role="status" className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm"><strong>{points.points} pontos</strong> neste telemóvel{points.points >= 100 ? " · já pode trocar por recompensa" : ""} · {points.hasAccount ? "cliente com conta" : "ainda sem conta (os pontos ficam guardados no número)"}</p>}
+            {points && points.points >= Math.min(...LOYALTY_REWARDS.map((r) => r.points)) && <div aria-label="Trocar pontos" className="flex flex-wrap gap-2"><Button type="button" size="sm" variant={!rewardId ? "default" : "outline"} onClick={() => { setRewardId(""); resetPrice(); }}>Sem recompensa</Button>{LOYALTY_REWARDS.filter((r) => r.points <= points.points).map((r) => <Button type="button" key={r.id} size="sm" variant={rewardId === r.id ? "default" : "outline"} onClick={() => { setRewardId(r.id); resetPrice(); }}>{r.label} · {r.points} pts</Button>)}</div>}
             {service === "Comer no local" && <label className="block text-sm font-medium">Número da mesa<input required maxLength={20} value={table} onChange={(e) => setTable(e.target.value)} placeholder="Ex.: 3" className={fieldClass} /></label>}
             <div className="flex flex-wrap gap-2"><Button type="button" size="sm" variant={!scheduled ? "default" : "outline"} aria-pressed={!scheduled} onClick={() => { setScheduled(false); setError(""); }}>Assim que possível</Button><Button type="button" size="sm" variant={scheduled ? "default" : "outline"} aria-pressed={scheduled} onClick={() => { setScheduled(true); setError(""); }}>Agendar pedido</Button></div>
             {scheduled && <div><label className="block text-sm font-medium">Data e hora pretendida (hora de Portugal)<input required type="datetime-local" value={scheduledFor} onChange={(event) => { setScheduledFor(event.target.value); setError(""); }} className={fieldClass} /></label><p className="mt-2 text-xs text-muted-foreground">{OPENING_HOURS_SUMMARY}</p></div>}
@@ -157,7 +161,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             {!lines.length && <p className="py-8 text-center text-sm text-muted-foreground">Sem produtos</p>}
             <ul className="divide-y divide-border">{lines.map((line) => <li key={line.key} className="py-3"><div className="flex items-center gap-2"><span className="min-w-0 flex-1 text-sm font-semibold">1× {line.dish.name}</span><span className="shrink-0 text-sm">{money(dishTotal(line.dish, line.selected))}</span><Button type="button" variant="ghost" size="icon" aria-label={`Remover ${line.dish.name}`} onClick={() => { setLines((previous) => previous.filter((item) => item.key !== line.key)); resetPrice(); }}><Trash2 className="h-4 w-4" /></Button></div>{line.dish.groups.map((group) => { const chosen = group.modifiers.filter((modifier) => (line.selected[modifier.id] ?? 0) > 0); return chosen.length ? <p key={group.id} className="text-xs text-muted-foreground">{group.name}: {chosen.map((modifier) => `${line.selected[modifier.id]}× ${modifier.name}`).join(", ")}</p> : null; })}{line.notes && <p className="text-xs italic text-muted-foreground">{line.notes}</p>}</li>)}</ul>
             <label className="block text-sm font-medium">Observações do pedido<textarea rows={3} maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} className={fieldClass} /></label>
-            <div className="space-y-2 border-t border-border pt-4 text-sm"><div className="flex justify-between"><span>Produtos</span><span>{money(subtotal)}</span></div>{delivery && <div className="flex justify-between"><span>Entrega</span><span>{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between text-lg font-bold"><span>Total</span><span>{money(changedTotal === null ? subtotal + fee : changedTotal / 100)}</span></div></div>
+            <div className="space-y-2 border-t border-border pt-4 text-sm"><div className="flex justify-between"><span>Produtos</span><span>{money(subtotal)}</span></div>{reward && <div className="flex justify-between text-primary"><span>Recompensa</span><span>{reward.label} · −{reward.points} pts</span></div>}{delivery && <div className="flex justify-between"><span>Entrega</span><span>{zone ? money(fee) : "a confirmar"}</span></div>}<div className="flex justify-between text-lg font-bold"><span>Total</span><span>{money(changedTotal === null ? subtotal + fee : changedTotal / 100)}</span></div></div>
             {changedTotal !== null && <p role="status" className="text-sm text-primary">O preço mudou. Confirme o total atualizado para criar o pedido.</p>}
             {!settings.isOpen && !settings.paused && <p role="status" className="text-sm text-destructive">{scheduled ? "O restaurante está FECHADO. O pedido agendado só poderá ser aceite com a loja aberta." : "O restaurante está FECHADO. Pode agendar para uma hora dentro do funcionamento."}</p>}
             {settings.paused && <p role="status" className="text-sm text-destructive">O restaurante está sem aceitar pedidos.</p>}

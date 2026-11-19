@@ -43,7 +43,7 @@ const manualOrderInput = orderInput.extend({
   table: z.string().trim().min(1).max(20).optional(),
 });
 
-async function createOrder(data: z.infer<typeof manualOrderInput>) {
+async function createOrder(data: z.infer<typeof manualOrderInput>, staffReward = false) {
   setResponseHeader("Cache-Control", "no-store");
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [settings, zones, menu] = await Promise.all([
@@ -79,7 +79,7 @@ async function createOrder(data: z.infer<typeof manualOrderInput>) {
   const reward = data.rewardId ? findReward(data.rewardId) : null;
   if (data.rewardId && !reward) throw new Error("Recompensa inválida.");
   let rewardSessionHash: string | null = null;
-  if (reward) {
+  if (reward && !staffReward) {
     const { verifiedLoyalty } = await import("./loyalty-session.server");
     const session = await verifiedLoyalty();
     if (!session || session.phone !== data.phone) throw new Error("Confirme o telemóvel deste pedido em Os meus pontos para resgatar.");
@@ -116,7 +116,8 @@ async function createOrder(data: z.infer<typeof manualOrderInput>) {
   if (total !== data.expectedTotalCents && !data.acceptRepriced) return { kind: "price_changed" as const, totalCents: total };
   const reference = "M" + Date.now().toString(36).toUpperCase().slice(-6) + crypto.randomUUID().slice(0, 2).toUpperCase();
   const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
-  const result = await db.rpc("matturo_place_loyalty_order", {
+  const rpcName = (staffReward && reward ? "matturo_place_staff_reward_order" : "matturo_place_loyalty_order") as "matturo_place_loyalty_order";
+  const result = await db.rpc(rpcName, {
     p_order: {
       reference, customer_name: data.name, customer_phone: data.phone, service: data.service, source: data.source,
       address: delivery ? data.address ?? "" : "", postal_code: delivery ? data.postal ?? "" : "", zone_name: zone?.name ?? "",
@@ -144,10 +145,10 @@ export const createManualOrder = createServerFn({ method: "POST" }).middleware([
   .inputValidator((input) => manualOrderInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase);
-    if (data.items.some((item) => item.reward) || data.rewardId) throw new Error("As ofertas devem ser resgatadas pela conta do cliente.");
+    if (data.items.some((item) => item.reward)) throw new Error("Escolha a recompensa na lista de pontos.");
     if (data.service === "Comer no local" && !data.table) throw new Error("Indique o número da mesa.");
     const notes = data.service === "Comer no local" ? [`MESA ${data.table}`, data.notes].filter(Boolean).join("\n").slice(0, 500) : data.notes;
-    return createOrder({ ...data, notes, source: "telefone" satisfies OrderSource });
+    return createOrder({ ...data, notes, source: "telefone" satisfies OrderSource }, true);
   });
 
 /** Admin-only: points currently in the telephone wallet (exists even before the customer creates an account). */

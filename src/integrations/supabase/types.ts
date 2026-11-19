@@ -2152,6 +2152,13 @@ export type Database = {
           reference: string
         }[]
       }
+      matturo_place_staff_reward_order: {
+        Args: { p_items: Json; p_order: Json; p_reward_points: number }
+        Returns: {
+          id: string
+          reference: string
+        }[]
+      }
       matturo_record_position:
         | {
             Args: {
