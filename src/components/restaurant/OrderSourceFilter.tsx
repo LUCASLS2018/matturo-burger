@@ -1,4 +1,4 @@
-import { Globe, LayoutList, PhoneCall, Smartphone } from "lucide-react";
+import { Globe, LayoutList, PhoneCall, Smartphone, Utensils } from "lucide-react";
 import {
   normalizeOrderSource,
   orderSourceCounts,
@@ -10,7 +10,8 @@ import {
 const sourceIcon: Record<OrderSource, typeof Globe> = { app: Smartphone, web: Globe, telefone: PhoneCall };
 
 /** Small tag showing whether the order came from the app, the website or a phone call. */
-export function OrderSourceBadge({ source }: { source?: string | null }) {
+export function OrderSourceBadge({ source, service }: { source?: string | null; service?: string | null }) {
+  if (service === "Comer no local") return <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground"><Utensils className="h-2.5 w-2.5" />Mesa</span>;
   const origin = normalizeOrderSource(source);
   const Icon = sourceIcon[origin];
   return (

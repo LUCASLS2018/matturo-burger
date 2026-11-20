@@ -41,6 +41,7 @@ const orderInput = z.object({
 const manualOrderInput = orderInput.extend({
   service: z.enum([...orderServices, "Comer no local"] as const),
   table: z.string().trim().min(1).max(20).optional(),
+  rewardIds: z.array(z.string().max(40)).max(30).optional(),
 });
 
 async function createOrder(data: z.infer<typeof manualOrderInput>, staffReward = false) {
@@ -76,8 +77,11 @@ async function createOrder(data: z.infer<typeof manualOrderInput>, staffReward =
     return { ...priced, unit_price_cents: unit, line_total_cents: unit * priced.qty };
   });
   if (data.items.some((line) => line.reward)) throw new Error("Atualize a página e escolha a recompensa em Os meus pontos.");
-  const reward = data.rewardId ? findReward(data.rewardId) : null;
-  if (data.rewardId && !reward) throw new Error("Recompensa inválida.");
+  const rewardIdList = staffReward && data.rewardIds?.length ? data.rewardIds : data.rewardId ? [data.rewardId] : [];
+  const rewards = rewardIdList.map((id) => findReward(id));
+  if (rewards.some((r) => !r)) throw new Error("Recompensa inválida.");
+  const chosen = rewards as NonNullable<ReturnType<typeof findReward>>[];
+  const reward = chosen.length ? { id: chosen.map((r) => r.id).join("+"), label: chosen.map((r) => r.label).join(" + "), points: chosen.reduce((n, r) => n + r.points, 0), discountCents: chosen.reduce((n, r) => n + (r.discountCents ?? 0), 0) } : null;
   let rewardSessionHash: string | null = null;
   if (reward && !staffReward) {
     const { verifiedLoyalty } = await import("./loyalty-session.server");
@@ -108,9 +112,11 @@ async function createOrder(data: z.infer<typeof manualOrderInput>, staffReward =
   if (delivery && (!data.address || !zone)) throw new Error("Indique a morada e um código postal de uma zona de entrega.");
   const productsCents = lines.reduce((sum, line) => sum + line.line_total_cents, 0);
   const subtotal = paidAfterReward(reward, productsCents);
-  if (!meetsRewardMinimum(!!reward, subtotal)) throw new Error(REWARD_MINIMUM_MESSAGE);
-  if (reward?.discountCents) lines.push({ dish_id: `recompensa:${reward.id}`, name: `${reward.label} (fidelização)`, options: {}, unit_price_cents: -reward.discountCents, qty: 1, line_total_cents: -reward.discountCents } as (typeof lines)[number]);
-  if (reward) lines.push(...(rewardLines(reward) as (typeof lines)[number][]));
+  if (!meetsRewardMinimum(!!reward && delivery, subtotal)) throw new Error(REWARD_MINIMUM_MESSAGE);
+  for (const r of chosen) {
+    if (r.discountCents) lines.push({ dish_id: `recompensa:${r.id}`, name: `${r.label} (fidelização)`, options: {}, unit_price_cents: -r.discountCents, qty: 1, line_total_cents: -r.discountCents } as (typeof lines)[number]);
+    lines.push(...(rewardLines(r) as (typeof lines)[number][]));
+  }
   const fee = zone?.fee_cents ?? 0;
   const total = subtotal + fee;
   if (total !== data.expectedTotalCents && !data.acceptRepriced) return { kind: "price_changed" as const, totalCents: total };

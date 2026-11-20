@@ -36,7 +36,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const save = useServerFn(createManualOrder);
   const lookupPoints = useServerFn(adminPhonePoints);
   const [table, setTable] = useState("");
-  const [rewardId, setRewardId] = useState("");
+  const [rewardIds, setRewardIds] = useState<string[]>([]);
   const [points, setPoints] = useState<{ points: number; hasAccount: boolean } | null>(null);
   const quoteDelivery = useServerFn(quoteRadiusDelivery);
   const [name, setName] = useState("");
@@ -60,7 +60,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const productsRef = useRef<HTMLDivElement>(null);
   const modifiersRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    setPoints(null); setRewardId("");
+    setPoints(null); setRewardIds([]);
     if (phone.replace(/\D/g, "").length < 9) return;
     let live = true;
     const timer = setTimeout(() => { lookupPoints({ data: { phone } }).then((r) => { if (live) setPoints(r); }).catch(() => {}); }, 400);
@@ -73,8 +73,11 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const [radiusQuote, setRadiusQuote] = useState<{ zone: { name: string; fee_cents: number; max_distance_km: number | null } | null; distanceKm: number } | null>(null);
   const [quoting, setQuoting] = useState(false);
   const zone = delivery ? radiusMode ? radiusQuote?.zone ?? null : findZone(postal, settings.zones) : null;
-  const reward = findReward(rewardId) ?? null;
-  const subtotal = paidAfterReward(reward, Math.round(lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0) * 100)) / 100;
+  const chosenRewards = rewardIds.map((id) => findReward(id)).filter((r): r is NonNullable<typeof r> => !!r);
+  const usedPoints = chosenRewards.reduce((n, r) => n + r.points, 0);
+  const leftPoints = (points?.points ?? 0) - usedPoints;
+  const reward = chosenRewards.length ? { label: chosenRewards.map((r) => r.label).join(" + "), points: usedPoints, discountCents: chosenRewards.reduce((n, r) => n + (r.discountCents ?? 0), 0) } : null;
+  const subtotal = paidAfterReward(reward as never, Math.round(lines.reduce((sum, line) => sum + dishTotal(line.dish, line.selected), 0) * 100)) / 100;
   const fee = zone ? zone.fee_cents / 100 : 0;
   const resetPrice = () => { setChangedTotal(null); };
   const verifyRadius = async () => {
@@ -105,7 +108,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
     try {
       if (!submission.current) submission.current = { id: crypto.randomUUID(), token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) => byte.toString(16).padStart(2, "0")).join("") };
       const result = await save({ data: {
-        name, phone, service, table: service === "Comer no local" ? table : undefined, rewardId: rewardId || undefined, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
+        name, phone, service, table: service === "Comer no local" ? table : undefined, rewardIds: rewardIds.length ? rewardIds : undefined, scheduledFor: scheduledIso, address: delivery ? address : undefined, postal: delivery ? postal : undefined, notes,
         expectedTotalCents: changedTotal ?? Math.round((subtotal + fee) * 100), acceptRepriced: changedTotal !== null,
         submissionId: submission.current.id, accessToken: submission.current.token,
         items: lines.map((line) => ({ productId: line.dish.id, qty: 1, selected: line.selected, options: line.notes.trim() ? { Observações: line.notes.trim() } : {} })),
@@ -132,7 +135,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             </div>
             <div className="flex flex-wrap gap-2">{(["Retirada", "Delivery", "Comer no local"] as OrderService[]).map((value) => <Button type="button" key={value} size="sm" variant={value === service ? "default" : "outline"} onClick={() => { setService(value); setRadiusQuote(null); resetPrice(); }}>{value === "Comer no local" ? "Mesa" : value}</Button>)}</div>
             {points && <p role="status" className="rounded-md border border-primary/40 bg-primary/5 px-3 py-2 text-sm"><strong>{points.points} pontos</strong> neste telemóvel{points.points >= 100 ? " · já pode trocar por recompensa" : ""} · {points.hasAccount ? "cliente com conta" : "ainda sem conta (os pontos ficam guardados no número)"}</p>}
-            {points && points.points >= Math.min(...LOYALTY_REWARDS.map((r) => r.points)) && <div aria-label="Trocar pontos" className="flex flex-wrap gap-2"><Button type="button" size="sm" variant={!rewardId ? "default" : "outline"} onClick={() => { setRewardId(""); resetPrice(); }}>Sem recompensa</Button>{LOYALTY_REWARDS.filter((r) => r.points <= points.points).map((r) => <Button type="button" key={r.id} size="sm" variant={rewardId === r.id ? "default" : "outline"} onClick={() => { setRewardId(r.id); resetPrice(); }}>{r.label} · {r.points} pts</Button>)}</div>}
+            {points && points.points >= Math.min(...LOYALTY_REWARDS.map((r) => r.points)) && <div aria-label="Trocar pontos" className="space-y-2"><p className="text-xs text-muted-foreground">Pode juntar várias recompensas até gastar os pontos todos · restam <strong>{leftPoints} pts</strong></p><div className="flex flex-wrap gap-2">{rewardIds.length > 0 && <Button type="button" size="sm" variant="outline" onClick={() => { setRewardIds([]); resetPrice(); }}>Limpar recompensas</Button>}{LOYALTY_REWARDS.map((r) => { const count = rewardIds.filter((id) => id === r.id).length; return <span key={r.id} className="inline-flex items-center gap-1 rounded-md border border-border px-1"><span className="px-1 text-xs">{r.label} · {r.points} pts</span><Button type="button" size="icon" variant="ghost" aria-label={`Retirar ${r.label}`} disabled={!count} onClick={() => { setRewardIds((prev) => { const i = prev.lastIndexOf(r.id); return prev.filter((_, j) => j !== i); }); resetPrice(); }}><Minus /></Button><span className="w-4 text-center text-xs">{count}</span><Button type="button" size="icon" variant="ghost" aria-label={`Adicionar ${r.label}`} disabled={r.points > leftPoints} onClick={() => { setRewardIds((prev) => [...prev, r.id]); resetPrice(); }}><Plus /></Button></span>; })}</div></div>}
             {service === "Comer no local" && <label className="block text-sm font-medium">Número da mesa<input required maxLength={20} value={table} onChange={(e) => setTable(e.target.value)} placeholder="Ex.: 3" className={fieldClass} /></label>}
             <div className="flex flex-wrap gap-2"><Button type="button" size="sm" variant={!scheduled ? "default" : "outline"} aria-pressed={!scheduled} onClick={() => { setScheduled(false); setError(""); }}>Assim que possível</Button><Button type="button" size="sm" variant={scheduled ? "default" : "outline"} aria-pressed={scheduled} onClick={() => { setScheduled(true); setError(""); }}>Agendar pedido</Button></div>
             {scheduled && <div><label className="block text-sm font-medium">Data e hora pretendida (hora de Portugal)<input required type="datetime-local" value={scheduledFor} onChange={(event) => { setScheduledFor(event.target.value); setError(""); }} className={fieldClass} /></label><p className="mt-2 text-xs text-muted-foreground">{OPENING_HOURS_SUMMARY}</p></div>}

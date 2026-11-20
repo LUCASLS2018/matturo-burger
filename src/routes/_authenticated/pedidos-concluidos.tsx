@@ -115,7 +115,7 @@ function CompletedOrderRow({ order, expanded, onToggle }: { order: AdminOrder; e
           <span className="flex min-w-0 items-center gap-2">
             <b className="shrink-0 text-sm">#{orderNumber(order)}</b>
             <span className="truncate text-sm font-semibold">{order.customer_name}</span>
-            <OrderSourceBadge source={order.source} />
+            <OrderSourceBadge source={order.source} service={order.service} />
           </span>
           <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="h-3 w-3 shrink-0" />{formatDate(order.created_at)} · {order.service}</span>
         </span>
