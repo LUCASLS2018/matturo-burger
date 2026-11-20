@@ -231,6 +231,11 @@ export const setOrderStatus = createServerFn({ method: "POST" }).middleware([req
     if (current.error || settings.error) throw new Error("Não foi possível validar o horário do pedido.");
     if (!canAcceptScheduledOrder(current.data.scheduled_for, settings.data.orders_paused, new Date())) throw new Error("Este pedido agendado só pode ser aceite com a loja aberta.");
   }
+  if (data.to === "concluido") {
+    const running = await context.supabase.from("matturo_deliveries").select("id").eq("order_id", data.id).neq("status", "delivered").limit(1);
+    if (running.error) throw new Error("Não foi possível validar a entrega.");
+    if (running.data.length) throw new Error("A entrega ainda está com o estafeta. O pedido fica concluído quando ele marcar como entregue.");
+  }
   const result = await context.supabase.from("matturo_orders").update({ status: data.to }).eq("id", data.id).eq("status", data.from).select("id").maybeSingle();
   if (result.error) throw new Error("Não foi possível guardar. Tente novamente.");
   if (!result.data) throw new Error("Este pedido foi alterado noutra janela. Atualize a lista.");
@@ -338,4 +343,11 @@ export const adminLoyalty = createServerFn({ method: "POST" }).middleware([requi
     return { id: wallet.id, name: names.get(wallet.phone) ?? "Cliente", phone: wallet.phone, available: wallet.balance, earned, spent,
       redemptions: own.filter((movement) => movement.kind === "redeem").map((movement) => ({ at: movement.created_at, reference: movement.matturo_orders?.reference ?? "", number: movement.matturo_orders ? orderNumber(movement.matturo_orders) : "—", cancelled: movement.matturo_orders?.status === "cancelado" })) };
   }).sort((a, b) => b.available - a.available);
+});
+
+export const deleteClosedOrder = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input)).handler(async ({ data, context }) => {
+  await assertAdmin(context.supabase);
+  const result = await context.supabase.rpc("matturo_delete_closed_order", { p_order_id: data.id });
+  if (result.error) throw new Error("Só pedidos concluídos ou cancelados podem ser apagados.");
+  return { ok: true };
 });

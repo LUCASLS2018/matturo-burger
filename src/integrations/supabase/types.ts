@@ -2127,6 +2127,10 @@ export type Database = {
         }
         Returns: string
       }
+      matturo_delete_closed_order: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       matturo_has_role: { Args: { wanted: string }; Returns: boolean }
       matturo_loyalty_phone: { Args: { raw_phone: string }; Returns: string }
       matturo_next_daily_order_number: {

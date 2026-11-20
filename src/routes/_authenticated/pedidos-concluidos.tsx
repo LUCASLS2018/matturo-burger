@@ -4,7 +4,11 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Bike, CheckCircle2, ChevronDown, Clock, MapPin, Phone, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { adminOrders } from "@/lib/orders.functions";
+import { adminOrders, deleteClosedOrder } from "@/lib/orders.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 import { groupByService, oldestFirst } from "@/lib/order-groups";
 import { ServiceGroupHeading } from "@/components/restaurant/ServiceGroupHeading";
 import { OrderSourceBadge, OrderSourceFilter } from "@/components/restaurant/OrderSourceFilter";
@@ -98,6 +102,13 @@ function CompletedOrdersPage() {
 }
 
 function CompletedOrderRow({ order, expanded, onToggle }: { order: AdminOrder; expanded: boolean; onToggle: () => void }) {
+  const remove = useServerFn(deleteClosedOrder);
+  const qc = useQueryClient();
+  const onDelete = async () => {
+    if (!window.confirm(`Apagar definitivamente o pedido #${orderNumber(order)}? Não é possível recuperar.`)) return;
+    try { await remove({ data: { id: order.id } }); toast.success("Pedido apagado."); await qc.invalidateQueries({ queryKey: completedOrdersQuery.queryKey }); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível apagar."); }
+  };
   const Icon = serviceIcon(order.service);
   const detailsId = `concluido-${order.id}-detalhes`;
 
@@ -144,6 +155,7 @@ function CompletedOrderRow({ order, expanded, onToggle }: { order: AdminOrder; e
             <span className="text-[11px] text-muted-foreground">{order.delivery_fee_cents ? `Inclui entrega ${money(order.delivery_fee_cents / 100)}` : "Total"}</span>
             <span className="text-lg font-bold tabular-nums">{money(order.total_cents / 100)}</span>
           </div>
+          <Button variant="destructive" size="sm" onClick={() => void onDelete()}><Trash2 />Apagar pedido</Button>
         </div>
       )}
     </article>
