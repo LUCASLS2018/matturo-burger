@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Ban, Bell, BellOff, Bike, CheckCircle2, ChefHat, ChevronDown, Clock, MapPin, Phone, Plus, Printer, ShoppingBag, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier } from "@/lib/orders.functions";
+import { adminOrders, setOrderStatus, orderCourierBoard, assignOrderCourier, deleteClosedOrder } from "@/lib/orders.functions";
 import { groupByService, oldestFirst } from "@/lib/order-groups";
 import { ServiceGroupHeading } from "@/components/restaurant/ServiceGroupHeading";
 import { nextOrderSteps, type OrderStatus } from "@/lib/order-pricing";
@@ -224,6 +224,13 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, ordering
   const Icon = serviceIcon(order.service);
   const delivery = board.deliveries.find((d) => d.order_id === order.id);
   const steps = nextOrderSteps(order.status as OrderStatus);
+  const removeOrder = useServerFn(deleteClosedOrder);
+  const qcDelete = useQueryClient();
+  const onDelete = async () => {
+    if (!window.confirm("Apagar definitivamente este pedido? Não é possível recuperar.")) return;
+    try { await removeOrder({ data: { id: order.id } }); toast.success("Pedido apagado."); await qcDelete.invalidateQueries({ queryKey: ["matturo-admin-orders"] }); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Não foi possível apagar."); }
+  };
   const [expanded, setExpanded] = useState(defaultExpanded);
   const detailsId = `pedido-${order.id}-detalhes`;
 
@@ -281,6 +288,7 @@ function OrderCard({ order, board, courierPick, onPick, onSend, onMove, ordering
                 ? <p className="text-xs text-muted-foreground">Ainda não há estafetas autorizados (adicione em Entregas → Equipa).</p>
                 : <>{nearby.length > 0 && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-xs"><p className="font-semibold text-primary">{nearby.length} pedido{nearby.length > 1 ? "s" : ""} perto deste cliente</p><ul className="mt-1 space-y-0.5 text-muted-foreground">{nearby.map((n) => <li key={n.id}>#{orderNumber(n)} · {n.customer_name} · {n.address}</li>)}</ul><Button size="sm" className="mt-2 h-8 w-full" onClick={() => void onSendNearby?.(nearby.map((n) => n.id))}><Bike />Enviar todos ao mesmo estafeta</Button></div>}<div className="flex gap-2"><select aria-label="Estafeta" className="h-8 flex-1 rounded-md border border-input bg-card px-2 text-xs" value={courierPick} onChange={(e) => onPick(order.id, e.target.value)}>{board.couriers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select><Button size="sm" variant="outline" className="h-8" onClick={() => void onSend(order.id)}><Bike />Enviar</Button></div></>)}
           </div>
+          {(order.status === "cancelado" || order.status === "concluido") && <footer className="border-t border-border px-4 py-3 sm:px-5"><Button size="sm" variant="destructive" onClick={() => void onDelete()}>Apagar pedido</Button></footer>}
           {steps.length > 0 && <footer className="flex flex-wrap gap-2 border-t border-border px-4 py-3 sm:px-5">{steps.map((s) => <Button key={s} size="sm" className={s === "cancelado" ? "" : "flex-1"} variant={s === "cancelado" ? "ghost" : "default"} disabled={(s === "aceite" && order.status === "novo" && !!order.scheduled_for && !orderingOpen) || (s === "concluido" && !!delivery && delivery.status !== "delivered")} title={s === "aceite" && order.scheduled_for && !orderingOpen ? "Só pode aceitar com a loja aberta" : s === "concluido" && delivery && delivery.status !== "delivered" ? "Aguarda o estafeta marcar como entregue" : undefined} onClick={() => { if (s === "aceite" && order.status === "novo" && !printTicket(order, "cozinha")) toast.error("Permita janelas pop-up para imprimir automaticamente."); void onMove(order.id, order.status as OrderStatus, s); }}>{s === "cancelado" ? "Cancelar" : boardLabels[s]}</Button>)}</footer>}
         </div>
       )}
