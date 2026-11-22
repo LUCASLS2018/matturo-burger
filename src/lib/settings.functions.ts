@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { radiusZoneSchema, zoneSchema } from "./restaurant-settings";
 import { isRestaurantOpen } from "./opening-hours";
-import { distanceKm, findRadiusZone } from "./delivery-radius";
+import { findRadiusZone } from "./delivery-radius";
 
 function publicDb(url: string, key: string) {
   return createClient<Database>(url, key, {
@@ -61,7 +61,8 @@ export const quoteRadiusDelivery = createServerFn({ method: "POST" })
     const { geocodePt } = await import("./geocode.server");
     const point = await geocodePt(data.address, data.postal);
     if (!point) throw new Error("Não foi possível localizar esta morada. Confirme a rua, o número e o código postal.");
-    const distance = distanceKm(
+    const { roadDistanceKm } = await import("./road-distance.server");
+      const distance = await roadDistanceKm(
       { lat: settings.data.store_latitude, lng: settings.data.store_longitude },
       { lat: point.lat, lng: point.lng },
     );

@@ -13,7 +13,7 @@ import { canonicalPhone, loyaltyPhoneSchema, meetsRewardMinimum, REWARD_MINIMUM_
 import { orderSources, type OrderSource } from "./order-source";
 import { composeModifierGroups, menuItemToDish, type ModifierGroupRecord, type ModifierRecord } from "./menu";
 import { CLOSED_ORDER_MESSAGE, canAcceptScheduledOrder, isRestaurantOpen, scheduledOrderError } from "./opening-hours";
-import { distanceKm, findRadiusZone, radiusZoneLabel } from "./delivery-radius";
+import { findRadiusZone, radiusZoneLabel } from "./delivery-radius";
 
 const menuFields = "id,name,slug,description,category,price_cents,discount_percent,image,available,visible,revision,position" as const;
 const orderInput = z.object({
@@ -98,7 +98,8 @@ async function createOrder(data: z.infer<typeof manualOrderInput>, staffReward =
       const { geocodePt } = await import("./geocode.server");
       const point = await geocodePt(data.address, data.postal ?? "");
       if (!point) throw new Error("Não foi possível localizar a morada. Confirme a rua, o número e o código postal completo.");
-      const distance = distanceKm(
+      const { roadDistanceKm } = await import("./road-distance.server");
+      const distance = await roadDistanceKm(
         { lat: settings.data.store_latitude, lng: settings.data.store_longitude },
         { lat: point.lat, lng: point.lng },
       );

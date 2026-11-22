@@ -52,6 +52,7 @@ vi.mock("@/lib/orders.functions", () => ({
   setOrderStatus: {},
   orderCourierBoard: {},
   assignOrderCourier: {},
+  deleteClosedOrder: {},
 }));
 vi.mock("@/lib/delivery.functions", () => ({ deliveryDashboard: {} }));
 vi.mock("@/components/restaurant/ManualOrder", () => ({
