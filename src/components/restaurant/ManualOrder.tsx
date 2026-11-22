@@ -93,9 +93,11 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
   const availableMenu = menu.filter((item) => item.visible && item.available);
   const categorySlugs = [...new Set(availableMenu.map((item) => item.category))];
   const visibleCategories = [...categories.filter((item) => categorySlugs.includes(item.slug)).map((item) => ({ slug: item.slug, name: item.name })), ...categorySlugs.filter((slug) => !categories.some((item) => item.slug === slug)).map((slug) => ({ slug, name: slug }))];
+  const rewardOnly = !delivery && rewardIds.some((id) => findReward(id)?.freeItems?.length);
+  const canSubmit = lines.length > 0 || rewardOnly;
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (busy || !lines.length || settings.paused || (!settings.isOpen && !scheduled)) return;
+    if (busy || !canSubmit || settings.paused || (!settings.isOpen && !scheduled)) return;
     let scheduledIso: string | undefined;
     if (scheduled) {
       const date = lisbonDateTimeToDate(scheduledFor);
@@ -169,7 +171,7 @@ export function ManualOrder({ onClose }: { onClose: () => void }) {
             {!settings.isOpen && !settings.paused && <p role="status" className="text-sm text-destructive">{scheduled ? "O restaurante está FECHADO. O pedido agendado só poderá ser aceite com a loja aberta." : "O restaurante está FECHADO. Pode agendar para uma hora dentro do funcionamento."}</p>}
             {settings.paused && <p role="status" className="text-sm text-destructive">O restaurante está sem aceitar pedidos.</p>}
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || !lines.length || settings.paused || (!settings.isOpen && !scheduled) || (scheduled && !scheduledFor) || (delivery && !zone)}><Plus />{busy ? "A guardar…" : scheduled ? changedTotal !== null ? "Confirmar total e agendar pedido" : "Guardar pedido agendado" : changedTotal !== null ? "Confirmar total e criar pedido" : "Criar pedido"}</Button>
+            <Button type="submit" className="w-full" disabled={busy || !canSubmit || settings.paused || (!settings.isOpen && !scheduled) || (scheduled && !scheduledFor) || (delivery && !zone)}><Plus />{busy ? "A guardar…" : scheduled ? changedTotal !== null ? "Confirmar total e agendar pedido" : "Guardar pedido agendado" : changedTotal !== null ? "Confirmar total e criar pedido" : "Criar pedido"}</Button>
             <Button type="button" variant="ghost" className="w-full" disabled={busy} onClick={onClose}>Cancelar</Button>
           </div>
         </div>

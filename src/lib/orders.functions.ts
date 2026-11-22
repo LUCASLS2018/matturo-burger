@@ -34,7 +34,7 @@ const orderInput = z.object({
     options: z.record(z.string().max(100), z.string().max(600)).default({}),
     selected: z.record(z.string().uuid(), z.number().int().min(0).max(100)).optional(),
     reward: z.boolean().optional(),
-  })).min(1).max(60),
+  })).max(60),
   rewardId: z.string().max(40).optional(),
 });
 
@@ -117,6 +117,7 @@ async function createOrder(data: z.infer<typeof manualOrderInput>, staffReward =
     if (r.discountCents) lines.push({ dish_id: `recompensa:${r.id}`, name: `${r.label} (fidelização)`, options: {}, unit_price_cents: -r.discountCents, qty: 1, line_total_cents: -r.discountCents } as (typeof lines)[number]);
     lines.push(...(rewardLines(r) as (typeof lines)[number][]));
   }
+  if (!data.items.length && (!staffReward || delivery || !chosen.some((r) => r.freeItems?.length))) throw new Error("Adicione pelo menos um produto.");
   const fee = zone?.fee_cents ?? 0;
   const total = subtotal + fee;
   if (total !== data.expectedTotalCents && !data.acceptRepriced) return { kind: "price_changed" as const, totalCents: total };
