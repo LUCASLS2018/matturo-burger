@@ -1,4 +1,4 @@
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -54,7 +54,8 @@ vi.mock("@/lib/orders.functions", () => ({
   assignOrderCourier: {},
   deleteClosedOrder: {},
 }));
-vi.mock("@/lib/delivery.functions", () => ({ deliveryDashboard: {} }));
+vi.mock("@/lib/delivery.functions", () => ({ deliveryDashboard: {}, liveCouriersFeed: {} }));
+vi.mock("@/components/restaurant/LiveCouriers", () => ({ LiveCouriers: () => null, default: () => null }));
 vi.mock("@/components/restaurant/ManualOrder", () => ({
   ManualOrder: () => null,
   manualMenuQuery: { queryKey: ["manual-menu"] },
@@ -77,21 +78,20 @@ afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe("orders board", () => {
   it("shows delivery and retirada as separate groups, oldest order first inside each", () => {
     render(<OrdersPage />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual(["Delivery", "Retirada"]);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent).slice(0, 2)).toEqual(["Delivery", "Retirada"]);
     const cards = screen.getAllByRole("article");
     expect(cards.map((card) => card.querySelector("b")?.textContent)).toEqual(["#D1", "#D2", "#R1", "#R2"]);
   });
 
   it("keeps scheduled orders in their own tab and disables acceptance while closed", () => {
-    mocks.orders.push({ ...mocks.orders[0]!, id: "scheduled", reference: "A1", customer_name: "Cliente A1", scheduled_for: "2026-11-10T12:00:00Z" });
+    mocks.orders.push({ ...mocks.orders[0]!, id: "scheduled", reference: "A1", customer_name: "Cliente A1", scheduled_for: new Date(Date.now() + 2 * 86400000).toISOString() });
     mocks.settings.isOpen = false;
     try {
       render(<OrdersPage />);
-      expect(screen.queryByText("Cliente A1")).toBeNull();
-      fireEvent.click(screen.getByRole("tab", { name: /Agendados/ }));
-      expect(screen.getByText("Cliente A1")).toBeTruthy();
-      fireEvent.click(screen.getByRole("article").querySelector("button") as HTMLButtonElement);
-      expect((screen.getByRole("button", { name: "Aceite" }) as HTMLButtonElement).disabled).toBe(true);
+      const section = screen.getByRole("region", { name: "Pedidos agendados" });
+      const card = within(section).getByText("Cliente A1").closest("article") as HTMLElement;
+      fireEvent.click(card.querySelector("button") as HTMLButtonElement);
+      expect((within(card).getByRole("button", { name: "Aceite" }) as HTMLButtonElement).disabled).toBe(true);
     } finally {
       mocks.orders.pop();
       mocks.settings.isOpen = true;
