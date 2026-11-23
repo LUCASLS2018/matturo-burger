@@ -172,3 +172,33 @@ export const liveCouriersFeed = createServerFn({ method: "POST" }).middleware([r
   if (positions.error || orders.error || profiles.error) throw new Error("Não foi possível carregar os estafetas.");
   return { deliveries: deliveries.data, positions: positions.data ?? [], orders: (orders.data ?? []).filter((o) => o.status !== "cancelado"), profiles: profiles.data ?? [] };
 });
+
+/** Admin-only: permanently removes a courier account. Refuses while the courier has open deliveries; past deliveries stay in history without a courier. */
+export const deleteCourierAccount = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => z.object({ userId: z.string().uuid() }).parse(input)).handler(async ({ data, context }) => {
+  const role = await context.supabase.rpc("matturo_has_role", { wanted: "admin" });
+  if (!role.data) throw new Error("Sem acesso.");
+  if (data.userId === context.userId) throw new Error("Não pode apagar a sua própria conta.");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const roles = await supabaseAdmin.from("matturo_user_roles").select("role").eq("user_id", data.userId);
+  if (roles.error) throw roles.error;
+  if (!roles.data.some((r) => r.role === "courier")) throw new Error("Esta conta não é de estafeta.");
+  if (roles.data.some((r) => r.role === "admin")) throw new Error("Não é possível apagar uma conta de administrador.");
+  const open = await supabaseAdmin.from("matturo_deliveries").select("id").eq("courier_id", data.userId).in("status", ["confirmed", "to_restaurant", "collected", "active"]).limit(1);
+  if (open.error) throw open.error;
+  if (open.data.length) throw new Error("O estafeta tem entregas em curso. Conclua ou cancele-as primeiro.");
+  const steps = [
+    () => supabaseAdmin.from("matturo_deliveries").update({ courier_id: null }).eq("courier_id", data.userId),
+    () => supabaseAdmin.from("matturo_order_events").update({ actor_id: null }).eq("actor_id", data.userId),
+    () => supabaseAdmin.from("matturo_courier_availability").delete().eq("user_id", data.userId),
+    () => supabaseAdmin.from("matturo_courier_push_tokens").delete().eq("user_id", data.userId),
+    () => supabaseAdmin.from("matturo_user_roles").delete().eq("user_id", data.userId),
+  ];
+  for (const step of steps) { const r = await step(); if (r.error) throw r.error; }
+  const removed = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+  if (removed.error) {
+    await supabaseAdmin.from("matturo_profiles").delete().eq("id", data.userId);
+    const retry = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (retry.error) throw retry.error;
+  }
+  return true;
+});

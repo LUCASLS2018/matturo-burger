@@ -4,7 +4,7 @@ import { ClientOnly, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { authorizeCourier, changeDelivery, deliveryDashboard, issueTrackingLink, recordPosition, setCourierAvailability, setDeliveryPayment } from "@/lib/delivery.functions";
+import { authorizeCourier, changeDelivery, deleteCourierAccount, deliveryDashboard, issueTrackingLink, recordPosition, setCourierAvailability, setDeliveryPayment } from "@/lib/delivery.functions";
 import { paymentFromNotes, paymentMethods } from "@/lib/payment-note";
 import { deliveryLabels, nextDeliveryState } from "@/lib/delivery";
 import { summarizeCourierDeliveries } from "@/lib/courier-delivery-stats";
@@ -199,6 +199,7 @@ export default function DeliveryPanel({ data }: { data: Data }) {
             <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Entregas hoje</p><p className="mt-1 text-2xl font-bold">{courier.delivered}</p></div>
             <div className="rounded-lg bg-secondary/60 p-3"><p className="text-xs text-muted-foreground">Em curso</p><p className="mt-1 text-2xl font-bold">{courier.active}</p></div>
           </div>
+          <Button size="sm" variant="outline" className="mt-3 w-full text-destructive" disabled={busy || courier.active > 0} title={courier.active > 0 ? "Tem entregas em curso" : undefined} onClick={() => { if (window.confirm(`Apagar definitivamente a conta de ${courier.name}? Ele deixa de conseguir entrar.`)) void run(() => deleteCourierAccount({ data: { userId: courier.id } })); }}>Apagar conta</Button>
         </article>;
       })}
       {!courierStats.length && <p className="col-span-full rounded-xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">Ainda não há estafetas autorizados.</p>}
